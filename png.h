@@ -716,6 +716,17 @@ typedef png_unknown_chunk * * png_unknown_chunkpp;
 #define PNG_sRGB_INTENT_ABSOLUTE   3
 #define PNG_sRGB_INTENT_LAST       4 /* Not a valid value */
 
+/* These are for the fcTL chunk.  These values should NOT be changed. */
+#define PNG_fcTL_DISPOSE_OP_NONE       0
+#define PNG_fcTL_DISPOSE_OP_BACKGROUND 1
+#define PNG_fcTL_DISPOSE_OP_PREVIOUS   2
+#define PNG_fcTL_DISPOSE_OP_LAST       3 /* Not a valid value */
+
+/* These are also for the fcTL chunk, and they should also NOT be changed. */
+#define PNG_fcTL_BLEND_OP_SOURCE       0
+#define PNG_fcTL_BLEND_OP_OVER         1
+#define PNG_fcTL_BLEND_OP_LAST         2 /* Not a valid value */
+
 /* This is for text chunks */
 #define PNG_KEYWORD_MAX_LENGTH     79
 
@@ -796,6 +807,10 @@ typedef PNG_CALLBACK(void, *png_write_status_ptr, (png_structp, png_uint_32,
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 typedef PNG_CALLBACK(void, *png_progressive_info_ptr, (png_structp, png_infop));
 typedef PNG_CALLBACK(void, *png_progressive_end_ptr, (png_structp, png_infop));
+#ifdef PNG_APNG_SUPPORTED
+typedef PNG_CALLBACK(void, *png_progressive_frame_ptr, (png_structp,
+    png_uint_32));
+#endif
 
 /* The following callback receives png_uint_32 row_number, int pass for the
  * png_bytep data of the row.  When transforming an interlaced image the
@@ -3337,6 +3352,75 @@ PNG_EXPORT(int, png_set_option, (png_structrp png_ptr, int option,
 /*******************************************************************************
  *  END OF HARDWARE AND SOFTWARE OPTIONS
  ******************************************************************************/
+
+#ifdef PNG_APNG_SUPPORTED
+PNG_EXPORT(png_uint_32, png_get_acTL, (png_structp png_ptr,
+   png_infop info_ptr, png_uint_32 *num_frames, png_uint_32 *num_plays));
+
+PNG_EXPORT(png_uint_32, png_set_acTL, (png_structp png_ptr,
+   png_infop info_ptr, png_uint_32 num_frames, png_uint_32 num_plays));
+
+PNG_EXPORT(png_uint_32, png_get_num_frames, (png_structp png_ptr,
+   png_infop info_ptr));
+
+PNG_EXPORT(png_uint_32, png_get_num_plays, (png_structp png_ptr,
+   png_infop info_ptr));
+
+PNG_EXPORT(png_uint_32, png_get_next_frame_fcTL,
+   (png_structp png_ptr, png_infop info_ptr, png_uint_32 *width,
+   png_uint_32 *height, png_uint_32 *x_offset, png_uint_32 *y_offset,
+   png_uint_16 *delay_num, png_uint_16 *delay_den, png_byte *dispose_op,
+   png_byte *blend_op));
+
+PNG_EXPORT(png_uint_32, png_set_next_frame_fcTL,
+   (png_structp png_ptr, png_infop info_ptr, png_uint_32 width,
+   png_uint_32 height, png_uint_32 x_offset, png_uint_32 y_offset,
+   png_uint_16 delay_num, png_uint_16 delay_den, png_byte dispose_op,
+   png_byte blend_op));
+
+PNG_EXPORT(png_uint_32, png_get_next_frame_width,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(png_uint_32, png_get_next_frame_height,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(png_uint_32, png_get_next_frame_x_offset,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(png_uint_32, png_get_next_frame_y_offset,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(png_uint_16, png_get_next_frame_delay_num,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(png_uint_16, png_get_next_frame_delay_den,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(png_byte, png_get_next_frame_dispose_op,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(png_byte, png_get_next_frame_blend_op,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(png_byte, png_get_first_frame_is_hidden,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(png_uint_32, png_set_first_frame_is_hidden,
+   (png_structp png_ptr, png_infop info_ptr, png_byte is_hidden));
+
+#ifdef PNG_READ_APNG_SUPPORTED
+PNG_EXPORT(void, png_read_frame_head, (png_structp png_ptr,
+   png_infop info_ptr));
+#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
+PNG_EXPORT(void, png_set_progressive_frame_fn, (png_structp png_ptr,
+   png_progressive_frame_ptr frame_info_fn,
+   png_progressive_frame_ptr frame_end_fn));
+#endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
+#endif /* PNG_READ_APNG_SUPPORTED */
+
+#ifdef PNG_WRITE_APNG_SUPPORTED
+PNG_EXPORT(void, png_write_frame_head, (png_structp png_ptr,
+   png_infop info_ptr, png_bytepp row_pointers,
+   png_uint_32 width, png_uint_32 height,
+   png_uint_32 x_offset, png_uint_32 y_offset,
+   png_uint_16 delay_num, png_uint_16 delay_den, png_byte dispose_op,
+   png_byte blend_op));
+
+PNG_EXPORT(void, png_write_frame_tail, (png_structp png_ptr,
+   png_infop info_ptr));
+#endif /* PNG_WRITE_APNG_SUPPORTED */
+#endif /* PNG_APNG_SUPPORTED */
 
 /* Maintainer: Put new public prototypes here ^, in libpng.3, in project
  * defs, and in scripts/symbols.def.

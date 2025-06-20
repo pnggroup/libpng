@@ -886,6 +886,12 @@ option SIMPLIFIED_WRITE_AFIRST enables FORMAT_AFIRST,
 option SIMPLIFIED_WRITE_BGR enables FORMAT_BGR,
    requires SIMPLIFIED_WRITE WRITE_BGR
 
+# APNG:
+option APNG
+option READ_APNG requires READ, APNG
+option WRITE_APNG requires WRITE, APNG
+# TODO: Enumerate the APNG chunk types in a dedicated chunk section.
+
 # Formats:
 option FORMAT_AFIRST disabled
 option FORMAT_BGR disabled

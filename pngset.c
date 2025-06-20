@@ -451,6 +451,13 @@ png_set_IHDR(png_const_structrp png_ptr, png_inforp info_ptr,
    info_ptr->pixel_depth = (png_byte)(info_ptr->channels * info_ptr->bit_depth);
 
    info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth, width);
+
+#ifdef PNG_APNG_SUPPORTED
+   /* Assume a non-animated PNG in the beginning. This may be overridden after
+    * seeing an acTL chunk later.
+    */
+   info_ptr->num_frames = 1;
+#endif
 }
 
 #ifdef PNG_oFFs_SUPPORTED
@@ -1305,6 +1312,144 @@ png_set_sPLT(png_const_structrp png_ptr,
       png_chunk_report(png_ptr, "sPLT out of memory", PNG_CHUNK_WRITE_ERROR);
 }
 #endif /* sPLT */
+
+#ifdef PNG_APNG_SUPPORTED
+png_uint_32 PNGAPI
+png_set_acTL(png_structp png_ptr, png_infop info_ptr,
+             png_uint_32 num_frames, png_uint_32 num_plays)
+{
+   png_debug1(1, "in %s storage function", "acTL");
+
+   if (png_ptr == NULL || info_ptr == NULL)
+   {
+      png_warning(png_ptr,
+                  "Ignoring call to png_set_acTL with NULL libpng object args");
+      return 0;
+   }
+   if (num_frames == 0)
+   {
+      png_warning(png_ptr,
+                  "Ignoring attempt to set acTL with num_frames zero");
+      return 0;
+   }
+   if (num_frames > PNG_UINT_31_MAX)
+   {
+      png_warning(png_ptr,
+                  "Ignoring attempt to set acTL with num_frames > 2^31-1");
+      return 0;
+   }
+   if (num_plays > PNG_UINT_31_MAX)
+   {
+      png_warning(png_ptr,
+                  "Ignoring attempt to set acTL with num_plays > 2^31-1");
+      return 0;
+   }
+
+   info_ptr->num_frames = num_frames;
+   info_ptr->num_plays = num_plays;
+
+   info_ptr->valid |= PNG_INFO_acTL;
+
+   return 1;
+}
+
+png_uint_32 PNGAPI
+png_set_next_frame_fcTL(png_structp png_ptr, png_infop info_ptr,
+                        png_uint_32 width, png_uint_32 height,
+                        png_uint_32 x_offset, png_uint_32 y_offset,
+                        png_uint_16 delay_num, png_uint_16 delay_den,
+                        png_byte dispose_op, png_byte blend_op)
+{
+   png_debug1(1, "in %s storage function", "fcTL");
+
+   if (png_ptr == NULL || info_ptr == NULL)
+   {
+      png_warning(png_ptr,
+                  "Ignoring call to png_set_fcTL with NULL libpng object args");
+      return 0;
+   }
+
+   png_ensure_fcTL_is_valid(png_ptr, width, height, x_offset, y_offset,
+                            delay_num, delay_den, dispose_op, blend_op);
+
+   /* No checking is required for delay_num and delay_den.
+    * They can hold any 16-bit value, including zero.
+    */
+
+   if (blend_op == PNG_fcTL_BLEND_OP_OVER)
+   {
+      if (!(png_ptr->color_type & PNG_COLOR_MASK_ALPHA) &&
+          !(png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)))
+      {
+         png_warning(png_ptr,
+                     "Ignoring wasteful fcTL BLEND_OP_OVER in opaque images");
+         blend_op = PNG_fcTL_BLEND_OP_SOURCE;
+      }
+   }
+
+   info_ptr->next_frame_width = width;
+   info_ptr->next_frame_height = height;
+   info_ptr->next_frame_x_offset = x_offset;
+   info_ptr->next_frame_y_offset = y_offset;
+   info_ptr->next_frame_delay_num = delay_num;
+   info_ptr->next_frame_delay_den = delay_den;
+   info_ptr->next_frame_dispose_op = dispose_op;
+   info_ptr->next_frame_blend_op = blend_op;
+
+   info_ptr->valid |= PNG_INFO_fcTL;
+
+   return 1;
+}
+
+void /* PRIVATE */
+png_ensure_fcTL_is_valid(png_structp png_ptr,
+                         png_uint_32 width, png_uint_32 height,
+                         png_uint_32 x_offset, png_uint_32 y_offset,
+                         png_uint_16 delay_num, png_uint_16 delay_den,
+                         png_byte dispose_op, png_byte blend_op)
+{
+   if (width == 0 || width > PNG_UINT_31_MAX)
+      png_error(png_ptr, "Invalid frame width in fcTL");
+   if (height == 0 || height > PNG_UINT_31_MAX)
+      png_error(png_ptr, "Invalid frame height in fcTL");
+   if (x_offset > PNG_UINT_31_MAX || y_offset > PNG_UINT_31_MAX)
+      png_error(png_ptr, "Invalid frame offset in fcTL");
+   if (width + x_offset > png_ptr->first_frame_width ||
+       height + y_offset > png_ptr->first_frame_height)
+      png_error(png_ptr, "Oversized frame in fcTL");
+
+   if (dispose_op != PNG_fcTL_DISPOSE_OP_NONE &&
+       dispose_op != PNG_fcTL_DISPOSE_OP_BACKGROUND &&
+       dispose_op != PNG_fcTL_DISPOSE_OP_PREVIOUS)
+      png_error(png_ptr, "Invalid dispose_op in fcTL");
+
+   if (blend_op != PNG_fcTL_BLEND_OP_SOURCE &&
+       blend_op != PNG_fcTL_BLEND_OP_OVER)
+      png_error(png_ptr, "Invalid blend_op in fcTL");
+
+   PNG_UNUSED(delay_num)
+   PNG_UNUSED(delay_den)
+}
+
+png_uint_32 PNGAPI
+png_set_first_frame_is_hidden(png_structp png_ptr, png_infop info_ptr,
+                              png_byte is_hidden)
+{
+   png_debug(1, "in png_first_frame_is_hidden");
+
+   if (png_ptr == NULL)
+      return 0;
+
+   if (is_hidden)
+      png_ptr->apng_flags |= PNG_FIRST_FRAME_HIDDEN;
+   else
+      png_ptr->apng_flags &= ~PNG_FIRST_FRAME_HIDDEN;
+
+   PNG_UNUSED(info_ptr)
+
+   return 1;
+}
+#endif /* PNG_APNG_SUPPORTED */
 
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
 static png_byte
