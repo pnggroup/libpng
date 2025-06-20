@@ -1428,20 +1428,22 @@ PNG_INTERNAL_FUNCTION(void,png_ensure_fcTL_is_valid,(png_structp png_ptr,
    png_byte dispose_op, png_byte blend_op), PNG_EMPTY);
 
 #ifdef PNG_READ_APNG_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_handle_acTL,(png_structp png_ptr, png_infop info_ptr,
-   png_uint_32 length),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_handle_fcTL,(png_structp png_ptr, png_infop info_ptr,
-   png_uint_32 length),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_handle_fdAT,(png_structp png_ptr, png_infop info_ptr,
-   png_uint_32 length),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_have_info,(png_structp png_ptr, png_infop info_ptr),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_handle_acTL,(png_structp png_ptr,
+   png_infop info_ptr, png_uint_32 length),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_handle_fcTL,(png_structp png_ptr,
+   png_infop info_ptr, png_uint_32 length),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_handle_fdAT,(png_structp png_ptr,
+   png_infop info_ptr, png_uint_32 length),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_have_info,(png_structp png_ptr,
+   png_infop info_ptr),PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void,png_ensure_sequence_number,(png_structp png_ptr,
    png_uint_32 length),PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void,png_read_reset,(png_structp png_ptr),PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void,png_read_reinit,(png_structp png_ptr,
    png_infop info_ptr),PNG_EMPTY);
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_progressive_read_reset,(png_structp png_ptr),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_progressive_read_reset,(png_structp png_ptr),
+   PNG_EMPTY);
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 #endif /* PNG_READ_APNG_SUPPORTED */
 

@@ -1370,10 +1370,10 @@ png_get_acTL(png_structp png_ptr, png_infop info_ptr,
    {
       *num_frames = info_ptr->num_frames;
       *num_plays = info_ptr->num_plays;
-      return (1);
+      return 1;
    }
 
-   return (0);
+   return 0;
 }
 
 png_uint_32 PNGAPI
@@ -1382,8 +1382,8 @@ png_get_num_frames(png_structp png_ptr, png_infop info_ptr)
    png_debug(1, "in png_get_num_frames");
 
    if (png_ptr != NULL && info_ptr != NULL)
-      return (info_ptr->num_frames);
-   return (0);
+      return info_ptr->num_frames;
+   return 0;
 }
 
 png_uint_32 PNGAPI
@@ -1392,8 +1392,8 @@ png_get_num_plays(png_structp png_ptr, png_infop info_ptr)
    png_debug(1, "in png_get_num_plays");
 
    if (png_ptr != NULL && info_ptr != NULL)
-      return (info_ptr->num_plays);
-   return (0);
+      return info_ptr->num_plays;
+   return 0;
 }
 
 png_uint_32 PNGAPI
@@ -1420,10 +1420,10 @@ png_get_next_frame_fcTL(png_structp png_ptr, png_infop info_ptr,
       *delay_den = info_ptr->next_frame_delay_den;
       *dispose_op = info_ptr->next_frame_dispose_op;
       *blend_op = info_ptr->next_frame_blend_op;
-      return (1);
+      return 1;
    }
 
-   return (0);
+   return 0;
 }
 
 png_uint_32 PNGAPI
@@ -1432,8 +1432,8 @@ png_get_next_frame_width(png_structp png_ptr, png_infop info_ptr)
    png_debug(1, "in png_get_next_frame_width");
 
    if (png_ptr != NULL && info_ptr != NULL)
-      return (info_ptr->next_frame_width);
-   return (0);
+      return info_ptr->next_frame_width;
+   return 0;
 }
 
 png_uint_32 PNGAPI
@@ -1442,8 +1442,8 @@ png_get_next_frame_height(png_structp png_ptr, png_infop info_ptr)
    png_debug(1, "in png_get_next_frame_height");
 
    if (png_ptr != NULL && info_ptr != NULL)
-      return (info_ptr->next_frame_height);
-   return (0);
+      return info_ptr->next_frame_height;
+   return 0;
 }
 
 png_uint_32 PNGAPI
@@ -1452,8 +1452,8 @@ png_get_next_frame_x_offset(png_structp png_ptr, png_infop info_ptr)
    png_debug(1, "in png_get_next_frame_x_offset");
 
    if (png_ptr != NULL && info_ptr != NULL)
-      return (info_ptr->next_frame_x_offset);
-   return (0);
+      return info_ptr->next_frame_x_offset;
+   return 0;
 }
 
 png_uint_32 PNGAPI
@@ -1462,8 +1462,8 @@ png_get_next_frame_y_offset(png_structp png_ptr, png_infop info_ptr)
    png_debug(1, "in png_get_next_frame_y_offset");
 
    if (png_ptr != NULL && info_ptr != NULL)
-      return (info_ptr->next_frame_y_offset);
-   return (0);
+      return info_ptr->next_frame_y_offset;
+   return 0;
 }
 
 png_uint_16 PNGAPI
@@ -1472,8 +1472,8 @@ png_get_next_frame_delay_num(png_structp png_ptr, png_infop info_ptr)
    png_debug(1, "in png_get_next_frame_delay_num");
 
    if (png_ptr != NULL && info_ptr != NULL)
-      return (info_ptr->next_frame_delay_num);
-   return (0);
+      return info_ptr->next_frame_delay_num;
+   return 0;
 }
 
 png_uint_16 PNGAPI
@@ -1482,8 +1482,8 @@ png_get_next_frame_delay_den(png_structp png_ptr, png_infop info_ptr)
    png_debug(1, "in png_get_next_frame_delay_den");
 
    if (png_ptr != NULL && info_ptr != NULL)
-      return (info_ptr->next_frame_delay_den);
-   return (0);
+      return info_ptr->next_frame_delay_den;
+   return 0;
 }
 
 png_byte PNGAPI
@@ -1492,8 +1492,8 @@ png_get_next_frame_dispose_op(png_structp png_ptr, png_infop info_ptr)
    png_debug(1, "in png_get_next_frame_dispose_op");
 
    if (png_ptr != NULL && info_ptr != NULL)
-      return (info_ptr->next_frame_dispose_op);
-   return (0);
+      return info_ptr->next_frame_dispose_op;
+   return 0;
 }
 
 png_byte PNGAPI
@@ -1502,8 +1502,8 @@ png_get_next_frame_blend_op(png_structp png_ptr, png_infop info_ptr)
    png_debug(1, "in png_get_next_frame_blend_op");
 
    if (png_ptr != NULL && info_ptr != NULL)
-      return (info_ptr->next_frame_blend_op);
-   return (0);
+      return info_ptr->next_frame_blend_op;
+   return 0;
 }
 
 png_byte PNGAPI

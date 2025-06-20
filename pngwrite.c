@@ -1505,10 +1505,11 @@ png_write_frame_head(png_structp png_ptr, png_infop info_ptr,
 {
    png_debug(1, "in png_write_frame_head");
 
-   /* there is a chance this has been set after png_write_info was called,
-   * so it would be set but not written. is there a way to be sure? */
+   /* There is a chance this has been set after png_write_info was called,
+    * so it would be set but not written. Is there a way to be sure?
+    */
    if (!(info_ptr->valid & PNG_INFO_acTL))
-      png_error(png_ptr, "png_write_frame_head(): acTL not set");
+      png_error(png_ptr, "Cannot write APNG frame: missing acTL");
 
    png_write_reset(png_ptr);
 
