@@ -194,13 +194,12 @@ png_read_frame_head(png_structp png_ptr, png_infop info_ptr)
 {
    png_byte have_chunk_after_DAT; /* after IDAT or after fdAT */
 
-   png_debug(0, "Reading frame head");
+   png_debug(1, "Reading frame head");
 
    if (!(png_ptr->mode & PNG_HAVE_acTL))
-      png_error(png_ptr, "attempt to png_read_frame_head() but "
-                         "no acTL present");
+      png_error(png_ptr, "Cannot read APNG frame: missing acTL");
 
-   /* do nothing for the main IDAT */
+   /* Do nothing for the main IDAT. */
    if (png_ptr->num_frames_read == 0)
       return;
 
@@ -215,39 +214,39 @@ png_read_frame_head(png_structp png_ptr, png_infop info_ptr)
 
       if (png_ptr->chunk_name == png_IDAT)
       {
-         /* discard trailing IDATs for the first frame */
+         /* Discard trailing IDATs for the first frame. */
          if (have_chunk_after_DAT || png_ptr->num_frames_read > 1)
-            png_error(png_ptr, "png_read_frame_head(): out of place IDAT");
+            png_error(png_ptr, "Misplaced IDAT in APNG stream");
          png_crc_finish(png_ptr, length);
       }
-
       else if (png_ptr->chunk_name == png_fcTL)
       {
          png_handle_fcTL(png_ptr, info_ptr, length);
          have_chunk_after_DAT = 1;
       }
-
       else if (png_ptr->chunk_name == png_fdAT)
       {
          png_ensure_sequence_number(png_ptr, length);
 
-         /* discard trailing fdATs for frames other than the first */
+         /* Discard trailing fdATs for all frames except the first. */
          if (!have_chunk_after_DAT && png_ptr->num_frames_read > 1)
+         {
             png_crc_finish(png_ptr, length - 4);
+         }
          else if (png_ptr->mode & PNG_HAVE_fcTL)
          {
             png_ptr->idat_size = length - 4;
             png_ptr->mode |= PNG_HAVE_IDAT;
-
             break;
          }
          else
-            png_error(png_ptr, "png_read_frame_head(): out of place fdAT");
+         {
+            png_error(png_ptr, "Misplaced fdAT in APNG stream");
+         }
       }
       else
       {
-         png_warning(png_ptr, "Skipped (ignored) a chunk "
-                              "between APNG chunks");
+         png_warning(png_ptr, "Ignoring unexpected chunk in APNG sequence");
          png_crc_finish(png_ptr, length);
       }
    }

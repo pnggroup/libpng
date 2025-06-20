@@ -1543,8 +1543,8 @@ test_one_file(const char *inname, const char *outname)
             y_offset = 0;
             delay_num = 1;
             delay_den = 1;
-            dispose_op = PNG_DISPOSE_OP_NONE;
-            blend_op = PNG_BLEND_OP_SOURCE;
+            dispose_op = PNG_fcTL_DISPOSE_OP_NONE;
+            blend_op = PNG_fcTL_BLEND_OP_SOURCE;
          }
 #ifdef PNG_WRITE_APNG_SUPPORTED
          png_write_frame_head(write_ptr, write_info_ptr, (png_bytepp)&row_buf,
@@ -1577,15 +1577,16 @@ test_one_file(const char *inname, const char *outname)
             for (y = 0; y < pass_height; y++)
             {
 #ifndef SINGLE_ROWBUF_ALLOC
-               pngtest_debug2("Allocating row buffer (pass %d, y = %u)...", pass, y);
+               pngtest_debug2("Allocating row buffer (pass %d, y = %u)...",
+                              pass, y);
 
                row_buf = (png_bytep)png_malloc(read_ptr,
                   png_get_rowbytes(read_ptr, read_info_ptr));
 
                pngtest_debug2("\t0x%08lx (%lu bytes)", (unsigned long)row_buf,
                   (unsigned long)png_get_rowbytes(read_ptr, read_info_ptr));
-
 #endif /* !SINGLE_ROWBUF_ALLOC */
+
                png_read_rows(read_ptr, (png_bytepp)&row_buf, NULL, 1);
 
 #ifdef PNG_WRITE_SUPPORTED
@@ -1608,6 +1609,9 @@ test_one_file(const char *inname, const char *outname)
                row_buf = NULL;
 #endif /* !SINGLE_ROWBUF_ALLOC */
             }
+#           ifdef pass_height
+#              undef pass_height
+#           endif
          }
 #ifdef PNG_WRITE_APNG_SUPPORTED
          png_write_frame_tail(write_ptr, write_info_ptr);
@@ -1667,6 +1671,9 @@ test_one_file(const char *inname, const char *outname)
          png_free(read_ptr, row_buf);
          row_buf = NULL;
       }
+#     ifdef pass_height
+#        undef pass_height
+#     endif
    }
 
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
