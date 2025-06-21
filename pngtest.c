@@ -877,7 +877,7 @@ test_one_file(const char *inname, const char *outname)
    int bit_depth, color_type;
    user_chunk_info my_user_chunk_data;
    int pass, num_passes;
-#ifdef PNG_APNG_SUPPORTED
+#ifdef PNG_READ_APNG_SUPPORTED
    png_uint_32 num_frames;
    png_uint_32 num_plays;
 #endif
@@ -1442,7 +1442,7 @@ test_one_file(const char *inname, const char *outname)
    }
 #endif
 
-#ifdef PNG_APNG_SUPPORTED
+#ifdef PNG_READ_APNG_SUPPORTED
    if (png_get_valid(read_ptr, read_info_ptr, PNG_INFO_acTL))
    {
       if (png_get_acTL(read_ptr, read_info_ptr, &num_frames, &num_plays))
@@ -1516,7 +1516,7 @@ test_one_file(const char *inname, const char *outname)
    t_misc += (t_stop - t_start);
    t_start = t_stop;
 #endif
-#ifdef PNG_APNG_SUPPORTED
+#ifdef PNG_READ_APNG_SUPPORTED
    if (png_get_valid(read_ptr, read_info_ptr, PNG_INFO_acTL))
    {
       png_uint_32 frame;
