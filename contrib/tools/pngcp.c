@@ -1,6 +1,6 @@
 /* pngcp.c
  *
- * Copyright (c) 2016,2022,2024 John Cunningham Bowler
+ * Copyright (c) 2016,2022,2024,2025 John Cunningham Bowler
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -1771,6 +1771,80 @@ read_png(struct display *dp, const char *filename)
          png_set_check_for_invalid_index(dp->read_pp, -1/*off completely*/);
 #  endif /* IGNORE_INDEX */
 
+   /* CHUNK HANDLING
+    * ==============
+    *
+    * This code makes every ancillary chunk unknown and "save if safe" then sets
+    * the unsafe-to-copy chunks that we **known** are safe for pngcp to copy to
+    * also be saved.
+    *
+    * This requires 'HANDLE_AS_UNKNOWN'; if not available the original code
+    * which just copies everything will be used.  The problem with this is
+    * that it will copy chunks we don't handle, there's no way round this
+    * without handle as unknown support.
+    */
+#   ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+         /* Step 1: tell libpng to apply the default 'unknown' handling to all
+          * the ancillary chunks (except tRNS) that it knows about.  At the
+          * same time make the default handling be to preserve the chunk
+          * only if it is safe.
+          *
+          * NOTE: a call to png_set_keep_unknown_chunks with a 0 or negative
+          * count (so no chunks given) sets the default handling for unknown
+          * chunks.  When the count is negative it *also* sets explicit handling
+          * for all the known non-critical chunks except tRNS to the given
+          * behaviour.
+          */
+        png_set_keep_unknown_chunks(dp->read_pp, PNG_HANDLE_CHUNK_IF_SAFE, NULL,
+           -1);
+
+        /* Step 2: for the not-safe-to-copy chunks pngcp knows about
+         * (as opposed to the ones libpng knows about) set the behavior
+         * explicitly.
+         *
+         * This is needed because even libpng **minor** revisions add chunks
+         * and these are frequently not safe to copy!  So if libpng adds
+         * handling for something we don't know about to be safe pngcp has to
+         * **not** copy it.
+         *
+         * This is also why previous versions of pngcp were wrong; they would
+         * copy new unsafe-to-copy chunks.  This is also why pngcp is still
+         * wrong if HANDLE_AS_UNKNOWN is not supported - there's no way to fix
+         * that bug!
+         *
+         * The list below has been shamelessly copied from pngset.c.  At
+         * present none of the 'unsafe-to-copy' chunks need to be removed as a
+         * result of pngcp recompressing the IDAT chunks.  This would not
+         * apply if it recompressed the fdAT chunks, but then it would get
+         * the sequence numbers right so this wouldn't matter.
+         */
+         static const png_byte chunks_to_keep[] = {
+             97,  99,  84,  76, '\0',  /* acTL */
+             98,  75,  71,  68, '\0',  /* bKGD */
+             99,  72,  82,  77, '\0',  /* cHRM */
+             99,  73,  67,  80, '\0',  /* cICP */
+             99,  76,  76,  73, '\0',  /* cLLI */
+            101,  88,  73, 102, '\0',  /* eXIf */
+            102,  99,  84,  76, '\0',  /* fcTL */
+            102, 100,  65,  84, '\0',  /* fdAT */
+            103,  65,  77,  65, '\0',  /* gAMA */
+            104,  73,  83,  84, '\0',  /* hIST */
+            105,  67,  67,  80, '\0',  /* iCCP */
+            109,  68,  67,  86, '\0',  /* mDCV */
+            112,  67,  65,  76, '\0',  /* pCAL */
+            115,  66,  73,  84, '\0',  /* sBIT */
+            115,  67,  65,  76, '\0',  /* sCAL */
+            115,  80,  76,  84, '\0',  /* sPLT */
+            115,  84,  69,  82, '\0',  /* sTER */
+            115,  82,  71,  66, '\0',  /* sRGB */
+            116,  73,  77,  69, '\0'   /* tIME */
+         };
+
+
+        png_set_keep_unknown_chunks(dp->read_pp, PNG_HANDLE_CHUNK_ALWAYS,
+           chunks_to_keep, (unsigned int)/*SAFE*/(sizeof chunks_to_keep)/5U);
+#   endif /* HANDLE_AS_UNKNOWN_SUPPORTED */
+
    if (dp->ip != NULL)
    {
       /* UNEXPECTED: some problem in the display_clean function calls! */
@@ -2032,6 +2106,10 @@ write_png(struct display *dp, const char *destname)
    text_restore(dp);
 
 #  ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+      /* dp->read_pp set up the handle as unknown support to only write
+       * chunks that pngcp knows to be safe to copy into unknown, so this
+       * just works:
+       */
       png_set_keep_unknown_chunks(dp->write_pp, PNG_HANDLE_CHUNK_ALWAYS, NULL,
             0);
 #  endif /* HANDLE_AS_UNKNOWN */
