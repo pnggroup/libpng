@@ -4928,7 +4928,7 @@ png_read_reinit(png_structp png_ptr, png_infop info_ptr)
    png_ptr->height = info_ptr->next_frame_height;
    png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth,png_ptr->width);
    if (png_ptr->info_rowbytes != 0)
-      png_ptr->info_rowbytes =
+      png_ptr->info_rowbytes = info_ptr->rowbytes =
          PNG_ROWBYTES(info_ptr->pixel_depth, png_ptr->width);
    if (png_ptr->prev_row)
       memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
