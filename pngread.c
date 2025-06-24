@@ -790,7 +790,13 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
       png_uint_32 chunk_name = png_ptr->chunk_name;
 
       if (chunk_name != png_IDAT)
-         png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
+      {
+         /* Some of the chunk handlers for non-IDAT used to do this if
+          * PNG_HAVE_IDAT was set.  It needs to happen consistently including
+          * for 'unknown' chunks.
+          */
+         png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT | PNG_AFTER_IDAT;
+      }
 
       if (chunk_name == png_IEND)
          png_handle_chunk(png_ptr, info_ptr, length);
