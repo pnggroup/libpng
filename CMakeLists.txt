@@ -332,9 +332,6 @@ if(PNG_HARDWARE_OPTIMIZATIONS)
       message(FATAL_ERROR "PNG_RISCV_RVV must be one of [${PNG_RISCV_RVV_POSSIBLE_VALUES}]")
     elseif(NOT PNG_RISCV_RVV STREQUAL "off")
 
-      set(_SAVED_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
-      set(CMAKE_REQUIRED_FLAGS "-march=rv64gv1p0")
-
       check_c_source_compiles("
         #include <riscv_vector.h>
         #include <asm/hwcap.h>
@@ -348,8 +345,6 @@ if(PNG_HARDWARE_OPTIMIZATIONS)
           vfloat32m1_t val = __riscv_vle32_v_f32m1((const float*)(src), 4);
           return (int)__riscv_vfmv_f_s_f32m1_f32(val);
       }" COMPILER_SUPPORTS_RVV)
-
-      set(CMAKE_REQUIRED_FLAGS ${_SAVED_CMAKE_REQUIRED_FLAGS})
 
       if(NOT COMPILER_SUPPORTS_RVV)
         message(FATAL_ERROR "Compiler does not support RISC-V Vector extension or its unable to detect it")
