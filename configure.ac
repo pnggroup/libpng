@@ -679,8 +679,7 @@ AS_HELP_STRING([[[--enable-riscv-rvv]]],
       [Enable RISC-V Vector optimizations: =no/off, check, api, yes/on:]
       [no/off: disable the optimizations; check: use internal checking code]
       [api: disable by default, enable by a call to png_set_option]
-      [yes/on: turn on unconditionally.]
-      [If not specified: determined by the compiler.]),
+      [yes/on: turn on. If not specified: determined by the compiler.]),
    [case "$enableval" in
       no|off)
          # disable the default enabling on __riscv systems:
@@ -688,20 +687,11 @@ AS_HELP_STRING([[[--enable-riscv-rvv]]],
                    [Disable RISC-V Vector optimizations])
          # Prevent inclusion of the platform-specific files below:
          enable_riscv_rvv=no ;;
-      check)
-         AC_DEFINE([PNG_RISCV_RVV_CHECK_SUPPORTED], [],
-                   [Check for RISC-V Vector support at run-time])
-         AC_MSG_WARN([--enable-riscv-rvv Please check contrib/riscv-rvv/README file]
-            [for the list of supported OSes.]);;
-      api)
-         AC_DEFINE([PNG_RISCV_RVV_API_SUPPORTED], [],
-                   [Turn on RISC-V Vector optimizations at run-time]);;
       yes|on)
          AC_DEFINE([PNG_RISCV_RVV_OPT], [2],
                    [Enable RISC-V Vector optimizations])
-         AC_MSG_WARN([--enable-riscv-rvv: please specify 'check' or 'api', if]
-            [you want the optimizations unconditionally pass e.g. '-march=rv64gv1p0']
-            [to the compiler.]);;
+         AC_MSG_WARN([--enable-riscv-rvv:]
+            [if you want the optimizations pass e.g. '-march=rv64gv1p0' to the compiler.]);;
       *)
          AC_MSG_ERROR([--enable-riscv-rvv=${enable_riscv_rvv}: invalid value])
    esac])
