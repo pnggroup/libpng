@@ -19,6 +19,7 @@ Authors, for copyright and licensing purposes.
  * John Bowler
  * Kevin Bracey
  * Lucas Chollet
+ * Maarten Bent
  * Magnus Holmgren
  * Mandar Sahastrabuddhe
  * Manfred Schlaegl
