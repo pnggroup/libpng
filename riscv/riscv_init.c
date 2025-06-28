@@ -26,7 +26,7 @@
 #  endif
 #endif
 
-static int png_have_rvv(png_structp png_ptr);
+static int png_have_rvv();
 #ifdef PNG_RISCV_RVV_FILE
 #  include PNG_RISCV_RVV_FILE
 #endif
@@ -43,7 +43,7 @@ png_init_filter_functions_rvv(png_structp pp, unsigned int bpp)
    static volatile sig_atomic_t no_rvv = -1; /* not checked */
 
    if (no_rvv < 0)
-      no_rvv = !png_have_rvv(pp);
+      no_rvv = !png_have_rvv();
 
    if (no_rvv)
       return;
