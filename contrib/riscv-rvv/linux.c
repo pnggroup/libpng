@@ -25,7 +25,7 @@
 #endif
 
 static int
-png_have_rvv(png_structp png_ptr) {
+png_have_rvv() {
 #if defined(__linux__)
    return getauxval (AT_HWCAP) & COMPAT_HWCAP_ISA_V ? 1 : 0;
 #else
