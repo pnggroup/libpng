@@ -108,12 +108,6 @@
 /* Enable POWERPC VSX optimizations */
 #undef PNG_POWERPC_VSX_OPT
 
-/* Turn on RISC-V Vector optimizations at run-time */
-#undef PNG_RISCV_RVV_API_SUPPORTED
-
-/* Check for RISC-V Vector support at run-time */
-#undef PNG_RISCV_RVV_CHECK_SUPPORTED
-
 /* Enable RISCV RVV optimizations */
 #undef PNG_RISCV_RVV_OPT
 
