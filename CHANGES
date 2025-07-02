@@ -6278,6 +6278,8 @@ Version 1.6.50 [July 1, 2025]
     (Contributed by John Bowler)
   Fixed the CMake file for cross-platform builds that require `libm`.
 
+Version 1.6.51 [TODO]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
