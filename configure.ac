@@ -707,10 +707,6 @@ then
 
    AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
 #include <riscv_vector.h>
-#include <asm/hwcap.h>
-#ifndef COMPAT_HWCAP_ISA_V /* added in linux-6.5 */
-#error "COMPAT_HWCAP_ISA_V is not available"
-#endif
 int main() {
    const float src[] = { 0.0f, 0.0f, 0.0f, 0.0f };
    uint64_t ptr[2] = {0x0908060504020100, 0xFFFFFFFF0E0D0C0A};
