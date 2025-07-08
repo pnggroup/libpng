@@ -303,6 +303,7 @@
 #endif
 
 #if PNG_RISCV_RVV_OPT > 0
+#if __riscv_v >= 1000000 && __riscv_v < 1900000
 #  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_rvv
 #  ifndef PNG_RISCV_RVV_IMPLEMENTATION
       /* Use the intrinsics code by default. */
@@ -310,7 +311,8 @@
 #  endif
 #else
 #  define PNG_RISCV_RVV_IMPLEMENTATION 0
-#endif
+#endif /* __riscv_v >= 1000000 && __riscv_v < 1900000 */
+#endif /* PNG_RISCV_RVV_OPT > 0 */
 
 /* Is this a build of a DLL where compilation of the object modules requires
  * different preprocessor settings to those required for a simple library?  If
@@ -1546,7 +1548,7 @@ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_lsx,(png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
 #endif
 
-#if PNG_RISCV_RVV_OPT > 0
+#if PNG_RISCV_RVV_IMPLEMENTATION == 1
 PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_rvv,(png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_rvv,(png_row_infop
@@ -2175,7 +2177,7 @@ PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_lsx,
     (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
 #endif
 
-#  if PNG_RISCV_RVV_OPT > 0
+#  if PNG_RISCV_RVV_IMPLEMENTATION == 1
 PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_rvv,
    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
 #endif

@@ -12,7 +12,7 @@
 
 #ifdef PNG_READ_SUPPORTED
 
-#if PNG_RISCV_RVV_IMPLEMENTATION > 0
+#if PNG_RISCV_RVV_IMPLEMENTATION == 1
 
 #include <riscv_vector.h>
 
@@ -23,7 +23,6 @@
 void
 png_init_filter_functions_rvv(png_structp pp, unsigned int bpp)
 {
-#if __riscv_v == 1000000
    png_debug(1, "in png_init_filter_functions_rvv");
 
    pp->read_filter[PNG_FILTER_VALUE_UP-1] = png_read_filter_row_up_rvv;
@@ -40,11 +39,7 @@ png_init_filter_functions_rvv(png_structp pp, unsigned int bpp)
       pp->read_filter[PNG_FILTER_VALUE_PAETH-1] = png_read_filter_row_paeth4_rvv;
       pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub4_rvv;
    }
-#else
-   PNG_UNUSED(pp);
-   PNG_UNUSED(bpp);
-#endif /* __riscv_v == 1000000 */
 }
 
-#endif /* PNG_RISCV_RVV_IMPLEMENTATION > 0 */
+#endif /* PNG_RISCV_RVV_IMPLEMENTATION == 1 */
 #endif /* PNG_READ_SUPPORTED */
