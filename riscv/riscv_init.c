@@ -12,24 +12,9 @@
 
 #ifdef PNG_READ_SUPPORTED
 
-#if PNG_RISCV_RVV_OPT > 0
+#if PNG_RISCV_RVV_IMPLEMENTATION == 1
 
 #include <riscv_vector.h>
-
-#include <signal.h>
-
-#ifndef PNG_RISCV_RVV_FILE
-#  if defined(__linux__)
-#    define PNG_RISCV_RVV_FILE "contrib/riscv-rvv/linux.c"
-#  else
-#    error "No support for run-time RISC-V Vector checking; use compile-time options"
-#  endif
-#endif
-
-static int png_have_rvv();
-#ifdef PNG_RISCV_RVV_FILE
-#  include PNG_RISCV_RVV_FILE
-#endif
 
 #ifndef PNG_ALIGNED_MEMORY_SUPPORTED
 #  error "ALIGNED_MEMORY is required; set: -DPNG_ALIGNED_MEMORY_SUPPORTED"
@@ -39,14 +24,6 @@ void
 png_init_filter_functions_rvv(png_structp pp, unsigned int bpp)
 {
    png_debug(1, "in png_init_filter_functions_rvv");
-
-   static volatile sig_atomic_t no_rvv = -1; /* not checked */
-
-   if (no_rvv < 0)
-      no_rvv = !png_have_rvv();
-
-   if (no_rvv)
-      return;
 
    pp->read_filter[PNG_FILTER_VALUE_UP-1] = png_read_filter_row_up_rvv;
 
@@ -64,5 +41,5 @@ png_init_filter_functions_rvv(png_structp pp, unsigned int bpp)
    }
 }
 
-#endif /* PNG_RISCV_RVV_OPT > 0 */
+#endif /* PNG_RISCV_RVV_IMPLEMENTATION == 1 */
 #endif /* PNG_READ_SUPPORTED */
