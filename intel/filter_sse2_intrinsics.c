@@ -51,10 +51,6 @@ static void store3(void* p, __m128i v) {
 void png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
 {
-   /* The Sub filter predicts each pixel as the previous pixel, a.
-    * There is no pixel to the left of the first pixel.  It's encoded directly.
-    * That works with our main loop if we just say that left pixel was zero.
-    */
    size_t rb;
 
    __m128i a, d = _mm_setzero_si128();
@@ -62,25 +58,31 @@ void png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
    png_debug(1, "in png_read_filter_row_sub3_sse2");
 
    rb = row_info->rowbytes;
-   while (rb >= 4) {
-      a = d; d = load4(row);
+
+   while (rb >= 3) {
+      a = d;
+      d = load4(row);
       d = _mm_add_epi8(d, a);
       store3(row, d);
 
       row += 3;
       rb  -= 3;
    }
+
+   /* Scalar fallback for trailing 1–2 bytes */
    if (rb > 0) {
-      a = d; d = load3(row);
-      d = _mm_add_epi8(d, a);
-      store3(row, d);
+      png_bytep p = row;
+      png_bytep q = row - 3;  /* previous pixel */
 
-      row += 3;
-      rb  -= 3;
+      if (rb >= 1)
+         p[0] = (png_byte)(p[0] + q[0]);
+
+      if (rb == 2)
+         p[1] = (png_byte)(p[1] + q[1]);
    }
-   PNG_UNUSED(prev)
-}
 
+   PNG_UNUSED(prev);
+}
 void png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
 {
