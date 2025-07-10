@@ -126,7 +126,8 @@ png_malloc_array_checked(png_const_structrp png_ptr, int nelements,
 if (nelements <= 0 || element_size == 0)
    return NULL;
 
-if (png_safe_multiply((png_alloc_size_t)nelements, (png_alloc_size_t)element_size, &total))
+if (png_safe_multiply((png_alloc_size_t)nelements,
+                      (png_alloc_size_t)element_size, &total))
    return png_malloc_base(png_ptr, total);
 
 return NULL;
