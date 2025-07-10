@@ -96,7 +96,21 @@ png_malloc_base,(png_const_structrp png_ptr, png_alloc_size_t size),
    /* Use the system malloc */
    return malloc((size_t)/*SAFE*/size); /* checked for truncation above */
 }
+/* Helper to check for safe multiplication without overflow */
+static int
+png_safe_multiply(png_alloc_size_t a, png_alloc_size_t b, png_alloc_size_t *result)
+{
+    if (a == 0 || b == 0) {
+        *result = 0;
+        return 1;
+    }
 
+    if (a > PNG_SIZE_MAX / b)
+        return 0;
+
+    *result = a * b;
+    return 1;
+}
 #if defined(PNG_TEXT_SUPPORTED) || defined(PNG_sPLT_SUPPORTED) ||\
    defined(PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED)
 /* This is really here only to work round a spurious warning in GCC 4.6 and 4.7
@@ -107,13 +121,15 @@ static png_voidp
 png_malloc_array_checked(png_const_structrp png_ptr, int nelements,
     size_t element_size)
 {
-   png_alloc_size_t req = (png_alloc_size_t)nelements; /* known to be > 0 */
+  png_alloc_size_t total;
 
-   if (req <= PNG_SIZE_MAX/element_size)
-      return png_malloc_base(png_ptr, req * element_size);
-
-   /* The failure case when the request is too large */
+if (nelements <= 0 || element_size == 0)
    return NULL;
+
+if (png_safe_multiply((png_alloc_size_t)nelements, (png_alloc_size_t)element_size, &total))
+   return png_malloc_base(png_ptr, total);
+
+return NULL;
 }
 
 PNG_FUNCTION(png_voidp /* PRIVATE */,
