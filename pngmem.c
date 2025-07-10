@@ -98,7 +98,8 @@ png_malloc_base,(png_const_structrp png_ptr, png_alloc_size_t size),
 }
 /* Helper to check for safe multiplication without overflow */
 static int
-png_safe_multiply(png_alloc_size_t a, png_alloc_size_t b, png_alloc_size_t *result)
+if (png_safe_multiply((png_alloc_size_t)nelements,
+                      (png_alloc_size_t)element_size, &total))
 {
     if (a == 0 || b == 0) {
         *result = 0;
