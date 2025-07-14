@@ -1613,9 +1613,20 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    buffer[length] = 0;
 
-   for (entry_start = buffer; *entry_start; entry_start++)
-      /* Empty loop to find end of name */ ;
+for (entry_start = buffer; entry_start < buffer + length && *entry_start;
+       entry_start++)
+ /* Empty loop to find end of name */ ;
 
+   if (entry_start >= buffer + length)
+   {
+      png_warning(png_ptr, "malformed sPLT chunk");
+      return handled_error;
+   }
+   if (*entry_start != 0)
+   {
+       png_warning(png_ptr, "malformed sPLT chunk");
+       return handled_error;
+   }
    ++entry_start;
 
    /* A sample depth should follow the separator, and we should be on it  */
