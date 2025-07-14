@@ -30,6 +30,7 @@ project(libpng
         LANGUAGES C ASM)
 
 include(CheckCSourceCompiles)
+include(CheckLibraryExists)
 include(GNUInstallDirs)
 
 # Allow the users to specify an application-specific API prefix for libpng
@@ -138,19 +139,15 @@ endif()
 
 # Find the zlib library.
 find_package(ZLIB REQUIRED)
+set(PNG_LINK_LIBRARIES ZLIB::ZLIB)
 
-# Find the math library (where available).
-if(UNIX
-   AND NOT (APPLE OR BEOS OR HAIKU)
-   AND NOT EMSCRIPTEN)
-  find_library(M_LIBRARY m)
-  if(M_LIBRARY)
-    set(M_LIBRARY m)
-  else()
-    set(M_LIBRARY "")
-  endif()
-else()
-  # libm is not available or not needed.
+# Find the math library (unless we already know it's not available or
+# not needed).
+if(UNIX AND NOT (APPLE OR BEOS OR HAIKU OR EMSCRIPTEN))
+  check_library_exists(m pow "" PNG_HAVE_LIBM_POW)
+endif()
+if(PNG_HAVE_LIBM_POW)
+  list(APPEND PNG_LINK_LIBRARIES m)
 endif()
 
 # Silence function deprecation warnings on the Windows compilers that might
@@ -461,7 +458,7 @@ if(PNG_SHARED)
                              SYSTEM
                              INTERFACE "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>")
   target_link_libraries(png_shared
-                        PUBLIC ZLIB::ZLIB ${M_LIBRARY})
+                        PUBLIC ${PNG_LINK_LIBRARIES})
 endif()
 
 if(PNG_STATIC)
@@ -479,7 +476,7 @@ if(PNG_STATIC)
                              SYSTEM
                              INTERFACE "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>")
   target_link_libraries(png_static
-                        PUBLIC ZLIB::ZLIB ${M_LIBRARY})
+                        PUBLIC ${PNG_LINK_LIBRARIES})
 endif()
 
 if(PNG_FRAMEWORK AND NOT APPLE)
@@ -512,7 +509,7 @@ if(PNG_FRAMEWORK)
                              SYSTEM
                              INTERFACE "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>")
   target_link_libraries(png_framework
-                        PUBLIC ZLIB::ZLIB ${M_LIBRARY})
+                        PUBLIC ${PNG_LINK_LIBRARIES})
 endif()
 
 if(NOT PNG_LIBRARY_TARGETS)
@@ -709,7 +706,7 @@ if(PNG_SHARED AND PNG_TOOLS)
 
   add_executable(png-fix-itxt ${png_fix_itxt_sources})
   target_link_libraries(png-fix-itxt
-                        PRIVATE ZLIB::ZLIB ${M_LIBRARY})
+                        PRIVATE ${PNG_LINK_LIBRARIES})
   list(APPEND PNG_BIN_TARGETS png-fix-itxt)
 endif()
 
