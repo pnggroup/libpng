@@ -999,11 +999,9 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       errmsg = "ignored in grayscale PNG";
 
    else if (length > 3*PNG_MAX_PALETTE_LENGTH || (length % 3) != 0)
-      errmsg = "invalid";
-   
-   else if (length == 0)
+      errmsg = "invalid"
+else if (length == 0)
        errmsg = "zero length";
-
    /* This drops PLTE in favour of tRNS or bKGD because both of those chunks
     * can have an effect on the rendering of the image whereas PLTE only matters
     * in the case of an 8-bit display with a decoder which controls the palette.
