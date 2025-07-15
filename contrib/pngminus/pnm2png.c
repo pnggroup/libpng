@@ -540,20 +540,28 @@ int fscan_pnm_token (FILE *pnm_file, char *token_buf, size_t token_buf_size)
   /* read string */
   do
   {
-    ret = fgetc (pnm_file);
+    ret = fgetc(pnm_file);
     if (ret == EOF) break;
+
     if (ret == '0')
     {
       /* avoid storing more than one leading '0' in the token buffer,
        * to ensure that all valid (in-range) numeric inputs can fit in. */
       if ((i == 0) && (token_buf[i] == '0')) continue;
     }
-    if (++i == token_buf_size - 1) break;
-    token_buf[i] = (char) ret;
+
+    /* Prevent buffer overflow */
+    if (i >= token_buf_size - 1)
+    {
+      break;
+    }
+
+    token_buf[i++] = (char) ret;
   }
   while ((ret != '\n') && (ret != '\r') && (ret != ' '));
 
-  token_buf[i] = '\0';
+  token_buf[i] = '\0';  // TO NULL-TERMINATE
+
   return (i > 0) ? 1 : 0;
 }
 
