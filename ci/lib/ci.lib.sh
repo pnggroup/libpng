@@ -57,9 +57,10 @@ function ci_expr {
     if [[ ${*:-0} == [0-9] ]]; then
         return $((!$1))
     else
-        # Sanitize input: allow only safe math characters
-        if [[ "$*" =~ [^0-9[:space:]+\-*/%()&\|\<\>=!] ]]; then
-            ci_err "invalid characters in expression: $*"
+        # Sanitize input: allow only digits, operators, parentheses, and spaces
+        local expr_input="$*"
+        if [[ "$expr_input" =~ [^0-9\ \+\-\*/%\(\)\<\>\=\!] ]]; then
+            ci_err "invalid characters in expression: $expr_input"
         fi
         expr >/dev/null "$@" && return $? || return $?
     fi
