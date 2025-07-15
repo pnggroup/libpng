@@ -54,14 +54,13 @@ function ci_err_internal {
 }
 
 function ci_expr {
-    if [[ ${*:-0} == [0-9] ]]
-    then
-        # This is the same as in the else-branch below, albeit much faster
-        # for our intended use cases.
+    if [[ ${*:-0} == [0-9] ]]; then
         return $((!$1))
     else
-        # The funny-looking compound command "... && return $? || return $?"
-        # allows the execution to continue uninterrupted under "set -e".
+        # Sanitize input: allow only safe math characters
+        if [[ "$*" =~ [^0-9[:space:]+\-*/%()&\|\<\>=!] ]]; then
+            ci_err "invalid characters in expression: $*"
+        fi
         expr >/dev/null "$@" && return $? || return $?
     fi
 }
