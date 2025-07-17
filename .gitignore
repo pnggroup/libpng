@@ -35,9 +35,15 @@ a.out
 
 # Debug files
 *.dSYM/
+*.dmp
 *.idb
 *.pdb
 *.su
+*.sym
+*.tds
+core
+core.[0-9]*
+!core/
 
 # Tag files
 TAGS
@@ -80,43 +86,33 @@ __recovery/
 nbbuild/
 nbdist/
 nbproject/
-## Visual Studio
+## Visual Studio 2015 and newer
 .vs/
-### Visual Studio user files
-*.rsuser
-*.sln.docstates
-*.suo
-*.user
-*.userprefs
-### Visual Studio cache files (for older versions)
-*.aps
-*.ncb
-*.opensdf
-*.sdf
-*.VC.db
-*.VC.opendb
-ipch/
 ## Visual Studio Code
 .vscode/*
 !.vscode/extensions.json
 !.vscode/launch.json
 !.vscode/settings.json
 !.vscode/tasks.json
+## Xcode 9 and newer
+xcuserdata/
 ## (Various)
 *.*cache
 *.cache*
 [._]*_history
 .history/
 [Bb]ackup*/
+CMakeLists.txt.user*
+CMakeUserPresets.json
 
 # Build, test and CI output directories
+[._]build*/
+/[Bb]uild/
+/[Oo]ut/
 *[Dd]ebug/
 [Dd]ebug*/
 *[Rr]elease/
 [Rr]elease*/
-[._]build*/
-/[Bb]uild*/
-/[Oo]ut/
 
 # Libpng configuration and auxiliary build artifacts
 *.out
@@ -150,9 +146,6 @@ ipch/
 /scripts/autoconf/lt*.m4
 /stamp-h1
 /test-driver
-CMake*.json
-!CMakePresets.json
-CMakeLists.txt.*
 pnglibconf.[ch]
 pnglibconf.dfn
 pnglibconf.pre
