@@ -18,6 +18,14 @@
 
 #include "pngpriv.h"
 
+#ifdef PNG_USER_GLOBAL_MEM_SUPPORTED
+static png_malloc_ptr
+png_global_malloc_fn;
+
+static png_free_ptr
+png_global_free_fn;
+#endif
+
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 /* Free a png_struct */
 void /* PRIVATE */
@@ -91,6 +99,11 @@ png_malloc_base,(png_const_structrp png_ptr, png_alloc_size_t size),
          return png_ptr->malloc_fn(png_constcast(png_structrp,png_ptr), size);
 #  else
       PNG_UNUSED(png_ptr)
+#  endif
+
+#  ifdef PNG_USER_GLOBAL_MEM_SUPPORTED
+      if (png_global_malloc_fn != NULL)
+         return png_malloc_fn(NULL,png_constcast(png_structrp,png_ptr), size);
 #  endif
 
    /* Use the system malloc */
@@ -247,6 +260,14 @@ png_free_default,(png_const_structrp png_ptr, png_voidp ptr),PNG_DEPRECATED)
       return;
 #endif /* USER_MEM */
 
+#ifdef PNG_USER_GLOBAL_MEM_SUPPORTED
+   if (png_ptr->free_fn != NULL)
+   {
+      png_global_free_fn(NULL, ptr);
+      return;
+   }
+#endif
+
    free(ptr);
 }
 
@@ -264,6 +285,15 @@ png_set_mem_fn(png_structrp png_ptr, png_voidp mem_ptr, png_malloc_ptr
       png_ptr->malloc_fn = malloc_fn;
       png_ptr->free_fn = free_fn;
    }
+
+#ifdef PNG_USER_GLOBAL_MEM_SUPPORTED
+   else
+   {
+      png_global_malloc_fn = malloc_fn;
+      png_global_free_fn = free_fn;
+   }
+#endif
+
 }
 
 /* This function returns a pointer to the mem_ptr associated with the user

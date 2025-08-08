@@ -6279,6 +6279,10 @@ Version 1.6.50 [July 1, 2025]
   Fixed the CMake file for cross-platform builds that require `libm`.
 
 Version 1.6.51 [TODO]
+  Add option PNG_USER_GLOBAL_MEM_SUPPORTED to allow using png_set_mem_fn
+    with a NULL png_ptr to set a common malloc/free to use, overriding
+    the default `malloc()` and `free()`, if not
+    set on a specific png_ptr.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
