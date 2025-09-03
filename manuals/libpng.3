@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "July 1, 2025"
+.TH LIBPNG 3 "September 3, 2025"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.6.50
+libpng \- Portable Network Graphics (PNG) Reference Library 1.8.0.git
 
 .SH SYNOPSIS
 \fB#include <png.h>\fP
@@ -3866,19 +3866,6 @@ Here is an example of writing two private chunks, prVt and miNE:
     /* Needed because miNE is not safe-to-copy */
     png_set_keep_unknown_chunks(png, PNG_HANDLE_CHUNK_ALWAYS,
        (png_bytep) "miNE", 1);
-    # if PNG_LIBPNG_VER < 10600
-      /* Deal with unknown chunk location bug in 1.5.x and earlier */
-      png_set_unknown_chunk_location(png, info, 0, PNG_HAVE_IHDR);
-      png_set_unknown_chunk_location(png, info, 1, PNG_AFTER_IDAT);
-    # endif
-    # if PNG_LIBPNG_VER < 10500
-      /* PNG_AFTER_IDAT writes two copies of the chunk prior to libpng-1.5.0,
-       * one before IDAT and another after IDAT, so don't use it; only use
-       * PNG_HAVE_IHDR location.  This call resets the location previously
-       * set by assignment and png_set_unknown_chunk_location() for chunk 1.
-       */
-      png_set_unknown_chunk_location(png, info, 1, PNG_HAVE_IHDR);
-    # endif
     #endif
 
 .SS The high-level write interface
