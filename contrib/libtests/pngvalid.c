@@ -1,6 +1,6 @@
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Copyright (c) 2021 Cosmin Truta
+ * Copyright (c) 2021-2025 Cosmin Truta
  * Copyright (c) 2014-2017 John Cunningham Bowler
  *
  * This code is released under the libpng license.
@@ -62,7 +62,7 @@
 /* 1.6.1 added support for the configure test harness, which uses 77 to indicate
  * a skipped test, in earlier versions we need to succeed on a skipped test, so:
  */
-#if PNG_LIBPNG_VER >= 10601 && defined(HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  define SKIP 77
 #else
 #  define SKIP 0
@@ -76,48 +76,7 @@
    (defined PNG_PROGRESSIVE_READ_SUPPORTED) &&\
    (defined PNG_FIXED_POINT_SUPPORTED || defined PNG_FLOATING_POINT_SUPPORTED)
 
-#if PNG_LIBPNG_VER < 10500
-/* This deliberately lacks the const. */
-typedef png_byte *png_const_bytep;
 
-/* This is copied from 1.5.1 png.h: */
-#define PNG_INTERLACE_ADAM7_PASSES 7
-#define PNG_PASS_START_ROW(pass) (((1U&~(pass))<<(3-((pass)>>1)))&7)
-#define PNG_PASS_START_COL(pass) (((1U& (pass))<<(3-(((pass)+1)>>1)))&7)
-#define PNG_PASS_ROW_SHIFT(pass) ((pass)>2?(8-(pass))>>1:3)
-#define PNG_PASS_COL_SHIFT(pass) ((pass)>1?(7-(pass))>>1:3)
-#define PNG_PASS_ROWS(height, pass) (((height)+(((1<<PNG_PASS_ROW_SHIFT(pass))\
-   -1)-PNG_PASS_START_ROW(pass)))>>PNG_PASS_ROW_SHIFT(pass))
-#define PNG_PASS_COLS(width, pass) (((width)+(((1<<PNG_PASS_COL_SHIFT(pass))\
-   -1)-PNG_PASS_START_COL(pass)))>>PNG_PASS_COL_SHIFT(pass))
-#define PNG_ROW_FROM_PASS_ROW(yIn, pass) \
-   (((yIn)<<PNG_PASS_ROW_SHIFT(pass))+PNG_PASS_START_ROW(pass))
-#define PNG_COL_FROM_PASS_COL(xIn, pass) \
-   (((xIn)<<PNG_PASS_COL_SHIFT(pass))+PNG_PASS_START_COL(pass))
-#define PNG_PASS_MASK(pass,off) ( \
-   ((0x110145AFU>>(((7-(off))-(pass))<<2)) & 0xFU) | \
-   ((0x01145AF0U>>(((7-(off))-(pass))<<2)) & 0xF0U))
-#define PNG_ROW_IN_INTERLACE_PASS(y, pass) \
-   ((PNG_PASS_MASK(pass,0) >> ((y)&7)) & 1)
-#define PNG_COL_IN_INTERLACE_PASS(x, pass) \
-   ((PNG_PASS_MASK(pass,1) >> ((x)&7)) & 1)
-
-/* These are needed too for the default build: */
-#define PNG_WRITE_16BIT_SUPPORTED
-#define PNG_READ_16BIT_SUPPORTED
-
-/* This comes from pnglibconf.h after 1.5: */
-#define PNG_FP_1 100000
-#define PNG_GAMMA_THRESHOLD_FIXED\
-   ((png_fixed_point)(PNG_GAMMA_THRESHOLD * PNG_FP_1))
-#endif
-
-#if PNG_LIBPNG_VER < 10600
-   /* 1.6.0 constifies many APIs, the following exists to allow pngvalid to be
-    * compiled against earlier versions.
-    */
-#  define png_const_structp png_structp
-#endif
 
 #ifndef RELEASE_BUILD
    /* RELEASE_BUILD is true for releases and release candidates: */
@@ -647,34 +606,8 @@ row_copy(png_bytep toBuffer, png_const_bytep fromBuffer, unsigned int bitWidth,
 static int
 pixel_cmp(png_const_bytep pa, png_const_bytep pb, png_uint_32 bit_width)
 {
-#if PNG_LIBPNG_VER < 10506
-   if (memcmp(pa, pb, bit_width>>3) == 0)
-   {
-      png_uint_32 p;
-
-      if ((bit_width & 7) == 0) return 0;
-
-      /* Ok, any differences? */
-      p = pa[bit_width >> 3];
-      p ^= pb[bit_width >> 3];
-
-      if (p == 0) return 0;
-
-      /* There are, but they may not be significant, remove the bits
-       * after the end (the low order bits in PNG.)
-       */
-      bit_width &= 7;
-      p >>= 8-bit_width;
-
-      if (p == 0) return 0;
-   }
-#else
-   /* From libpng-1.5.6 the overwrite should be fixed, so compare the trailing
-    * bits too:
-    */
    if (memcmp(pa, pb, (bit_width+7)>>3) == 0)
       return 0;
-#endif
 
    /* Return the index of the changed byte. */
    {
@@ -4851,9 +4784,7 @@ perform_formatting_test(png_store *ps)
    {
       png_const_charp correct = "29 Aug 2079 13:53:60 +0000";
       png_const_charp result;
-#     if PNG_LIBPNG_VER >= 10600
-         char timestring[29];
-#     endif
+      char timestring[29];
       png_structp pp;
       png_time pt;
 
@@ -7484,22 +7415,7 @@ image_transform_png_set_strip_16_mod(const image_transform *this,
        * 'scale' API (above) must be used.
        */
 #     ifdef PNG_READ_ACCURATE_SCALE_SUPPORTED
-#        if PNG_LIBPNG_VER >= 10504
-#           error PNG_READ_ACCURATE_SCALE should not be set
-#        endif
-
-         /* The strip 16 algorithm drops the low 8 bits rather than calculating
-          * 1/257, so we need to adjust the permitted errors appropriately:
-          * Notice that this is only relevant prior to the addition of the
-          * png_set_scale_16 API in 1.5.4 (but 1.5.4+ always defines the above!)
-          */
-         {
-            const double d = (255-128.5)/65535;
-            that->rede += d;
-            that->greene += d;
-            that->bluee += d;
-            that->alphae += d;
-         }
+#        error PNG_READ_ACCURATE_SCALE should not be set
 #     endif
    }
 
@@ -9932,47 +9848,6 @@ gamma_component_validate(const char *name, const validate_info *vi,
              * (chop) method of scaling was used.
              */
 #           ifndef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
-#              if PNG_LIBPNG_VER < 10504
-                  /* This may be required for other components in the future,
-                   * but at present the presence of gamma correction effectively
-                   * prevents the errors in the component scaling (I don't quite
-                   * understand why, but since it's better this way I care not
-                   * to ask, JB 20110419.)
-                   */
-                  if (pass == 0 && alpha < 0 && vi->scale16 && vi->sbit > 8 &&
-                     vi->sbit + vi->isbit_shift == 16)
-                  {
-                     tmp = ((id >> 8) - .5)/255;
-
-                     if (tmp > 0)
-                     {
-                        is_lo = ceil(outmax * tmp - vi->maxout_total);
-                        if (is_lo < 0) is_lo = 0;
-                     }
-
-                     else
-                        is_lo = 0;
-
-                     tmp = ((id >> 8) + .5)/255;
-
-                     if (tmp < 1)
-                     {
-                        is_hi = floor(outmax * tmp + vi->maxout_total);
-                        if (is_hi > outmax) is_hi = outmax;
-                     }
-
-                     else
-                        is_hi = outmax;
-
-                     if (!(od < is_lo || od > is_hi))
-                     {
-                        if (encoded_error < vi->outlog)
-                           return i;
-
-                        pass = "within 8 bit limits:\n";
-                     }
-                  }
-#              endif
 #           endif
          }
          else /* !use_input_precision */
@@ -11755,9 +11630,9 @@ int main(int argc, char **argv)
 #  ifdef PNG_WRITE_tRNS_SUPPORTED
       pm.test_tRNS = 1;
 #  endif
-   pm.test_lbg = PNG_LIBPNG_VER >= 10600;
+   pm.test_lbg = 1; /* PNG_LIBPNG_VER >= 10600 */
    pm.test_lbg_gamma_threshold = 1;
-   pm.test_lbg_gamma_transform = PNG_LIBPNG_VER >= 10600;
+   pm.test_lbg_gamma_transform = 1; /* PNG_LIBPNG_VER >= 10600 */
    pm.test_lbg_gamma_sbit = 1;
    pm.test_lbg_gamma_composition = PNG_LIBPNG_VER == 10700;
 
@@ -12213,7 +12088,7 @@ int main(int argc, char **argv)
          (pm.this.nerrors || (pm.this.treat_warnings_as_errors &&
             pm.this.nwarnings)) ? "FAIL" : "PASS",
          command,
-#if defined(PNG_FLOATING_ARITHMETIC_SUPPORTED) || PNG_LIBPNG_VER < 10500
+#if defined(PNG_FLOATING_ARITHMETIC_SUPPORTED)
          "floating"
 #else
          "fixed"
