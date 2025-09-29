@@ -105,6 +105,9 @@ xcuserdata/
 CMakeLists.txt.user*
 CMakeUserPresets.json
 
+# Local configuration files and prompts for coding agents
+*.local.*
+
 # Build, test and CI output directories
 [._]build*/
 /[Bb]uild/
