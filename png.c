@@ -244,10 +244,6 @@ png_user_version_check(png_structrp png_ptr, png_const_charp user_png_ver)
       png_warning(png_ptr, m);
 #endif
 
-#ifdef PNG_ERROR_NUMBERS_SUPPORTED
-      png_ptr->flags = 0;
-#endif
-
       return 0;
    }
 
