@@ -2448,14 +2448,6 @@ PNG_EXPORT(png_uint_32, png_permit_mng_features, (png_structrp png_ptr,
 #define PNG_HANDLE_CHUNK_ALWAYS       3
 #define PNG_HANDLE_CHUNK_LAST         4
 
-/* Strip the prepended error numbers ("#nnn ") from error and warning
- * messages before passing them to the error or warning handler.
- */
-#ifdef PNG_ERROR_NUMBERS_SUPPORTED
-PNG_EXPORT(void, png_set_strip_error_numbers, (png_structrp png_ptr,
-    png_uint_32 strip_mode));
-#endif
-
 /* Added in libpng-1.2.6 */
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
 PNG_EXPORT(void, png_set_user_limits, (png_structrp png_ptr,

@@ -489,7 +489,7 @@
 /* #define PNG_FLAG_KEEP_UNKNOWN_CHUNKS      0x8000U */
 /* #define PNG_FLAG_KEEP_UNSAFE_CHUNKS      0x10000U */
 #define PNG_FLAG_LIBRARY_MISMATCH        0x20000U
-#define PNG_FLAG_STRIP_ERROR_NUMBERS     0x40000U
+                                  /*     0x40000U    unused */
 #define PNG_FLAG_STRIP_ERROR_TEXT        0x80000U
 #define PNG_FLAG_BENIGN_ERRORS_WARN     0x100000U /* Added to libpng-1.4.0 */
 #define PNG_FLAG_APP_WARNINGS_WARN      0x200000U /* Added to libpng-1.6.0 */

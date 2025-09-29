@@ -251,7 +251,6 @@ option WRITE_INT_FUNCTIONS disabled
 #
 # WARNINGS: normally on, if off no warnings are generated
 # ERROR_TEXT: normally on, if off errors happen but there is no message
-# ERROR_NUMBERS: unimplemented feature, therefore disabled
 # BENIGN_ERRORS: support for just issuing warnings for recoverable errors
 #
 # BENIGN_READ_ERRORS:
@@ -268,7 +267,6 @@ option WRITE_INT_FUNCTIONS disabled
 
 option WARNINGS
 option ERROR_TEXT
-option ERROR_NUMBERS disabled
 
 option BENIGN_ERRORS
 option BENIGN_WRITE_ERRORS requires BENIGN_ERRORS disabled
