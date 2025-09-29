@@ -657,11 +657,9 @@ png_default_error,(png_const_structrp png_ptr, png_const_charp error_message),
     PNG_NORETURN)
 {
 #ifdef PNG_CONSOLE_IO_SUPPORTED
-   {
-      fprintf(stderr, "libpng error: %s", error_message ? error_message :
-         "undefined");
-      fprintf(stderr, PNG_STRING_NEWLINE);
-   }
+   fprintf(stderr, "libpng error: %s", error_message ? error_message :
+      "undefined");
+   fprintf(stderr, PNG_STRING_NEWLINE);
 #else
    PNG_UNUSED(error_message) /* Make compiler happy */
 #endif
