@@ -657,9 +657,8 @@ png_default_error,(png_const_structrp png_ptr, png_const_charp error_message),
     PNG_NORETURN)
 {
 #ifdef PNG_CONSOLE_IO_SUPPORTED
-   fprintf(stderr, "libpng error: %s", error_message ? error_message :
+   fprintf(stderr, "libpng error: %s\n", error_message ? error_message :
       "undefined");
-   fprintf(stderr, PNG_STRING_NEWLINE);
 #else
    PNG_UNUSED(error_message) /* Make compiler happy */
 #endif
@@ -697,8 +696,7 @@ static void /* PRIVATE */
 png_default_warning(png_const_structrp png_ptr, png_const_charp warning_message)
 {
 #ifdef PNG_CONSOLE_IO_SUPPORTED
-   fprintf(stderr, "libpng warning: %s", warning_message);
-   fprintf(stderr, PNG_STRING_NEWLINE);
+   fprintf(stderr, "libpng warning: %s\n", warning_message);
 #else
    PNG_UNUSED(warning_message) /* Make compiler happy */
 #endif

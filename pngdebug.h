@@ -37,10 +37,6 @@
 #ifndef PNGDEBUG_H
 #define PNGDEBUG_H
 
-#ifndef PNG_STRING_NEWLINE
-#  define PNG_STRING_NEWLINE "\n"
-#endif
-
 #ifdef PNG_DEBUG
 #  if (PNG_DEBUG > 0)
 #    if !defined(PNG_DEBUG_FILE) && defined(_MSC_VER)
@@ -50,14 +46,14 @@
 #          define _DEBUG
 #        endif
 #        ifndef png_debug
-#          define png_debug(l,m)  _RPT0(_CRT_WARN,m PNG_STRING_NEWLINE)
+#          define png_debug(l,m)  _RPT0(_CRT_WARN,m "\n")
 #        endif
 #        ifndef png_debug1
-#          define png_debug1(l,m,p1)  _RPT1(_CRT_WARN,m PNG_STRING_NEWLINE,p1)
+#          define png_debug1(l,m,p1)  _RPT1(_CRT_WARN,m "\n",p1)
 #        endif
 #        ifndef png_debug2
 #          define png_debug2(l,m,p1,p2) \
-             _RPT2(_CRT_WARN,m PNG_STRING_NEWLINE,p1,p2)
+             _RPT2(_CRT_WARN,m "\n",p1,p2)
 #        endif
 #      endif
 #    else /* PNG_DEBUG_FILE || !_MSC_VER */
@@ -74,7 +70,7 @@
 #            define png_debug(l,m) \
        do { \
        int num_tabs=l; \
-       fprintf(PNG_DEBUG_FILE,"%s" m PNG_STRING_NEWLINE,(num_tabs==1 ? "   " : \
+       fprintf(PNG_DEBUG_FILE,"%s" m "\n",(num_tabs==1 ? "   " : \
          (num_tabs==2 ? "      " : (num_tabs>2 ? "         " : "")))); \
        } while (0)
 #          endif
@@ -82,7 +78,7 @@
 #            define png_debug1(l,m,p1) \
        do { \
        int num_tabs=l; \
-       fprintf(PNG_DEBUG_FILE,"%s" m PNG_STRING_NEWLINE,(num_tabs==1 ? "   " : \
+       fprintf(PNG_DEBUG_FILE,"%s" m "\n",(num_tabs==1 ? "   " : \
          (num_tabs==2 ? "      " : (num_tabs>2 ? "         " : ""))),p1); \
        } while (0)
 #          endif
@@ -90,7 +86,7 @@
 #            define png_debug2(l,m,p1,p2) \
        do { \
        int num_tabs=l; \
-       fprintf(PNG_DEBUG_FILE,"%s" m PNG_STRING_NEWLINE,(num_tabs==1 ? "   " : \
+       fprintf(PNG_DEBUG_FILE,"%s" m "\n",(num_tabs==1 ? "   " : \
          (num_tabs==2 ? "      " : (num_tabs>2 ? "         " : ""))),p1,p2);\
        } while (0)
 #          endif
@@ -100,9 +96,9 @@
        do { \
        int num_tabs=l; \
        char format[256]; \
-       snprintf(format,256,"%s%s%s",(num_tabs==1 ? "\t" : \
+       snprintf(format,256,"%s%s\n",(num_tabs==1 ? "\t" : \
          (num_tabs==2 ? "\t\t":(num_tabs>2 ? "\t\t\t":""))), \
-         m,PNG_STRING_NEWLINE); \
+         m); \
        fprintf(PNG_DEBUG_FILE,format); \
        } while (0)
 #          endif
@@ -111,9 +107,9 @@
        do { \
        int num_tabs=l; \
        char format[256]; \
-       snprintf(format,256,"%s%s%s",(num_tabs==1 ? "\t" : \
+       snprintf(format,256,"%s%s\n",(num_tabs==1 ? "\t" : \
          (num_tabs==2 ? "\t\t":(num_tabs>2 ? "\t\t\t":""))), \
-         m,PNG_STRING_NEWLINE); \
+         m); \
        fprintf(PNG_DEBUG_FILE,format,p1); \
        } while (0)
 #          endif
@@ -122,9 +118,9 @@
        do { \
        int num_tabs=l; \
        char format[256]; \
-       snprintf(format,256,"%s%s%s",(num_tabs==1 ? "\t" : \
+       snprintf(format,256,"%s%s\n",(num_tabs==1 ? "\t" : \
          (num_tabs==2 ? "\t\t":(num_tabs>2 ? "\t\t\t":""))), \
-         m,PNG_STRING_NEWLINE); \
+         m); \
        fprintf(PNG_DEBUG_FILE,format,p1,p2); \
        } while (0)
 #          endif

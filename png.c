@@ -793,14 +793,12 @@ png_get_copyright(png_const_structrp png_ptr)
 #ifdef PNG_STRING_COPYRIGHT
    return PNG_STRING_COPYRIGHT
 #else
-   return PNG_STRING_NEWLINE \
-      "libpng version 1.8.0.git" PNG_STRING_NEWLINE \
-      "Copyright (c) 2018-2025 Cosmin Truta" PNG_STRING_NEWLINE \
-      "Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson" \
-      PNG_STRING_NEWLINE \
-      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
-      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
-      PNG_STRING_NEWLINE;
+   return "\n"
+      "libpng version 1.8.0.git\n"
+      "Copyright (c) 2018-2025 Cosmin Truta\n"
+      "Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson\n"
+      "Copyright (c) 1996-1997 Andreas Dilger\n"
+      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n";
 #endif
 }
 
@@ -837,7 +835,7 @@ png_get_header_version(png_const_structrp png_ptr)
 #  ifndef PNG_READ_SUPPORTED
       " (NO READ SUPPORT)"
 #  endif
-      PNG_STRING_NEWLINE;
+      "\n";
 #else
    return PNG_HEADER_VERSION_STRING;
 #endif
