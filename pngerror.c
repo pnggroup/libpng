@@ -389,10 +389,10 @@ png_format_buffer(png_const_structrp png_ptr, png_charp buffer, png_const_charp
       ishift -= 8;
       if (isnonalpha(c) != 0)
       {
-         buffer[iout++] = PNG_LITERAL_LEFT_SQUARE_BRACKET;
+         buffer[iout++] = '[';
          buffer[iout++] = png_digit[(c & 0xf0) >> 4];
          buffer[iout++] = png_digit[c & 0x0f];
-         buffer[iout++] = PNG_LITERAL_RIGHT_SQUARE_BRACKET;
+         buffer[iout++] = ']';
       }
 
       else

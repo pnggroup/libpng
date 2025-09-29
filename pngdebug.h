@@ -36,17 +36,10 @@
  */
 #ifndef PNGDEBUG_H
 #define PNGDEBUG_H
-/* These settings control the formatting of messages in png.c and pngerror.c */
-/* Moved to pngdebug.h at 1.5.0 */
-#  ifndef PNG_LITERAL_LEFT_SQUARE_BRACKET
-#    define PNG_LITERAL_LEFT_SQUARE_BRACKET 0x5b
-#  endif
-#  ifndef PNG_LITERAL_RIGHT_SQUARE_BRACKET
-#    define PNG_LITERAL_RIGHT_SQUARE_BRACKET 0x5d
-#  endif
-#  ifndef PNG_STRING_NEWLINE
-#    define PNG_STRING_NEWLINE "\n"
-#  endif
+
+#ifndef PNG_STRING_NEWLINE
+#  define PNG_STRING_NEWLINE "\n"
+#endif
 
 #ifdef PNG_DEBUG
 #  if (PNG_DEBUG > 0)
