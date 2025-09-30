@@ -175,12 +175,11 @@ png_format_number(png_const_charp start, png_charp end, int format,
 void
 png_warning(png_const_structrp png_ptr, png_const_charp warning_message)
 {
-   int offset = 0;
    if (png_ptr != NULL && png_ptr->warning_fn != NULL)
       (*(png_ptr->warning_fn))(png_constcast(png_structrp,png_ptr),
-          warning_message + offset);
+          warning_message);
    else
-      png_default_warning(png_ptr, warning_message + offset);
+      png_default_warning(png_ptr, warning_message);
 }
 
 /* These functions support 'formatted' warning messages with up to
