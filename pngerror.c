@@ -65,7 +65,7 @@ png_err,(png_const_structrp png_ptr),PNG_NORETURN)
 }
 #endif /* ERROR_TEXT */
 
-/* Utility to safely appends strings to a buffer.  This never errors out so
+/* Utility to safely append strings to a buffer.  This never errors out so
  * error checking is not required in the caller.
  */
 size_t
@@ -86,7 +86,7 @@ png_safecat(png_charp buffer, size_t bufsize, size_t pos,
 
 #if defined(PNG_WARNINGS_SUPPORTED) || defined(PNG_TIME_RFC1123_SUPPORTED)
 /* Utility to dump an unsigned value into a buffer, given a start pointer and
- * and end pointer (which should point just *beyond* the end of the buffer!)
+ * an end pointer (which should point just *beyond* the end of the buffer!).
  * Returns the pointer to the start of the formatted string.
  */
 png_charp
@@ -705,7 +705,7 @@ png_default_warning(png_const_structrp png_ptr, png_const_charp warning_message)
 /* This function is called when the application wants to use another method
  * of handling errors and warnings.  Note that the error function MUST NOT
  * return to the calling routine or serious problems will occur.  The return
- * method used in the default routine calls longjmp(png_ptr->jmp_buf_ptr, 1)
+ * method used in the default routine calls longjmp(png_ptr->jmp_buf_ptr, 1).
  */
 void
 png_set_error_fn(png_structrp png_ptr, png_voidp error_ptr,
