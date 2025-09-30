@@ -380,13 +380,12 @@ png_format_buffer(png_const_structrp png_ptr, png_charp buffer, png_const_charp
     error_message)
 {
    png_uint_32 chunk_name = png_ptr->chunk_name;
-   int iout = 0, ishift = 24;
+   int iout = 0, ishift;
 
-   while (ishift >= 0)
+   for (ishift = 24; ishift >= 0; ishift -= 8)
    {
       int c = (int)(chunk_name >> ishift) & 0xff;
 
-      ishift -= 8;
       if (isnonalpha(c) != 0)
       {
          buffer[iout++] = '[';
