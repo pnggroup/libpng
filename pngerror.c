@@ -1,4 +1,4 @@
-/* pngerror.c - stub functions for i/o and memory allocation
+/* pngerror.c - functions for warnings and error handling
  *
  * Copyright (c) 2018-2025 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
@@ -237,11 +237,10 @@ png_formatted_warning(png_const_structrp png_ptr, png_warning_parameters p,
    size_t i = 0; /* Index in the msg[] buffer: */
    char msg[192];
 
-   /* Each iteration through the following loop writes at most one character
-    * to msg[i++] then returns here to validate that there is still space for
-    * the trailing '\0'.  It may (in the case of a parameter) read more than
-    * one character from message[]; it must check for '\0' and continue to the
-    * test if it finds the end of string.
+   /* Iterate through characters in message and resolve encountered
+    * parameters, which consist of @ followed by parameter number. Either
+    * add the resolved parameter or the raw character at msg[i]. Always check
+    * that there is still space for the trailing '\0'.
     */
    while (i<(sizeof msg)-1 && *message != '\0')
    {
