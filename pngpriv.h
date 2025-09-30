@@ -1514,7 +1514,7 @@ PNG_INTERNAL_FUNCTION(size_t,png_safecat,(png_charp buffer, size_t bufsize,
  */
 #if defined(PNG_WARNINGS_SUPPORTED) || defined(PNG_TIME_RFC1123_SUPPORTED)
 /* Utility to dump an unsigned value into a buffer, given a start pointer and
- * and end pointer (which should point just *beyond* the end of the buffer!)
+ * an end pointer (which should point just *beyond* the end of the buffer!).
  * Returns the pointer to the start of the formatted string.  This utility only
  * does unsigned values.
  */
