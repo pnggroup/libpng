@@ -250,20 +250,13 @@ png_formatted_warning(png_const_structrp png_ptr, png_warning_parameters p,
        */
       if (p != NULL && *message == '@' && message[1] != '\0')
       {
-         int parameter_char = *++message; /* Consume the '@' */
-         static const char valid_parameters[] = "123456789";
-         int parameter = 0;
-
-         /* Search for the parameter digit, the index in the string is the
-          * parameter to use.
-          */
-         while (valid_parameters[parameter] != parameter_char &&
-            valid_parameters[parameter] != '\0')
-            ++parameter;
+         const int parameter_char = *++message; /* Consume the '@' */
 
          /* If the parameter digit is out of range it will just get printed. */
-         if (parameter < PNG_WARNING_PARAMETER_COUNT)
+         if (parameter_char >= '1' && parameter_char <= '9')
          {
+            const int parameter = parameter_char - '1';
+
             /* Append this parameter */
             png_const_charp parm = p[parameter];
             png_const_charp pend = p[parameter] + (sizeof p[parameter]);
