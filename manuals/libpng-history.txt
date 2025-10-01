@@ -64,6 +64,27 @@ application:
 
    png_uint_32 application_vn = PNG_LIBPNG_VER;
 
+Version numbering during this period was inconsistent due to various
+miscommunications, code incompatibilities and other factors outside the
+authors' control.  The table below shows the relationship between source
+version, PNG_LIBPNG_VER_STRING, PNG_LIBPNG_VER and shared library version
+for early releases:
+
+   source                 png.h  png.h  shared-lib
+   version                string   int  version
+   -------                ------ -----  ----------
+   0.89c "1.0 beta 3"     0.89      89  1.0.89
+   0.90  "1.0 beta 4"     0.90      90  0.90  [should have been 2.0.90]
+   0.95  "1.0 beta 5"     0.95      95  0.95  [should have been 2.0.95]
+   0.96  "1.0 beta 6"     0.96      96  0.96  [should have been 2.0.96]
+   0.97b "1.00.97 beta 7" 1.00.97   97  1.0.1 [should have been 2.0.97]
+   0.97c                  0.97      97  2.0.97
+   0.98                   0.98      98  2.0.98
+   0.99                   0.99      98  2.0.99
+   0.99a-m                0.99      99  2.0.99
+   1.00                   1.00     100  2.1.0 [100 should be 10000]
+   1.0.0                  1.0.0    100  2.1.0 [100 should be 10000]
+
 II. Changes to Libpng from version 1.0.x to 1.2.x
 
 Support for user memory management was enabled by default.  To
@@ -160,6 +181,46 @@ The function
 which also expands tRNS to alpha was replaced with
     png_set_expand_gray_1_2_4_to_8()
 which does not. It has been deprecated since libpng-1.0.18 and 1.2.9.
+
+Version numbering stabilized during the 1.0.x series. From 1.0.0 onward, the
+PNG_LIBPNG_VER_STRING matched the source version, and PNG_LIBPNG_VER became
+a five-digit integer of the form XXYYZZ (where XX=major, YY=minor, ZZ=release).
+Beta versions were initially given the previous release number plus a letter
+(through 1.0.6j), then switched to the upcoming release number plus "betaNN"
+or "rcNN". The table below shows this evolution:
+
+   source                 png.h  png.h  shared-lib
+   version                string   int  version
+   -------                ------ -----  ----------
+   1.0.0      (from here on, the   100  2.1.0 [100 should be 10000]
+   1.0.1       png.h string is   10001  2.1.0
+   1.0.1a-e    identical to the  10002  from here on, the shared library
+   1.0.2       source version)   10002  is 2.V where V is the source code
+   1.0.2a-b                      10003  version, except as noted.
+   1.0.3                         10003
+   1.0.3a-d                      10004
+   1.0.4                         10004
+   1.0.4a-f                      10005
+   1.0.5 (+ 2 patches)           10005
+   1.0.5a-d                      10006
+   1.0.5e-r                      10100 (not source compatible)
+   1.0.5s-v                      10006 (not binary compatible)
+   1.0.6 (+ 3 patches)           10006 (still binary incompatible)
+   1.0.6d-f                      10007 (still binary incompatible)
+   1.0.6g                        10007
+   1.0.6h                        10007  10.6h (testing xy.z so-numbering)
+   1.0.6i                        10007  10.6i
+   1.0.6j                        10007  2.1.0.6j (incompatible with 1.0.0)
+   1.0.7beta11-14        DLLNUM  10007  2.1.0.7beta11-14 (binary compatible)
+   1.0.7beta15-18           1    10007  2.1.0.7beta15-18 (binary compatible)
+   1.0.7rc1-2               1    10007  2.1.0.7rc1-2 (binary compatible)
+   1.0.7                    1    10007  (still compatible)
+   ...
+   1.0.69                  10    10069  10.so.0.69[.0]
+
+From 1.0.7 onward, version numbering became consistent, with the source
+version matching the shared-library major and minor numbers, and the
+shared-library major version indicating backward compatibility.
 
 III. Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
 
