@@ -19,6 +19,18 @@
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 
+#define png_isalpha(c) \
+   (((c) >= 'A' && (c) <= 'Z') || ((c) >= 'a' && (c) <= 'z'))
+
+#if defined(PNG_WARNINGS_SUPPORTED) || \
+    (defined(PNG_READ_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED)) || \
+    defined(PNG_TIME_RFC1123_SUPPORTED)
+static const char png_digits[] = {
+   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+   'A', 'B', 'C', 'D', 'E', 'F'
+};
+#endif
+
 static PNG_FUNCTION(void /* PRIVATE */,
 png_default_error,(png_const_structrp png_ptr, png_const_charp error_message),
     PNG_NORETURN);
@@ -104,9 +116,6 @@ png_format_number(png_const_charp start, png_charp end, int format,
     */
    while (end > start && (number != 0 || count < mincount))
    {
-
-      static const char digits[] = "0123456789ABCDEF";
-
       switch (format)
       {
          case PNG_NUMBER_FORMAT_fixed:
@@ -114,7 +123,7 @@ png_format_number(png_const_charp start, png_charp end, int format,
             mincount = 5;
             if (output != 0 || number % 10 != 0)
             {
-               *--end = digits[number % 10];
+               *--end = png_digits[number % 10];
                output = 1;
             }
             number /= 10;
@@ -126,7 +135,7 @@ png_format_number(png_const_charp start, png_charp end, int format,
             /* FALLTHROUGH */
 
          case PNG_NUMBER_FORMAT_u:
-            *--end = digits[number % 10];
+            *--end = png_digits[number % 10];
             number /= 10;
             break;
 
@@ -136,7 +145,7 @@ png_format_number(png_const_charp start, png_charp end, int format,
             /* FALLTHROUGH */
 
          case PNG_NUMBER_FORMAT_x:
-            *--end = digits[number & 0xf];
+            *--end = png_digits[number & 0xf];
             number >>= 4;
             break;
 
@@ -360,9 +369,6 @@ png_app_error(png_const_structrp png_ptr, png_const_charp error_message)
  * to 63 bytes. The name characters are output as hex digits wrapped in []
  * if the character is invalid.
  */
-#define isnonalpha(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
-static const char png_digit[] = "0123456789ABCDEF";
-
 static void /* PRIVATE */
 png_format_buffer(png_const_structrp png_ptr, png_charp buffer, png_const_charp
     error_message)
@@ -374,11 +380,11 @@ png_format_buffer(png_const_structrp png_ptr, png_charp buffer, png_const_charp
    {
       int c = (int)(chunk_name >> ishift) & 0xff;
 
-      if (isnonalpha(c) != 0)
+      if (!png_isalpha(c))
       {
          buffer[iout++] = '[';
-         buffer[iout++] = png_digit[(c & 0xf0) >> 4];
-         buffer[iout++] = png_digit[c & 0x0f];
+         buffer[iout++] = png_digits[(c & 0xf0) >> 4];
+         buffer[iout++] = png_digits[c & 0x0f];
          buffer[iout++] = ']';
       }
 
