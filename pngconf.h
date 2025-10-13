@@ -463,46 +463,47 @@ typedef ptrdiff_t png_ptrdiff_t;
  */
 typedef png_int_32 png_fixed_point;
 
-/* Add typedefs for pointers */
-typedef void                  * png_voidp;
-typedef const void            * png_const_voidp;
-typedef png_byte              * png_bytep;
-typedef const png_byte        * png_const_bytep;
-typedef png_uint_32           * png_uint_32p;
-typedef const png_uint_32     * png_const_uint_32p;
-typedef png_int_32            * png_int_32p;
-typedef const png_int_32      * png_const_int_32p;
-typedef png_uint_16           * png_uint_16p;
-typedef const png_uint_16     * png_const_uint_16p;
-typedef png_int_16            * png_int_16p;
-typedef const png_int_16      * png_const_int_16p;
-typedef char                  * png_charp;
-typedef const char            * png_const_charp;
-typedef png_fixed_point       * png_fixed_point_p;
-typedef const png_fixed_point * png_const_fixed_point_p;
-typedef size_t                * png_size_tp;
-typedef const size_t          * png_const_size_tp;
+/* [Deprecated] */
+typedef void                  *png_voidp;
+typedef const void            *png_const_voidp;
+typedef png_byte              *png_bytep;
+typedef const png_byte        *png_const_bytep;
+typedef png_uint_32           *png_uint_32p;
+typedef const png_uint_32     *png_const_uint_32p;
+typedef png_int_32            *png_int_32p;
+typedef const png_int_32      *png_const_int_32p;
+typedef png_uint_16           *png_uint_16p;
+typedef const png_uint_16     *png_const_uint_16p;
+typedef png_int_16            *png_int_16p;
+typedef const png_int_16      *png_const_int_16p;
+typedef char                  *png_charp;
+typedef const char            *png_const_charp;
+typedef png_fixed_point       *png_fixed_point_p;
+typedef const png_fixed_point *png_const_fixed_point_p;
+typedef size_t                *png_size_tp;
+typedef const size_t          *png_const_size_tp;
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-typedef double       * png_doublep;
-typedef const double * png_const_doublep;
+/* [Deprecated] */
+typedef double       *png_doublep;
+typedef const double *png_const_doublep;
 #endif
 
-/* Pointers to pointers; i.e. arrays */
-typedef png_byte        * * png_bytepp;
-typedef png_uint_32     * * png_uint_32pp;
-typedef png_int_32      * * png_int_32pp;
-typedef png_uint_16     * * png_uint_16pp;
-typedef png_int_16      * * png_int_16pp;
-typedef const char      * * png_const_charpp;
-typedef char            * * png_charpp;
-typedef png_fixed_point * * png_fixed_point_pp;
+/* [Deprecated] */
+typedef png_byte        **png_bytepp;
+typedef png_uint_32     **png_uint_32pp;
+typedef png_int_32      **png_int_32pp;
+typedef png_uint_16     **png_uint_16pp;
+typedef png_int_16      **png_int_16pp;
+typedef const char      **png_const_charpp;
+typedef char            **png_charpp;
+typedef png_fixed_point **png_fixed_point_pp;
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-typedef double          * * png_doublepp;
+typedef double          **png_doublepp;
 #endif
 
-/* Pointers to pointers to pointers; i.e., pointer to array */
-typedef char            * * * png_charppp;
+/* [Deprecated] */
+typedef char ***png_charppp;
 
 #ifdef PNG_STDIO_SUPPORTED
 /* With PNG_STDIO_SUPPORTED it was possible to use I/O streams that were
@@ -510,7 +511,8 @@ typedef char            * * * png_charppp;
  * before Win32 and Windows CE applications before WinCE 3.0, but that kind
  * of support has long been discontinued.
  */
-typedef FILE            * png_FILE_p; /* [Deprecated] */
+/* [Deprecated] */
+typedef FILE *png_FILE_p;
 #endif
 
 #endif /* PNG_BUILDING_SYMBOL_TABLE */

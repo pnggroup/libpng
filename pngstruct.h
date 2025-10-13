@@ -59,7 +59,8 @@ typedef struct png_compression_buffer
 {
    struct png_compression_buffer *next;
    png_byte                       output[1]; /* actually zbuf_size */
-} png_compression_buffer, *png_compression_bufferp;
+} png_compression_buffer;
+typedef png_compression_buffer *png_compression_bufferp; /* [Deprecated] */
 
 #define PNG_COMPRESSION_BUFFER_SIZE(pp)\
    (offsetof(png_compression_buffer, output) + (pp)->zbuffer_size)

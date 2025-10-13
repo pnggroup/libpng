@@ -196,9 +196,9 @@
          PNG_INTERNAL_FUNCTION(type, name, args, PNG_EMPTY);
 #     ifndef PNG_VERSION_INFO_ONLY
          typedef struct png_incomplete png_double;
-         typedef png_double*           png_doublep;
-         typedef const png_double*     png_const_doublep;
-         typedef png_double**          png_doublepp;
+         typedef png_double*           png_doublep;       /* [Deprecated] */
+         typedef const png_double*     png_const_doublep; /* [Deprecated] */
+         typedef png_double**          png_doublepp;      /* [Deprecated] */
 #     endif
 #  endif
 #endif
@@ -822,10 +822,8 @@
     */
 #endif
 
-/* This is used for 16-bit gamma tables -- only the top level pointers are
- * const; this could be changed:
- */
-typedef const png_uint_16p * png_const_uint_16pp;
+/* [Deprecated] */
+typedef const png_uint_16p *png_const_uint_16pp;
 
 /* Added to libpng-1.5.7: sRGB conversion tables */
 #if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\

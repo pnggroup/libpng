@@ -343,46 +343,43 @@ extern "C" {
  */
 typedef char* png_libpng_version_1_8_0_git;
 
-/* Basic control structions.  Read libpng-manual.txt or libpng.3 for more info.
+/* Basic control structures: png_struct, png_info, etc.
  *
- * png_struct is the cache of information used while reading or writing a single
+ * The type names ending in 'p', 'pp' and 'rp' denote pointer,
+ * pointer-to-pointer and restricted-pointer types, respectively.
+ * Although these types are deprecated as of libpng 1.8.0, their
+ * declarations remain in the public headers to ensure continued
+ * compatibility with the existing PNG-supporting applications.
+ *
+ * See the libpng manual for more information.
+ */
+
+/* png_struct is the cache of information used while reading or writing a
  * PNG file.  One of these is always required, although the simplified API
  * (below) hides the creation and destruction of it.
  */
-typedef struct png_struct_def png_struct;
-typedef const png_struct * png_const_structp;
-typedef png_struct * png_structp;
-typedef png_struct * * png_structpp;
+typedef struct png_struct_def png_struct; /* [Opaque] */
 
-/* png_info contains information read from or to be written to a PNG file.  One
- * or more of these must exist while reading or creating a PNG file.  The
- * information is not used by libpng during read but is used to control what
- * gets written when a PNG file is created.  "png_get_" function calls read
- * information during read and "png_set_" functions calls write information
- * when creating a PNG.
- * been moved into a separate header file that is not accessible to
- * applications.  Read libpng-manual.txt or libpng.3 for more info.
- */
-typedef struct png_info_def png_info;
-typedef png_info * png_infop;
-typedef const png_info * png_const_infop;
-typedef png_info * * png_infopp;
+typedef const png_struct *png_const_structp;               /* [Deprecated] */
+typedef png_struct *png_structp;                           /* [Deprecated] */
+typedef png_struct **png_structpp;                         /* [Deprecated] */
+typedef png_struct *PNG_RESTRICT png_structrp;             /* [Deprecated] */
+typedef const png_struct *PNG_RESTRICT png_const_structrp; /* [Deprecated] */
 
-/* Types with names ending 'p' are pointer types.  The corresponding types with
- * names ending 'rp' are identical pointer types except that the pointer is
- * marked 'restrict', which means that it is the only pointer to the object
- * passed to the function.  Applications should not use the 'restrict' types;
- * it is always valid to pass 'p' to a pointer with a function argument of the
- * corresponding 'rp' type.  Different compilers have different rules with
- * regard to type matching in the presence of 'restrict'.  For backward
- * compatibility libpng callbacks never have 'restrict' in their parameters and,
- * consequentially, writing portable application code is extremely difficult if
- * an attempt is made to use 'restrict'.
+/* png_info contains information read from or to be written to a PNG file.
+ * One or more of these must exist while reading or creating a PNG file.
+ * The information is not used by libpng during read, but is used to control
+ * what gets written when a PNG file is created.  "png_get_" function calls
+ * read information during decoding, while "png_set_" function calls write
+ * information during encoding.
  */
-typedef png_struct * PNG_RESTRICT png_structrp;
-typedef const png_struct * PNG_RESTRICT png_const_structrp;
-typedef png_info * PNG_RESTRICT png_inforp;
-typedef const png_info * PNG_RESTRICT png_const_inforp;
+typedef struct png_info_def png_info; /* [Opaque] */
+
+typedef png_info *png_infop;                           /* [Deprecated] */
+typedef const png_info *png_const_infop;               /* [Deprecated] */
+typedef png_info **png_infopp;                         /* [Deprecated] */
+typedef png_info *PNG_RESTRICT png_inforp;             /* [Deprecated] */
+typedef const png_info *PNG_RESTRICT png_const_inforp; /* [Deprecated] */
 
 /* Three color definitions.  The order of the red, green, and blue, (and the
  * exact size) is not important, although the size of the fields need to
@@ -394,9 +391,10 @@ typedef struct png_color_struct
    png_byte green;
    png_byte blue;
 } png_color;
-typedef png_color * png_colorp;
-typedef const png_color * png_const_colorp;
-typedef png_color * * png_colorpp;
+
+typedef png_color *png_colorp;             /* [Deprecated] */
+typedef const png_color *png_const_colorp; /* [Deprecated] */
+typedef png_color **png_colorpp;           /* [Deprecated] */
 
 typedef struct png_color_16_struct
 {
@@ -406,9 +404,10 @@ typedef struct png_color_16_struct
    png_uint_16 blue;
    png_uint_16 gray;  /* for use in grayscale files */
 } png_color_16;
-typedef png_color_16 * png_color_16p;
-typedef const png_color_16 * png_const_color_16p;
-typedef png_color_16 * * png_color_16pp;
+
+typedef png_color_16 *png_color_16p;             /* [Deprecated] */
+typedef const png_color_16 *png_const_color_16p; /* [Deprecated] */
+typedef png_color_16 **png_color_16pp;           /* [Deprecated] */
 
 typedef struct png_color_8_struct
 {
@@ -418,9 +417,10 @@ typedef struct png_color_8_struct
    png_byte gray;  /* for use in grayscale files */
    png_byte alpha; /* for alpha channel files */
 } png_color_8;
-typedef png_color_8 * png_color_8p;
-typedef const png_color_8 * png_const_color_8p;
-typedef png_color_8 * * png_color_8pp;
+
+typedef png_color_8 *png_color_8p;             /* [Deprecated] */
+typedef const png_color_8 *png_const_color_8p; /* [Deprecated] */
+typedef png_color_8 **png_color_8pp;           /* [Deprecated] */
 
 /*
  * The following two structures are used for the in-core representation
@@ -434,9 +434,10 @@ typedef struct png_sPLT_entry_struct
    png_uint_16 alpha;
    png_uint_16 frequency;
 } png_sPLT_entry;
-typedef png_sPLT_entry * png_sPLT_entryp;
-typedef const png_sPLT_entry * png_const_sPLT_entryp;
-typedef png_sPLT_entry * * png_sPLT_entrypp;
+
+typedef png_sPLT_entry *png_sPLT_entryp;             /* [Deprecated] */
+typedef const png_sPLT_entry *png_const_sPLT_entryp; /* [Deprecated] */
+typedef png_sPLT_entry **png_sPLT_entrypp;           /* [Deprecated] */
 
 /*  When the depth of the sPLT palette is 8 bits, the color and alpha samples
  *  occupy the LSB of their respective members, and the MSB of each member
@@ -450,9 +451,10 @@ typedef struct png_sPLT_struct
    png_sPLT_entryp entries;  /* palette entries */
    png_int_32 nentries;      /* number of palette entries */
 } png_sPLT_t;
-typedef png_sPLT_t * png_sPLT_tp;
-typedef const png_sPLT_t * png_const_sPLT_tp;
-typedef png_sPLT_t * * png_sPLT_tpp;
+
+typedef png_sPLT_t *png_sPLT_tp;             /* [Deprecated] */
+typedef const png_sPLT_t *png_const_sPLT_tp; /* [Deprecated] */
+typedef png_sPLT_t **png_sPLT_tpp;           /* [Deprecated] */
 
 #ifdef PNG_TEXT_SUPPORTED
 /* png_text holds the contents of a text/ztxt/itxt chunk in a PNG file,
@@ -489,9 +491,10 @@ typedef struct png_text_struct
    png_charp lang_key;     /* keyword translated UTF-8 string, 0 or more
                               chars or a NULL pointer */
 } png_text;
-typedef png_text * png_textp;
-typedef const png_text * png_const_textp;
-typedef png_text * * png_textpp;
+
+typedef png_text *png_textp;             /* [Deprecated] */
+typedef const png_text *png_const_textp; /* [Deprecated] */
+typedef png_text **png_textpp;           /* [Deprecated] */
 #endif
 
 /* Supported compression types for text in PNG files (tEXt, and zTXt).
@@ -519,9 +522,10 @@ typedef struct png_time_struct
    png_byte minute;  /* minute of hour, 0 - 59 */
    png_byte second;  /* second of minute, 0 - 60 (for leap seconds) */
 } png_time;
-typedef png_time * png_timep;
-typedef const png_time * png_const_timep;
-typedef png_time * * png_timepp;
+
+typedef png_time *png_timep;             /* [Deprecated] */
+typedef const png_time *png_const_timep; /* [Deprecated] */
+typedef png_time **png_timepp;           /* [Deprecated] */
 
 #if defined(PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED) ||\
    defined(PNG_USER_CHUNKS_SUPPORTED)
@@ -548,9 +552,9 @@ typedef struct png_unknown_chunk_t
 }
 png_unknown_chunk;
 
-typedef png_unknown_chunk * png_unknown_chunkp;
-typedef const png_unknown_chunk * png_const_unknown_chunkp;
-typedef png_unknown_chunk * * png_unknown_chunkpp;
+typedef png_unknown_chunk *png_unknown_chunkp;             /* [Deprecated] */
+typedef const png_unknown_chunk *png_const_unknown_chunkp; /* [Deprecated] */
+typedef png_unknown_chunk **png_unknown_chunkpp;           /* [Deprecated] */
 #endif
 
 /* Flag values for the unknown chunk location byte. */
@@ -700,8 +704,8 @@ typedef struct png_row_info_struct
    png_byte pixel_depth; /* bits per pixel (depth * channels) */
 } png_row_info;
 
-typedef png_row_info * png_row_infop;
-typedef png_row_info * * png_row_infopp;
+typedef png_row_info *png_row_infop;   /* [Deprecated] */
+typedef png_row_info **png_row_infopp; /* [Deprecated] */
 
 /* These are the function types for the I/O functions and for the functions
  * that allow the user to override the default I/O functions with his or her
@@ -2675,7 +2679,8 @@ PNG_EXPORT(int, png_get_palette_max, (png_const_structp png_ptr,
 
 #define PNG_IMAGE_VERSION 1
 
-typedef struct png_control *png_controlp;
+typedef struct png_control *png_controlp; /* [Deprecated] */
+
 typedef struct
 {
    png_controlp opaque;    /* Initialize to NULL, free with png_image_free */
@@ -2712,7 +2717,9 @@ typedef struct
    png_uint_32  warning_or_error;
 
    char         message[64];
-} png_image, *png_imagep;
+} png_image;
+
+typedef png_image *png_imagep; /* [Deprecated] */
 
 /* The samples of the image have one to four channels whose components have
  * original values in the range 0 to 1.0:
@@ -3091,7 +3098,7 @@ PNG_EXPORT(int, png_image_write_to_stdio, (png_imagep image, FILE *file,
  */
 
 PNG_EXPORT(int, png_image_write_to_memory, (png_imagep image, void *memory,
-   png_alloc_size_t * PNG_RESTRICT memory_bytes, int convert_to_8_bit,
+   png_alloc_size_t *memory_bytes, int convert_to_8_bit,
    const void *buffer, png_int_32 row_stride, const void *colormap));
    /* Write the image to the given memory buffer.  The function both writes the
     * whole PNG data stream to *memory and updates *memory_bytes with the count
