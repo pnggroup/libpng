@@ -867,7 +867,7 @@ png_set_read_status_fn(png_structrp png_ptr, png_read_status_ptr read_row_fn)
 #ifdef PNG_INFO_IMAGE_SUPPORTED
 void PNGAPI
 png_read_png(png_structrp png_ptr, png_inforp info_ptr,
-    int transforms, voidp params)
+    int transforms, png_voidp params)
 {
    png_debug(1, "in png_read_png");
 
