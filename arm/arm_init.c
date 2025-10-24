@@ -79,8 +79,8 @@ png_target_free_data_arm(png_structrp pp)
 
 static int
 png_target_do_expand_palette_neon(png_structrp png_ptr, png_row_infop row_info,
-      png_bytep row, png_const_colorp palette, png_const_bytep trans_alpha,
-      int num_trans)
+    png_bytep row, png_const_colorp palette, png_const_bytep trans_alpha,
+    int num_trans)
 {
    /* NOTE: it is important that this is done. row_info->width is not a CSE
     * because the pointer is not declared with the 'restrict' parameter, this

@@ -502,8 +502,8 @@ pngtest_error(png_structp png_ptr, png_const_charp message)
  */
 typedef struct memory_information
 {
-   png_alloc_size_t          size;
-   png_voidp                 pointer;
+   png_alloc_size_t size;
+   png_voidp pointer;
    struct memory_information *next;
 } memory_information;
 typedef memory_information *memory_infop;
@@ -640,10 +640,10 @@ chunk used in ImageMagick to store "virtual page" size).  */
 typedef struct user_chunk_info_def
 {
    png_const_infop info_ptr;
-   png_uint_32     vpAg_width, vpAg_height;
-   png_byte        vpAg_units;
-   png_byte        sTER_mode;
-   int             location[2];
+   png_uint_32 vpAg_width, vpAg_height;
+   png_byte vpAg_units;
+   png_byte sTER_mode;
+   int location[2];
 } user_chunk_info;
 
 /* Used for location and order; zero means nothing. */

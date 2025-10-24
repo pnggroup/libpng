@@ -12,7 +12,7 @@
 /* Build an RGBA8 palette from the separate RGB and alpha palettes. */
 static void
 png_riffle_palette_neon(png_bytep riffled_palette, png_const_colorp palette,
-      png_const_bytep trans_alpha, int num_trans)
+    png_const_bytep trans_alpha, int num_trans)
 {
    int i;
 
@@ -46,7 +46,7 @@ png_riffle_palette_neon(png_bytep riffled_palette, png_const_colorp palette,
 /* Expands a palettized row into RGBA8. */
 static png_uint_32
 png_target_do_expand_palette_rgba8_neon(const png_uint_32 *riffled_palette,
-      png_uint_32 row_width, png_const_bytep *ssp, png_bytep *ddp)
+    png_uint_32 row_width, png_const_bytep *ssp, png_bytep *ddp)
 {
    const png_uint_32 pixels_per_chunk = 4;
    png_uint_32 i;
@@ -88,7 +88,7 @@ png_target_do_expand_palette_rgba8_neon(const png_uint_32 *riffled_palette,
 /* Expands a palettized row into RGB8. */
 static png_uint_32
 png_target_do_expand_palette_rgb8_neon(png_const_colorp paletteIn,
-      png_uint_32 row_width, png_const_bytep *ssp, png_bytep *ddp)
+    png_uint_32 row_width, png_const_bytep *ssp, png_bytep *ddp)
 {
    /* TODO: This case is VERY dangerous: */
    png_const_bytep palette = (png_const_bytep)paletteIn;

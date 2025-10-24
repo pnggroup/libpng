@@ -61,7 +61,8 @@ png_error,(png_const_structrp png_ptr, png_const_charp error_message),
 }
 #else
 PNG_FUNCTION(void,
-png_err,(png_const_structrp png_ptr),PNG_NORETURN)
+png_err,(png_const_structrp png_ptr),
+    PNG_NORETURN)
 {
    /* Prior to 1.5.2 the error_fn received a NULL pointer, expressed
     * erroneously as '\0', instead of the empty string "".  This was
@@ -370,8 +371,8 @@ png_app_error(png_const_structrp png_ptr, png_const_charp error_message)
  * if the character is invalid.
  */
 static void /* PRIVATE */
-png_format_buffer(png_const_structrp png_ptr, png_charp buffer, png_const_charp
-    error_message)
+png_format_buffer(png_const_structrp png_ptr, png_charp buffer,
+    png_const_charp error_message)
 {
    png_uint_32 chunk_name = png_ptr->chunk_name;
    int iout = 0, ishift;
@@ -449,8 +450,8 @@ png_chunk_warning(png_const_structrp png_ptr, png_const_charp warning_message)
 #ifdef PNG_READ_SUPPORTED
 #ifdef PNG_BENIGN_ERRORS_SUPPORTED
 void
-png_chunk_benign_error(png_const_structrp png_ptr, png_const_charp
-    error_message)
+png_chunk_benign_error(png_const_structrp png_ptr,
+    png_const_charp error_message)
 {
    if ((png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN) != 0)
       png_chunk_warning(png_ptr, error_message);
@@ -507,7 +508,8 @@ png_chunk_report(png_const_structrp png_ptr, png_const_charp message, int error)
 #ifdef PNG_ERROR_TEXT_SUPPORTED
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 PNG_FUNCTION(void,
-png_fixed_error,(png_const_structrp png_ptr, png_const_charp name),PNG_NORETURN)
+png_fixed_error,(png_const_structrp png_ptr, png_const_charp name),
+    PNG_NORETURN)
 {
 #  define fixed_message "fixed point overflow in "
 #  define fixed_message_ln ((sizeof fixed_message)-1)
@@ -659,7 +661,8 @@ png_default_error,(png_const_structrp png_ptr, png_const_charp error_message),
 }
 
 PNG_FUNCTION(void,
-png_longjmp,(png_const_structrp png_ptr, int val),PNG_NORETURN)
+png_longjmp,(png_const_structrp png_ptr, int val),
+    PNG_NORETURN)
 {
 #ifdef PNG_SETJMP_SUPPORTED
    if (png_ptr != NULL && png_ptr->longjmp_fn != NULL &&

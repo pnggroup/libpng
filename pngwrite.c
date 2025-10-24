@@ -552,7 +552,8 @@ png_convert_from_time_t(png_timep ptime, time_t ttime)
 /* Initialize png_ptr structure, and allocate any memory needed */
 PNG_FUNCTION(png_structp,
 png_create_write_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
-    png_error_ptr error_fn, png_error_ptr warn_fn),PNG_ALLOCATED)
+    png_error_ptr error_fn, png_error_ptr warn_fn),
+    PNG_ALLOCATED)
 {
 #ifndef PNG_USER_MEM_SUPPORTED
    png_structrp png_ptr = png_create_png_struct(user_png_ver, error_ptr,
@@ -566,7 +567,8 @@ png_create_write_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
 PNG_FUNCTION(png_structp,
 png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
     png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
-    png_malloc_ptr malloc_fn, png_free_ptr free_fn),PNG_ALLOCATED)
+    png_malloc_ptr malloc_fn, png_free_ptr free_fn),
+    PNG_ALLOCATED)
 {
    png_structrp png_ptr = png_create_png_struct(user_png_ver, error_ptr,
        error_fn, warn_fn, mem_ptr, malloc_fn, free_fn);
@@ -1355,8 +1357,8 @@ png_set_write_status_fn(png_structrp png_ptr, png_write_status_ptr write_row_fn)
 
 #ifdef PNG_WRITE_USER_TRANSFORM_SUPPORTED
 void
-png_set_write_user_transform_fn(png_structrp png_ptr, png_user_transform_ptr
-    write_user_transform_fn)
+png_set_write_user_transform_fn(png_structrp png_ptr,
+    png_user_transform_ptr write_user_transform_fn)
 {
    png_debug(1, "in png_set_write_user_transform_fn");
 
@@ -1577,17 +1579,17 @@ png_image_write_init(png_imagep image)
 typedef struct
 {
    /* Arguments: */
-   png_imagep      image;
+   png_imagep image;
    png_const_voidp buffer;
-   png_int_32      row_stride;
+   png_int_32 row_stride;
    png_const_voidp colormap;
-   int             convert_to_8bit;
+   int convert_to_8bit;
    /* Local variables: */
    png_const_voidp first_row;
-   ptrdiff_t       row_bytes;
-   png_voidp       local_row;
+   ptrdiff_t row_bytes;
+   png_voidp local_row;
    /* Byte count for memory writing */
-   png_bytep        memory;
+   png_bytep memory;
    png_alloc_size_t memory_bytes; /* not used for STDIO */
    png_alloc_size_t output_bytes; /* running total */
 } png_image_write_control;

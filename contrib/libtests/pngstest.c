@@ -83,7 +83,7 @@ static char tmpf[23] = "TMP";
  * Hill, "The Art of Electronics".
  */
 static void
-make_random_bytes(png_uint_32* seed, void* pv, size_t size)
+make_random_bytes(png_uint_32 *seed, void *pv, size_t size)
 {
    png_uint_32 u0 = seed[0], u1 = seed[1];
    png_bytep bytes = voidcast(png_bytep, pv);
@@ -473,7 +473,8 @@ typedef struct
 }
 format_list;
 
-static void format_init(format_list *pf)
+static void
+format_init(format_list *pf)
 {
    int i;
    for (i=0; i<FORMAT_SET_COUNT; ++i)
@@ -481,7 +482,8 @@ static void format_init(format_list *pf)
 }
 
 #if 0 /* currently unused */
-static void format_clear(format_list *pf)
+static void
+format_clear(format_list *pf)
 {
    int i;
    for (i=0; i<FORMAT_SET_COUNT; ++i)
@@ -489,7 +491,8 @@ static void format_clear(format_list *pf)
 }
 #endif
 
-static int format_is_initial(format_list *pf)
+static int
+format_is_initial(format_list *pf)
 {
    int i;
    for (i=0; i<FORMAT_SET_COUNT; ++i)
@@ -499,7 +502,8 @@ static int format_is_initial(format_list *pf)
    return 1;
 }
 
-static int format_set(format_list *pf, png_uint_32 format)
+static int
+format_set(format_list *pf, png_uint_32 format)
 {
    if (format < FORMAT_COUNT)
       return pf->bits[format >> 5] |= ((png_uint_32)1) << (format & 31);
@@ -508,7 +512,8 @@ static int format_set(format_list *pf, png_uint_32 format)
 }
 
 #if 0 /* currently unused */
-static int format_unset(format_list *pf, png_uint_32 format)
+static int
+format_unset(format_list *pf, png_uint_32 format)
 {
    if (format < FORMAT_COUNT)
       return pf->bits[format >> 5] &= ~((png_uint_32)1) << (format & 31);
@@ -517,13 +522,15 @@ static int format_unset(format_list *pf, png_uint_32 format)
 }
 #endif
 
-static int format_isset(format_list *pf, png_uint_32 format)
+static int
+format_isset(format_list *pf, png_uint_32 format)
 {
    return format < FORMAT_COUNT &&
       (pf->bits[format >> 5] & (((png_uint_32)1) << (format & 31))) != 0;
 }
 
-static void format_default(format_list *pf, int redundant)
+static void
+format_default(format_list *pf, int redundant)
 {
    if (redundant)
    {
@@ -647,7 +654,8 @@ freeimage(Image *image)
 /* This is actually a re-initializer; allows an image structure to be re-used by
  * freeing everything that relates to an old image.
  */
-static void initimage(Image *image, png_uint_32 opts, const char *file_name,
+static void
+initimage(Image *image, png_uint_32 opts, const char *file_name,
    int stride_extra)
 {
    freeimage(image);
@@ -3821,7 +3829,8 @@ main(int argc, char **argv)
 }
 
 #else /* !PNG_SIMPLIFIED_READ_SUPPORTED */
-int main(void)
+int
+main(void)
 {
    fprintf(stderr, "pngstest: no read support in libpng, test skipped\n");
    /* So the test is skipped: */

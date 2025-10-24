@@ -1096,8 +1096,8 @@ png_set_rgb_to_gray(png_structrp png_ptr, int error_action, double red,
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 void
-png_set_read_user_transform_fn(png_structrp png_ptr, png_user_transform_ptr
-    read_user_transform_fn)
+png_set_read_user_transform_fn(png_structrp png_ptr,
+    png_user_transform_ptr read_user_transform_fn)
 {
    png_debug(1, "in png_set_read_user_transform_fn");
 
@@ -4270,8 +4270,8 @@ png_do_encode_alpha(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
  * upon whether you supply trans and num_trans.
  */
 static void
-png_do_expand_palette(png_row_infop row_info, png_bytep row, png_const_colorp
-      palette, png_const_bytep trans_alpha, int num_trans)
+png_do_expand_palette(png_row_infop row_info, png_bytep row,
+    png_const_colorp palette, png_const_bytep trans_alpha, int num_trans)
 {
    int shift, value;
    png_bytep sp, dp;

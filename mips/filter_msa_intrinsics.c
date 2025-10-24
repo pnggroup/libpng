@@ -354,7 +354,7 @@
 
 static void
 png_read_filter_row_up_msa(png_row_infop row_info, png_bytep row,
-   png_const_bytep prev_row)
+    png_const_bytep prev_row)
 {
    size_t i, cnt, cnt16, cnt32;
    size_t istop = row_info->rowbytes;
@@ -446,7 +446,7 @@ png_read_filter_row_up_msa(png_row_infop row_info, png_bytep row,
 
 static void
 png_read_filter_row_sub4_msa(png_row_infop row_info, png_bytep row,
-   png_const_bytep prev_row)
+    png_const_bytep prev_row)
 {
    size_t count;
    size_t istop = row_info->rowbytes;
@@ -486,7 +486,7 @@ png_read_filter_row_sub4_msa(png_row_infop row_info, png_bytep row,
 
 static void
 png_read_filter_row_sub3_msa(png_row_infop row_info, png_bytep row,
-   png_const_bytep prev_row)
+    png_const_bytep prev_row)
 {
    size_t count;
    size_t istop = row_info->rowbytes;
@@ -532,7 +532,7 @@ png_read_filter_row_sub3_msa(png_row_infop row_info, png_bytep row,
 
 static void
 png_read_filter_row_avg4_msa(png_row_infop row_info, png_bytep row,
-   png_const_bytep prev_row)
+    png_const_bytep prev_row)
 {
    size_t i;
    png_bytep src = row;
@@ -584,7 +584,7 @@ png_read_filter_row_avg4_msa(png_row_infop row_info, png_bytep row,
 
 static void
 png_read_filter_row_avg3_msa(png_row_infop row_info, png_bytep row,
-   png_const_bytep prev_row)
+    png_const_bytep prev_row)
 {
    size_t i;
    png_bytep src = row;
@@ -646,7 +646,7 @@ png_read_filter_row_avg3_msa(png_row_infop row_info, png_bytep row,
 
 static void
 png_read_filter_row_paeth4_msa(png_row_infop row_info, png_bytep row,
-   png_const_bytep prev_row)
+    png_const_bytep prev_row)
 {
    int32_t count, rp_end;
    png_bytep nxt;
@@ -717,7 +717,7 @@ png_read_filter_row_paeth4_msa(png_row_infop row_info, png_bytep row,
 
 static void
 png_read_filter_row_paeth3_msa(png_row_infop row_info, png_bytep row,
-   png_const_bytep prev_row)
+    png_const_bytep prev_row)
 {
    int32_t count, rp_end;
    png_bytep nxt;
