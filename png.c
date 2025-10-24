@@ -101,7 +101,8 @@ png_sig_cmp(png_const_bytep sig, size_t start, size_t num_to_check)
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 /* Function to allocate memory for zlib */
 PNG_FUNCTION(voidpf /* PRIVATE */,
-png_zalloc,(voidpf png_ptr, uInt items, uInt size),PNG_ALLOCATED)
+png_zalloc,(voidpf png_ptr, uInt items, uInt size),
+    PNG_ALLOCATED)
 {
    png_alloc_size_t num_bytes = size;
 
@@ -257,7 +258,8 @@ png_user_version_check(png_structrp png_ptr, png_const_charp user_png_ver)
 PNG_FUNCTION(png_structp /* PRIVATE */,
 png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
     png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
-    png_malloc_ptr malloc_fn, png_free_ptr free_fn),PNG_ALLOCATED)
+    png_malloc_ptr malloc_fn, png_free_ptr free_fn),
+    PNG_ALLOCATED)
 {
    png_struct create_struct;
 #  ifdef PNG_SETJMP_SUPPORTED
@@ -361,7 +363,8 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
 
 /* Allocate the memory for an info_struct for the application. */
 PNG_FUNCTION(png_infop,PNGAPI
-png_create_info_struct,(png_const_structrp png_ptr),PNG_ALLOCATED)
+png_create_info_struct,(png_const_structrp png_ptr),
+    PNG_ALLOCATED)
 {
    png_inforp info_ptr;
 
@@ -2257,8 +2260,8 @@ PNG_FP_End:
 int
 png_check_fp_string(png_const_charp string, size_t size)
 {
-   int        state=0;
-   size_t char_index=0;
+   int state = 0;
+   size_t char_index = 0;
 
    if (png_check_fp_number(string, size, &state, &char_index) != 0 &&
       (char_index == size || string[char_index] == 0))
