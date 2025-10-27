@@ -1675,7 +1675,7 @@ makename(struct display *dp, const char *dir, const char *infile)
 
 /* error handler callbacks for libpng */
 static void
-display_warning(png_structp pp, png_const_charp warning)
+display_warning(png_structp pp, const char *warning)
 {
    struct display *dp = get_dp(pp);
 
@@ -1685,7 +1685,7 @@ display_warning(png_structp pp, png_const_charp warning)
 }
 
 static void
-display_error(png_structp pp, png_const_charp error)
+display_error(png_structp pp, const char *error)
 {
    struct display *dp = get_dp(pp);
 
@@ -1717,7 +1717,7 @@ display_start_read(struct display *dp, const char *filename)
 }
 
 static void
-read_function(png_structp pp, png_bytep data, size_t size)
+read_function(png_structp pp, png_byte *data, size_t size)
 {
    struct display *dp = get_dp(pp);
 
@@ -1971,7 +1971,7 @@ display_start_write(struct display *dp, const char *filename)
 }
 
 static void
-write_function(png_structp pp, png_bytep data, size_t size)
+write_function(png_structp pp, png_byte *data, size_t size)
 {
    struct display *dp = get_dp(pp);
 

@@ -553,7 +553,7 @@ struct display
    png_infop      original_ip;       /* set by the original read */
 
    size_t         original_rowbytes; /* of the original rows: */
-   png_bytepp     original_rows;     /* from the original read */
+   png_byte **    original_rows;     /* from the original read */
 
    /* Original chunks valid */
    png_uint_32    chunks;
@@ -769,13 +769,13 @@ display_log(struct display *dp, error_level level, const char *fmt, ...)
 
 /* error handler callbacks for libpng */
 static void
-display_warning(png_structp pp, png_const_charp warning)
+display_warning(png_structp pp, const char *warning)
 {
    display_log(get_dp(pp), LIBPNG_WARNING, "%s", warning);
 }
 
 static void
-display_error(png_structp pp, png_const_charp error)
+display_error(png_structp pp, const char *error)
 {
    struct display *dp = get_dp(pp);
 
@@ -810,7 +810,7 @@ display_cache_file(struct display *dp, const char *filename)
 }
 
 static void
-buffer_read(struct display *dp, struct buffer *bp, png_bytep data,
+buffer_read(struct display *dp, struct buffer *bp, png_byte *data,
    size_t size)
 {
    struct buffer_list *last = bp->current;
@@ -859,7 +859,7 @@ buffer_read(struct display *dp, struct buffer *bp, png_bytep data,
 }
 
 static void
-read_function(png_structp pp, png_bytep data, size_t size)
+read_function(png_structp pp, png_byte *data, size_t size)
 {
    buffer_read(get_dp(pp), get_buffer(pp), data, size);
 }
@@ -907,7 +907,7 @@ read_png(struct display *dp, struct buffer *bp, const char *operation,
 
 #if 0 /* crazy debugging */
    {
-      png_bytep pr = png_get_rows(pp, ip)[0];
+      png_byte *pr = png_get_rows(pp, ip)[0];
       size_t rb = png_get_rowbytes(pp, ip);
       size_t cb;
       char c = ' ';
@@ -1059,7 +1059,7 @@ compare_read(struct display *dp, int applied_transforms)
     * the shift transform, in which case low bits may have been lost.
     */
    {
-      png_bytepp rows = png_get_rows(dp->read_pp, dp->read_ip);
+      png_byte **rows = png_get_rows(dp->read_pp, dp->read_ip);
       unsigned int mask;  /* mask (if not zero) for the final byte */
 
       if (bit_depth < 8)
@@ -1085,8 +1085,8 @@ compare_read(struct display *dp, int applied_transforms)
 
          for (y=0; y<height; ++y)
          {
-            png_bytep row = rows[y];
-            png_bytep orig = dp->original_rows[y];
+            png_byte *row = rows[y];
+            png_byte *orig = dp->original_rows[y];
 
             if (memcmp(row, orig, rowbytes-(mask != 0)) != 0 || (mask != 0 &&
                ((row[rowbytes-1] & mask) != (orig[rowbytes-1] & mask))))
@@ -1242,8 +1242,8 @@ compare_read(struct display *dp, int applied_transforms)
 
          for (y=0; y<height; ++y)
          {
-            png_bytep row = rows[y];
-            png_bytep orig = dp->original_rows[y];
+            png_byte *row = rows[y];
+            png_byte *orig = dp->original_rows[y];
             unsigned long x;
 
             for (x=0; x<(width-(mask!=0)); ++x)
@@ -1281,7 +1281,7 @@ compare_read(struct display *dp, int applied_transforms)
 
 #ifdef PNG_WRITE_PNG_SUPPORTED
 static void
-buffer_write(struct display *dp, struct buffer *buffer, png_bytep data,
+buffer_write(struct display *dp, struct buffer *buffer, png_byte *data,
    size_t size)
    /* Generic write function used both from the write callback provided to
     * libpng and from the generic read code.
@@ -1326,7 +1326,7 @@ buffer_write(struct display *dp, struct buffer *buffer, png_bytep data,
 }
 
 static void
-write_function(png_structp pp, png_bytep data, size_t size)
+write_function(png_structp pp, png_byte *data, size_t size)
 {
    buffer_write(get_dp(pp), get_buffer(pp), data, size);
 }

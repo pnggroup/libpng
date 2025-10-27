@@ -46,7 +46,7 @@ png_get_rowbytes(png_const_structrp png_ptr, png_const_inforp info_ptr)
 }
 
 #ifdef PNG_INFO_IMAGE_SUPPORTED
-png_bytepp
+png_byte **
 png_get_rows(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
    if (png_ptr != NULL && info_ptr != NULL)
@@ -487,7 +487,7 @@ png_get_channels(png_const_structrp png_ptr, png_const_inforp info_ptr)
 }
 
 #ifdef PNG_READ_SUPPORTED
-png_const_bytep
+const png_byte *
 png_get_signature(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
    if (png_ptr != NULL && info_ptr != NULL)
@@ -716,8 +716,8 @@ png_get_sRGB(png_const_structrp png_ptr, png_const_inforp info_ptr,
 #ifdef PNG_iCCP_SUPPORTED
 png_uint_32
 png_get_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_charpp name, int *compression_type,
-    png_bytepp profile, png_uint_32 *proflen)
+    char **name, int *compression_type,
+    png_byte **profile, png_uint_32 *proflen)
 {
    png_debug1(1, "in %s retrieval function", "iCCP");
 
@@ -760,9 +760,9 @@ png_get_sPLT(png_const_structrp png_ptr, png_inforp info_ptr,
 #ifdef PNG_cICP_SUPPORTED
 png_uint_32
 png_get_cICP(png_const_structrp png_ptr,
-             png_const_inforp info_ptr, png_bytep colour_primaries,
-             png_bytep transfer_function, png_bytep matrix_coefficients,
-             png_bytep video_full_range_flag)
+             png_const_inforp info_ptr, png_byte *colour_primaries,
+             png_byte *transfer_function, png_byte *matrix_coefficients,
+             png_byte *video_full_range_flag)
 {
     png_debug1(1, "in %s retrieval function", "cICP");
 
@@ -786,8 +786,8 @@ png_get_cICP(png_const_structrp png_ptr,
 #  ifdef PNG_FIXED_POINT_SUPPORTED
 png_uint_32
 png_get_cLLI_fixed(png_const_structrp png_ptr, png_const_inforp info_ptr,
-    png_uint_32p maxCLL,
-    png_uint_32p maxFALL)
+    png_uint_32 *maxCLL,
+    png_uint_32 *maxFALL)
 {
    png_debug1(1, "in %s retrieval function", "cLLI");
 
@@ -831,7 +831,7 @@ png_get_mDCV_fixed(png_const_structrp png_ptr, png_const_inforp info_ptr,
     png_fixed_point *red_x, png_fixed_point *red_y,
     png_fixed_point *green_x, png_fixed_point *green_y,
     png_fixed_point *blue_x, png_fixed_point *blue_y,
-    png_uint_32p mastering_maxDL, png_uint_32p mastering_minDL)
+    png_uint_32 *mastering_maxDL, png_uint_32 *mastering_minDL)
 {
    png_debug1(1, "in %s retrieval function", "mDCV");
 
@@ -890,7 +890,7 @@ png_get_mDCV(png_const_structrp png_ptr, png_const_inforp info_ptr,
 #ifdef PNG_eXIf_SUPPORTED
 png_uint_32
 png_get_eXIf_1(png_const_structrp png_ptr, png_const_inforp info_ptr,
-    png_uint_32 *num_exif, png_bytep *exif)
+    png_uint_32 *num_exif, png_byte **exif)
 {
    png_debug1(1, "in %s retrieval function", "eXIf");
 
@@ -909,7 +909,7 @@ png_get_eXIf_1(png_const_structrp png_ptr, png_const_inforp info_ptr,
 #ifdef PNG_hIST_SUPPORTED
 png_uint_32
 png_get_hIST(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_uint_16p *hist)
+    png_uint_16 **hist)
 {
    png_debug1(1, "in %s retrieval function", "hIST");
 
@@ -992,8 +992,8 @@ png_get_oFFs(png_const_structrp png_ptr, png_const_inforp info_ptr,
 #ifdef PNG_pCAL_SUPPORTED
 png_uint_32
 png_get_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_charp *purpose, png_int_32 *X0, png_int_32 *X1, int *type, int *nparams,
-    png_charp *units, png_charpp *params)
+    char **purpose, png_int_32 *X0, png_int_32 *X1, int *type, int *nparams,
+    char **units, char ***params)
 {
    png_debug1(1, "in %s retrieval function", "pCAL");
 
@@ -1065,7 +1065,7 @@ png_get_sCAL(png_const_structrp png_ptr, png_const_inforp info_ptr,
 #  endif /* FLOATING POINT */
 png_uint_32
 png_get_sCAL_s(png_const_structrp png_ptr, png_const_inforp info_ptr,
-    int *unit, png_charpp width, png_charpp height)
+    int *unit, char **width, char **height)
 {
    png_debug1(1, "in %s retrieval function", "sCAL(str)");
 
@@ -1200,7 +1200,7 @@ png_get_tIME(png_const_structrp png_ptr, png_inforp info_ptr,
 #ifdef PNG_tRNS_SUPPORTED
 png_uint_32
 png_get_tRNS(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_bytep *trans_alpha, int *num_trans, png_color_16p *trans_color)
+    png_byte **trans_alpha, int *num_trans, png_color_16p *trans_color)
 {
    png_uint_32 retval = 0;
 
@@ -1268,7 +1268,7 @@ png_get_rgb_to_gray_status(png_const_structrp png_ptr)
 #endif
 
 #ifdef PNG_USER_CHUNKS_SUPPORTED
-png_voidp
+void *
 png_get_user_chunk_ptr(png_const_structrp png_ptr)
 {
    return (png_ptr ? png_ptr->user_chunk_ptr : NULL);

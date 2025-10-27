@@ -57,7 +57,7 @@
  */
 #if ZLIB_VERNUM < 0x1260
 #  define PNGZ_MSG_CAST(s) constcast(char*,s)
-#  define PNGZ_INPUT_CAST(b) constcast(png_bytep,b)
+#  define PNGZ_INPUT_CAST(b) constcast(png_byte *,b)
 #else
 #  define PNGZ_MSG_CAST(s) (s)
 #  define PNGZ_INPUT_CAST(b) (b)
@@ -147,8 +147,8 @@
  * normally be an error).
  */
 typedef png_uint_16  udigit; /* A 'unum' is an array of these */
-typedef png_uint_16p uarb;
-typedef png_const_uint_16p uarbc;
+typedef png_uint_16 *uarb;
+typedef const png_uint_16 *uarbc;
 
 #define UDIGITS(unum) ((sizeof unum)/(sizeof (udigit))
    /* IMPORTANT: only apply this to an array, applied to a pointer the result
@@ -424,7 +424,7 @@ static void
 make_random_bytes(png_uint_32 *seed, void *pv, size_t size)
 {
    png_uint_32 u0 = seed[0], u1 = seed[1];
-   png_bytep bytes = voidcast(png_bytep, pv);
+   png_byte *bytes = voidcast(png_byte *, pv);
 
    /* There are thirty-three bits; the next bit in the sequence is bit-33 XOR
     * bit-20.  The top 1 bit is in u1, the bottom 32 are in u0.
@@ -2932,7 +2932,7 @@ skip_chunk:
 }
 
 static png_uint_32
-get32(png_bytep buffer, int offset)
+get32(png_byte *buffer, int offset)
    /* Read a 32-bit value from an 8-byte circular buffer (used only below).
     */
 {
@@ -3149,13 +3149,13 @@ read_chunk(struct file *file)
 static struct file *get_control(png_const_structrp png_ptr);
 
 static void
-error_handler(png_structp png_ptr, png_const_charp message)
+error_handler(png_structp png_ptr, const char *message)
 {
    stop(get_control(png_ptr),  LIBPNG_ERROR_CODE, message);
 }
 
 static void
-warning_handler(png_structp png_ptr, png_const_charp message)
+warning_handler(png_structp png_ptr, const char *message)
 {
    struct file *file = get_control(png_ptr);
 
@@ -3167,7 +3167,7 @@ warning_handler(png_structp png_ptr, png_const_charp message)
  * passing it to libpng
  */
 static void
-read_callback(png_structp png_ptr, png_bytep buffer, size_t count)
+read_callback(png_structp png_ptr, png_byte *buffer, size_t count)
    /* Return 'count' bytes to libpng in 'buffer' */
 {
    struct file *file = get_control(png_ptr);

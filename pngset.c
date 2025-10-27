@@ -317,9 +317,9 @@ png_set_mDCV(png_const_structrp png_ptr, png_inforp info_ptr,
 #ifdef PNG_eXIf_SUPPORTED
 void
 png_set_eXIf_1(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_uint_32 num_exif, png_bytep exif)
+    png_uint_32 num_exif, png_byte *exif)
 {
-   png_bytep new_exif;
+   png_byte *new_exif;
 
    png_debug1(1, "in %s storage function", "eXIf");
 
@@ -327,7 +327,7 @@ png_set_eXIf_1(png_const_structrp png_ptr, png_inforp info_ptr,
        (png_ptr->mode & PNG_WROTE_eXIf) != 0)
       return;
 
-   new_exif = png_voidcast(png_bytep, png_malloc_warn(png_ptr, num_exif));
+   new_exif = png_voidcast(png_byte *, png_malloc_warn(png_ptr, num_exif));
 
    if (new_exif == NULL)
    {
@@ -373,7 +373,7 @@ png_set_gAMA(png_const_structrp png_ptr, png_inforp info_ptr, double file_gamma)
 #ifdef PNG_hIST_SUPPORTED
 void
 png_set_hIST(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_const_uint_16p hist)
+    const png_uint_16 *hist)
 {
    int i;
 
@@ -396,7 +396,7 @@ png_set_hIST(png_const_structrp png_ptr, png_inforp info_ptr,
    /* Changed from info->num_palette to PNG_MAX_PALETTE_LENGTH in
     * version 1.2.1
     */
-   info_ptr->hist = png_voidcast(png_uint_16p, png_malloc_warn(png_ptr,
+   info_ptr->hist = png_voidcast(png_uint_16 *, png_malloc_warn(png_ptr,
        PNG_MAX_PALETTE_LENGTH * (sizeof (png_uint_16))));
 
    if (info_ptr->hist == NULL)
@@ -480,8 +480,8 @@ png_set_oFFs(png_const_structrp png_ptr, png_inforp info_ptr,
 #ifdef PNG_pCAL_SUPPORTED
 void
 png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_const_charp purpose, png_int_32 X0, png_int_32 X1, int type,
-    int nparams, png_const_charp units, png_charpp params)
+    const char *purpose, png_int_32 X0, png_int_32 X1, int type,
+    int nparams, const char *units, char **params)
 {
    size_t length;
    int i;
@@ -525,7 +525,7 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
       }
    }
 
-   info_ptr->pcal_purpose = png_voidcast(png_charp,
+   info_ptr->pcal_purpose = png_voidcast(char *,
        png_malloc_warn(png_ptr, length));
 
    if (info_ptr->pcal_purpose == NULL)
@@ -549,7 +549,7 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
    png_debug1(3, "allocating units for info (%lu bytes)",
        (unsigned long)length);
 
-   info_ptr->pcal_units = png_voidcast(png_charp,
+   info_ptr->pcal_units = png_voidcast(char *,
        png_malloc_warn(png_ptr, length));
 
    if (info_ptr->pcal_units == NULL)
@@ -560,8 +560,8 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
 
    memcpy(info_ptr->pcal_units, units, length);
 
-   info_ptr->pcal_params = png_voidcast(png_charpp, png_malloc_warn(png_ptr,
-       (size_t)(((unsigned int)nparams + 1) * (sizeof (png_charp)))));
+   info_ptr->pcal_params = png_voidcast(char **, png_malloc_warn(png_ptr,
+       (size_t)(((unsigned int)nparams + 1) * (sizeof (char *)))));
 
    if (info_ptr->pcal_params == NULL)
    {
@@ -570,7 +570,7 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
    }
 
    memset(info_ptr->pcal_params, 0, ((unsigned int)nparams + 1) *
-       (sizeof (png_charp)));
+       (sizeof (char *)));
 
    for (i = 0; i < nparams; i++)
    {
@@ -578,7 +578,7 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
       png_debug2(3, "allocating parameter %d for info (%lu bytes)", i,
           (unsigned long)length);
 
-      info_ptr->pcal_params[i] = (png_charp)png_malloc_warn(png_ptr, length);
+      info_ptr->pcal_params[i] = (char *)png_malloc_warn(png_ptr, length);
 
       if (info_ptr->pcal_params[i] == NULL)
       {
@@ -596,7 +596,7 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
 #ifdef PNG_sCAL_SUPPORTED
 void
 png_set_sCAL_s(png_const_structrp png_ptr, png_inforp info_ptr,
-    int unit, png_const_charp swidth, png_const_charp sheight)
+    int unit, const char *swidth, const char *sheight)
 {
    size_t lengthw = 0, lengthh = 0;
 
@@ -625,7 +625,7 @@ png_set_sCAL_s(png_const_structrp png_ptr, png_inforp info_ptr,
 
    png_debug1(3, "allocating unit for info (%u bytes)", (unsigned int)lengthw);
 
-   info_ptr->scal_s_width = png_voidcast(png_charp,
+   info_ptr->scal_s_width = png_voidcast(char *,
        png_malloc_warn(png_ptr, lengthw));
 
    if (info_ptr->scal_s_width == NULL)
@@ -641,7 +641,7 @@ png_set_sCAL_s(png_const_structrp png_ptr, png_inforp info_ptr,
 
    png_debug1(3, "allocating unit for info (%u bytes)", (unsigned int)lengthh);
 
-   info_ptr->scal_s_height = png_voidcast(png_charp,
+   info_ptr->scal_s_height = png_voidcast(char *,
        png_malloc_warn(png_ptr, lengthh));
 
    if (info_ptr->scal_s_height == NULL)
@@ -857,11 +857,11 @@ png_set_sRGB_gAMA_and_cHRM(png_const_structrp png_ptr, png_inforp info_ptr,
 #ifdef PNG_iCCP_SUPPORTED
 void
 png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_const_charp name, int compression_type,
-    png_const_bytep profile, png_uint_32 proflen)
+    const char *name, int compression_type,
+    const png_byte *profile, png_uint_32 proflen)
 {
-   png_charp new_iccp_name;
-   png_bytep new_iccp_profile;
+   char *new_iccp_name;
+   png_byte *new_iccp_profile;
    size_t length;
 
    png_debug1(1, "in %s storage function", "iCCP");
@@ -873,7 +873,7 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
       png_app_error(png_ptr, "Invalid iCCP compression method");
 
    length = strlen(name)+1;
-   new_iccp_name = png_voidcast(png_charp, png_malloc_warn(png_ptr, length));
+   new_iccp_name = png_voidcast(char *, png_malloc_warn(png_ptr, length));
 
    if (new_iccp_name == NULL)
    {
@@ -883,7 +883,7 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
    }
 
    memcpy(new_iccp_name, name, length);
-   new_iccp_profile = png_voidcast(png_bytep,
+   new_iccp_profile = png_voidcast(png_byte *,
        png_malloc_warn(png_ptr, proflen));
 
    if (new_iccp_profile == NULL)
@@ -1049,7 +1049,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
          textp->compression = text_ptr[i].compression;
       }
 
-      textp->key = png_voidcast(png_charp,png_malloc_base(png_ptr,
+      textp->key = png_voidcast(char *,png_malloc_base(png_ptr,
           key_len + text_length + lang_len + lang_key_len + 4));
 
       if (textp->key == NULL)
@@ -1142,7 +1142,7 @@ png_set_tIME(png_const_structrp png_ptr, png_inforp info_ptr,
 #ifdef PNG_tRNS_SUPPORTED
 void
 png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
-    png_const_bytep trans_alpha, int num_trans, png_const_color_16p trans_color)
+    const png_byte *trans_alpha, int num_trans, png_const_color_16p trans_color)
 {
    png_debug1(1, "in %s storage function", "tRNS");
 
@@ -1166,7 +1166,7 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
        if (num_trans > 0 && num_trans <= PNG_MAX_PALETTE_LENGTH)
        {
          /* Changed from num_trans to PNG_MAX_PALETTE_LENGTH in version 1.2.1 */
-          info_ptr->trans_alpha = png_voidcast(png_bytep,
+          info_ptr->trans_alpha = png_voidcast(png_byte *,
               png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH));
           memcpy(info_ptr->trans_alpha, trans_alpha, (size_t)num_trans);
 
@@ -1270,7 +1270,7 @@ png_set_sPLT(png_const_structrp png_ptr,
        * on trying to add sPLT chunks.
        */
       length = strlen(entries->name) + 1;
-      np->name = png_voidcast(png_charp, png_malloc_base(png_ptr, length));
+      np->name = png_voidcast(char *, png_malloc_base(png_ptr, length));
 
       if (np->name == NULL)
          break;
@@ -1564,7 +1564,7 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
 
       else
       {
-         np->data = png_voidcast(png_bytep,
+         np->data = png_voidcast(png_byte *,
              png_malloc_base(png_ptr, unknowns->size));
 
          if (np->data == NULL)
@@ -1634,7 +1634,7 @@ png_permit_mng_features(png_structrp png_ptr, png_uint_32 mng_features)
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 static unsigned int
-add_one_chunk(png_bytep list, unsigned int count, png_const_bytep add, int keep)
+add_one_chunk(png_byte *list, unsigned int count, const png_byte *add, int keep)
 {
    unsigned int i;
 
@@ -1663,9 +1663,9 @@ add_one_chunk(png_bytep list, unsigned int count, png_const_bytep add, int keep)
 
 void
 png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
-    png_const_bytep chunk_list, int num_chunks_in)
+    const png_byte *chunk_list, int num_chunks_in)
 {
-   png_bytep new_list;
+   png_byte *new_list;
    unsigned int num_chunks, old_num_chunks;
 
    if (png_ptr == NULL)
@@ -1757,7 +1757,7 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
     */
    if (keep != 0)
    {
-      new_list = png_voidcast(png_bytep, png_malloc(png_ptr,
+      new_list = png_voidcast(png_byte *, png_malloc(png_ptr,
           5 * (num_chunks + old_num_chunks)));
 
       if (old_num_chunks > 0)
@@ -1777,8 +1777,8 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
     */
    if (new_list != NULL)
    {
-      png_const_bytep inlist;
-      png_bytep outlist;
+      const png_byte *inlist;
+      png_byte *outlist;
       unsigned int i;
 
       for (i=0; i<num_chunks; ++i)
@@ -1827,7 +1827,7 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
 
 #ifdef PNG_READ_USER_CHUNKS_SUPPORTED
 void
-png_set_read_user_chunk_fn(png_structrp png_ptr, png_voidp user_chunk_ptr,
+png_set_read_user_chunk_fn(png_structrp png_ptr, void *user_chunk_ptr,
     png_user_chunk_ptr read_user_chunk_fn)
 {
    png_debug(1, "in png_set_read_user_chunk_fn");
@@ -1843,7 +1843,7 @@ png_set_read_user_chunk_fn(png_structrp png_ptr, png_voidp user_chunk_ptr,
 #ifdef PNG_INFO_IMAGE_SUPPORTED
 void
 png_set_rows(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_bytepp row_pointers)
+    png_byte **row_pointers)
 {
    png_debug(1, "in png_set_rows");
 
@@ -2046,10 +2046,10 @@ png_set_check_for_invalid_index(png_structrp png_ptr, int allowed)
  * valid one could not be generated, and the caller must png_error.
  */
 png_uint_32 /* PRIVATE */
-png_check_keyword(png_structrp png_ptr, png_const_charp key, png_bytep new_key)
+png_check_keyword(png_structrp png_ptr, const char *key, png_byte *new_key)
 {
 #ifdef PNG_WARNINGS_SUPPORTED
-   png_const_charp orig_key = key;
+   const char *orig_key = key;
 #endif
    png_uint_32 key_len = 0;
    int bad_character = 0;

@@ -34,13 +34,13 @@
 static int verbose = 1;
 static png_byte no_profile[] = "no profile";
 
-static png_bytep
+static png_byte *
 extract(FILE *fp, png_uint_32 *proflen)
 {
    png_structp png_ptr =
       png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
    png_infop info_ptr = NULL;
-   png_bytep result = NULL;
+   png_byte *result = NULL;
 
    /* Initialize for error or no profile: */
    *proflen = 0;
@@ -66,9 +66,9 @@ extract(FILE *fp, png_uint_32 *proflen)
    png_read_info(png_ptr, info_ptr);
 
    {
-      png_charp name;
+      char *name;
       int compression_type;
-      png_bytep profile;
+      png_byte *profile;
 
       if (png_get_iCCP(png_ptr, info_ptr, &name, &compression_type, &profile,
                        proflen) & PNG_INFO_iCCP)
@@ -98,7 +98,7 @@ extract_one_file(const char *filename)
    if (fp != NULL)
    {
       png_uint_32 proflen = 0;
-      png_bytep profile = extract(fp, &proflen);
+      png_byte *profile = extract(fp, &proflen);
 
       if (profile != NULL && profile != no_profile)
       {

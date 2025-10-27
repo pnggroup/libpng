@@ -42,7 +42,7 @@
  * define:
  *
  *    PNG_TARGET_STORES_DATA
- *       If set a png_voidp pointer called "target_data" will be defined in
+ *       If set a void *pointer called "target_data" will be defined in
  *       pngstruct.h.  The initialization code included in pngsimd.c must then
  *       also implement a function to free the data called png_target_free_data,
  *       see png_simd.c.

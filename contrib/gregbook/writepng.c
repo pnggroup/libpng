@@ -63,7 +63,7 @@
 
 /* local prototype */
 
-static void writepng_error_handler(png_structp png_ptr, png_const_charp msg);
+static void writepng_error_handler(png_structp png_ptr, const char *msg);
 
 
 
@@ -366,7 +366,7 @@ void writepng_cleanup(mainprog_info *mainprog_ptr)
 
 
 
-static void writepng_error_handler(png_structp png_ptr, png_const_charp msg)
+static void writepng_error_handler(png_structp png_ptr, const char *msg)
 {
     mainprog_info  *mainprog_ptr;
 

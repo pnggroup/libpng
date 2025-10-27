@@ -642,7 +642,7 @@ get_unknown(display *d, png_infop info_ptr, int after_IDAT)
 #endif /* SAVE_UNKNOWN_CHUNKS */
 
 static int
-check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/,
+check(FILE *fp, int argc, const char **argv, png_uint_32 *flags/*out*/,
    display *d, int set_callback)
 {
    int i, npasses, ipass;

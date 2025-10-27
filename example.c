@@ -56,7 +56,7 @@ int main(int argc, const char **argv)
       /* The first argument is the file to read: */
       if (png_image_begin_read_from_file(&image, argv[1]) != 0)
       {
-         png_bytep buffer;
+         png_byte *buffer;
 
          /* Set the format in which to read the PNG file; this code chooses a
           * simple sRGB format with a non-associated alpha channel, adequate to
@@ -298,7 +298,7 @@ void read_png(FILE *fp, int sig_read) /* File is already open */
     * was compiled with a compatible version of the library.  REQUIRED.
     */
    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-       png_voidp user_error_ptr, user_error_fn, user_warning_fn);
+       void *user_error_ptr, user_error_fn, user_warning_fn);
 
    if (png_ptr == NULL)
    {
@@ -483,7 +483,7 @@ void read_png(FILE *fp, int sig_read) /* File is already open */
       /* This reduces the image to the palette supplied in the file. */
       else if (png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette) != 0)
       {
-         png_uint_16p histogram = NULL;
+         png_uint_16 *histogram = NULL;
          png_get_hIST(png_ptr, info_ptr, &histogram);
          png_set_quantize(png_ptr, palette, num_palette,
              max_screen_colors, histogram, 0);
@@ -535,7 +535,7 @@ void read_png(FILE *fp, int sig_read) /* File is already open */
    png_read_update_info(png_ptr, info_ptr);
 
    /* Allocate the memory to hold the image using the fields of info_ptr. */
-   png_bytep row_pointers[height];
+   png_byte *row_pointers[height];
    for (row = 0; row < height; row++)
       row_pointers[row] = NULL; /* Clear the pointer array */
    for (row = 0; row < height; row++)
@@ -599,7 +599,7 @@ initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
     * linked libraries.
     */
    *png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-        png_voidp user_error_ptr, user_error_fn, user_warning_fn);
+        void *user_error_ptr, user_error_fn, user_warning_fn);
    if (*png_ptr == NULL)
    {
       *info_ptr = NULL;
@@ -636,7 +636,7 @@ initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
 
 int
 process_data(png_structp *png_ptr, png_infop *info_ptr,
-    png_bytep buffer, png_uint_32 length)
+    png_byte *buffer, png_uint_32 length)
 {
    if (setjmp(png_jmpbuf((*png_ptr))))
    {
@@ -670,7 +670,7 @@ info_callback(png_structp png_ptr, png_infop info)
     */
 }
 
-row_callback(png_structp png_ptr, png_bytep new_row,
+row_callback(png_structp png_ptr, png_byte *new_row,
     png_uint_32 row_num, int pass)
 {
    /* This function is called for every row in the image.  If the
@@ -690,7 +690,7 @@ row_callback(png_structp png_ptr, png_bytep new_row,
     */
 
    /* Get pointer to corresponding row in our PNG read buffer. */
-   png_bytep old_row = ((png_bytep *)our_data)[row_num];
+   png_byte *old_row = ((png_byte **)our_data)[row_num];
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
    /* If both rows are allocated, then copy the new row
@@ -755,7 +755,7 @@ void write_png(char *file_name /* , ... other image information ... */)
     * in case we are using dynamically linked libraries.  REQUIRED.
     */
    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
-       png_voidp user_error_ptr, user_error_fn, user_warning_fn);
+       void *user_error_ptr, user_error_fn, user_warning_fn);
    if (png_ptr == NULL)
    {
       fclose(fp);
@@ -963,9 +963,9 @@ void write_png(char *file_name /* , ... other image information ... */)
       png_error(png_ptr, "Image data buffer would be too large");
 
    png_byte image[height * width * bytes_per_pixel];
-   png_bytep row_pointers[height];
+   png_byte *row_pointers[height];
 
-   if (height > PNG_UINT_32_MAX / (sizeof (png_bytep)))
+   if (height > PNG_UINT_32_MAX / (sizeof (png_byte *)))
       png_error(png_ptr, "Image is too tall to process in memory");
 
    /* Set up pointers into your "image" byte array. */

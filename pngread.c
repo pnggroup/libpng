@@ -22,7 +22,7 @@
 
 /* Create a PNG structure for reading, and allocate any memory needed. */
 PNG_FUNCTION(png_structp,
-png_create_read_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
+png_create_read_struct,(const char *user_png_ver, void *error_ptr,
     png_error_ptr error_fn, png_error_ptr warn_fn),
     PNG_ALLOCATED)
 {
@@ -38,8 +38,8 @@ png_create_read_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
  * needed.
  */
 PNG_FUNCTION(png_structp,
-png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
-    png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
+png_create_read_struct_2,(const char *user_png_ver, void *error_ptr,
+    png_error_ptr error_fn, png_error_ptr warn_fn, void *mem_ptr,
     png_malloc_ptr malloc_fn, png_free_ptr free_fn),
     PNG_ALLOCATED)
 {
@@ -311,7 +311,7 @@ png_start_read_image(png_structrp png_ptr)
  * NOTE: this is apparently only supported in the 'sequential' reader.
  */
 static void
-png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
+png_do_read_intrapixel(png_row_infop row_info, png_byte *row)
 {
    png_debug(1, "in png_do_read_intrapixel");
 
@@ -323,7 +323,7 @@ png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
 
       if (row_info->bit_depth == 8)
       {
-         png_bytep rp;
+         png_byte *rp;
          png_uint_32 i;
 
          if (row_info->color_type == PNG_COLOR_TYPE_RGB)
@@ -343,7 +343,7 @@ png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
       }
       else if (row_info->bit_depth == 16)
       {
-         png_bytep rp;
+         png_byte *rp;
          png_uint_32 i;
 
          if (row_info->color_type == PNG_COLOR_TYPE_RGB)
@@ -373,7 +373,7 @@ png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
 #endif /* MNG_FEATURES */
 
 void
-png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
+png_read_row(png_structrp png_ptr, png_byte *row, png_byte *dsp_row)
 {
    png_row_info row_info;
 
@@ -638,12 +638,12 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
  */
 
 void
-png_read_rows(png_structrp png_ptr, png_bytepp row,
-    png_bytepp display_row, png_uint_32 num_rows)
+png_read_rows(png_structrp png_ptr, png_byte **row,
+    png_byte **display_row, png_uint_32 num_rows)
 {
    png_uint_32 i;
-   png_bytepp rp;
-   png_bytepp dp;
+   png_byte **rp;
+   png_byte **dp;
 
    png_debug(1, "in png_read_rows");
 
@@ -655,8 +655,8 @@ png_read_rows(png_structrp png_ptr, png_bytepp row,
    if (rp != NULL && dp != NULL)
       for (i = 0; i < num_rows; i++)
       {
-         png_bytep rptr = *rp++;
-         png_bytep dptr = *dp++;
+         png_byte *rptr = *rp++;
+         png_byte *dptr = *dp++;
 
          png_read_row(png_ptr, rptr, dptr);
       }
@@ -664,7 +664,7 @@ png_read_rows(png_structrp png_ptr, png_bytepp row,
    else if (rp != NULL)
       for (i = 0; i < num_rows; i++)
       {
-         png_bytep rptr = *rp;
+         png_byte *rptr = *rp;
          png_read_row(png_ptr, rptr, NULL);
          rp++;
       }
@@ -672,7 +672,7 @@ png_read_rows(png_structrp png_ptr, png_bytepp row,
    else if (dp != NULL)
       for (i = 0; i < num_rows; i++)
       {
-         png_bytep dptr = *dp;
+         png_byte *dptr = *dp;
          png_read_row(png_ptr, NULL, dptr);
          dp++;
       }
@@ -693,11 +693,11 @@ png_read_rows(png_structrp png_ptr, png_bytepp row,
  * [*] png_handle_alpha() does not exist yet, as of this version of libpng
  */
 void
-png_read_image(png_structrp png_ptr, png_bytepp image)
+png_read_image(png_structrp png_ptr, png_byte **image)
 {
    png_uint_32 i, image_height;
    int pass, j;
-   png_bytepp rp;
+   png_byte **rp;
 
    png_debug(1, "in png_read_image");
 
@@ -955,7 +955,7 @@ png_set_read_status_fn(png_structrp png_ptr, png_read_status_ptr read_row_fn)
 #ifdef PNG_INFO_IMAGE_SUPPORTED
 void
 png_read_png(png_structrp png_ptr, png_inforp info_ptr,
-    int transforms, png_voidp params)
+    int transforms, void *params)
 {
    png_debug(1, "in png_read_png");
 
@@ -966,7 +966,7 @@ png_read_png(png_structrp png_ptr, png_inforp info_ptr,
     * PNG file before the first IDAT (image data chunk).
     */
    png_read_info(png_ptr, info_ptr);
-   if (info_ptr->height > PNG_UINT_32_MAX/(sizeof (png_bytep)))
+   if (info_ptr->height > PNG_UINT_32_MAX/(sizeof (png_byte *)))
       png_error(png_ptr, "Image is too high to process with png_read_png()");
 
    /* -------------- image transformations start here ------------------- */
@@ -1135,8 +1135,8 @@ png_read_png(png_structrp png_ptr, png_inforp info_ptr,
    {
       png_uint_32 iptr;
 
-      info_ptr->row_pointers = png_voidcast(png_bytepp, png_malloc(png_ptr,
-          info_ptr->height * (sizeof (png_bytep))));
+      info_ptr->row_pointers = png_voidcast(png_byte **, png_malloc(png_ptr,
+          info_ptr->height * (sizeof (png_byte *))));
 
       for (iptr=0; iptr<info_ptr->height; iptr++)
          info_ptr->row_pointers[iptr] = NULL;
@@ -1144,7 +1144,7 @@ png_read_png(png_structrp png_ptr, png_inforp info_ptr,
       info_ptr->free_me |= PNG_FREE_ROWS;
 
       for (iptr = 0; iptr < info_ptr->height; iptr++)
-         info_ptr->row_pointers[iptr] = png_voidcast(png_bytep,
+         info_ptr->row_pointers[iptr] = png_voidcast(png_byte *,
              png_malloc(png_ptr, info_ptr->rowbytes));
    }
 
@@ -1194,13 +1194,13 @@ typedef struct
 {
    /* Arguments: */
    png_imagep image;
-   png_voidp buffer;
+   void *buffer;
    png_int_32 row_stride;
-   png_voidp colormap;
+   void *colormap;
    png_const_colorp background;
    /* Local variables: */
-   png_voidp local_row;
-   png_voidp first_row;
+   void *local_row;
+   void *first_row;
    ptrdiff_t row_bytes;             /* step between rows */
    int file_encoding;               /* E_ values above */
    png_fixed_point gamma_to_linear; /* For P_FILE, reciprocal of gamma */
@@ -1361,7 +1361,7 @@ png_image_is_not_sRGB(png_const_structrp png_ptr)
 }
 
 static int
-png_image_read_header(png_voidp argument)
+png_image_read_header(void *argument)
 {
    png_imagep image = png_voidcast(png_imagep, argument);
    png_structrp png_ptr = image->opaque->png_ptr;
@@ -1491,7 +1491,7 @@ png_image_begin_read_from_file(png_imagep image, const char *file_name)
 #endif /* STDIO */
 
 static void
-png_image_memory_read(png_structp png_ptr, png_bytep out, size_t need)
+png_image_memory_read(png_structp png_ptr, png_byte *out, size_t need)
 {
    if (png_ptr != NULL)
    {
@@ -1501,7 +1501,7 @@ png_image_memory_read(png_structp png_ptr, png_bytep out, size_t need)
          png_controlp cp = image->opaque;
          if (cp != NULL)
          {
-            png_const_bytep memory = cp->memory;
+            const png_byte *memory = cp->memory;
             size_t size = cp->size;
 
             if (memory != NULL && size >= need)
@@ -1521,7 +1521,7 @@ png_image_memory_read(png_structp png_ptr, png_bytep out, size_t need)
 }
 
 int png_image_begin_read_from_memory(png_imagep image,
-    png_const_voidp memory, size_t size)
+    const void *memory, size_t size)
 {
    if (image != NULL && image->version == PNG_IMAGE_VERSION)
    {
@@ -1533,7 +1533,7 @@ int png_image_begin_read_from_memory(png_imagep image,
              * store it into io_ptr.  Again do this in-place to avoid calling a
              * libpng function that requires error handling.
              */
-            image->opaque->memory = png_voidcast(png_const_bytep, memory);
+            image->opaque->memory = png_voidcast(const png_byte *, memory);
             image->opaque->size = size;
             image->opaque->png_ptr->io_ptr = image;
             image->opaque->png_ptr->read_data_fn = png_image_memory_read;
@@ -1846,7 +1846,7 @@ png_create_colormap_entry(png_image_read_control *display,
 
       if (output_encoding == P_LINEAR)
       {
-         png_uint_16p entry = png_voidcast(png_uint_16p, display->colormap);
+         png_uint_16 *entry = png_voidcast(png_uint_16 *, display->colormap);
 
          entry += ip * PNG_IMAGE_SAMPLE_CHANNELS(image->format);
 
@@ -1901,7 +1901,7 @@ png_create_colormap_entry(png_image_read_control *display,
 
       else /* output encoding is P_sRGB */
       {
-         png_bytep entry = png_voidcast(png_bytep, display->colormap);
+         png_byte *entry = png_voidcast(png_byte *, display->colormap);
 
          entry += ip * PNG_IMAGE_SAMPLE_CHANNELS(image->format);
 
@@ -2045,7 +2045,7 @@ make_rgb_colormap(png_image_read_control *display)
    ((png_byte)(6 * (6 * PNG_DIV51(r) + PNG_DIV51(g)) + PNG_DIV51(b)))
 
 static int
-png_image_read_colormap(png_voidp argument)
+png_image_read_colormap(void *argument)
 {
    png_image_read_control *display =
       png_voidcast(png_image_read_control*, argument);
@@ -2690,9 +2690,9 @@ png_image_read_colormap(png_voidp argument)
                    * match, add the new one and set this as the background
                    * index.
                    */
-                  if (memcmp((png_const_bytep)display->colormap +
+                  if (memcmp((const png_byte *)display->colormap +
                       sample_size * cmap_entries,
-                      (png_const_bytep)display->colormap +
+                      (const png_byte *)display->colormap +
                           sample_size * PNG_RGB_INDEX(r,g,b),
                      sample_size) != 0)
                   {
@@ -2763,7 +2763,7 @@ png_image_read_colormap(png_voidp argument)
           */
          {
             unsigned int num_trans = png_ptr->num_trans;
-            png_const_bytep trans = num_trans > 0 ? png_ptr->trans_alpha : NULL;
+            const png_byte *trans = num_trans > 0 ? png_ptr->trans_alpha : NULL;
             png_const_colorp colormap = png_ptr->palette;
             int do_background = trans != NULL &&
                (output_format & PNG_FORMAT_FLAG_ALPHA) == 0;
@@ -2898,7 +2898,7 @@ png_image_read_colormap(png_voidp argument)
 
 /* The final part of the color-map read called from png_image_finish_read. */
 static int
-png_image_read_and_map(png_voidp argument)
+png_image_read_and_map(void *argument)
 {
    png_image_read_control *display = png_voidcast(png_image_read_control*,
        argument);
@@ -2928,7 +2928,7 @@ png_image_read_and_map(png_voidp argument)
       png_uint_32 height = image->height;
       png_uint_32 width = image->width;
       int proc = display->colormap_processing;
-      png_bytep first_row = png_voidcast(png_bytep, display->first_row);
+      png_byte *first_row = png_voidcast(png_byte *, display->first_row);
       ptrdiff_t step_row = display->row_bytes;
       int pass;
 
@@ -2958,9 +2958,9 @@ png_image_read_and_map(png_voidp argument)
 
          for (; y<height; y += stepy)
          {
-            png_bytep inrow = png_voidcast(png_bytep, display->local_row);
-            png_bytep outrow = first_row + y * step_row;
-            png_const_bytep end_row = outrow + width;
+            png_byte *inrow = png_voidcast(png_byte *, display->local_row);
+            png_byte *outrow = first_row + y * step_row;
+            const png_byte *end_row = outrow + width;
 
             /* Read read the libpng data into the temporary buffer. */
             png_read_row(png_ptr, inrow, NULL);
@@ -3087,7 +3087,7 @@ png_image_read_and_map(png_voidp argument)
 }
 
 static int
-png_image_read_colormapped(png_voidp argument)
+png_image_read_colormapped(void *argument)
 {
    png_image_read_control *display = png_voidcast(png_image_read_control*,
        argument);
@@ -3167,7 +3167,7 @@ png_image_read_colormapped(png_voidp argument)
     * size libpng requires and call the relevant processing routine safely.
     */
    {
-      png_voidp first_row = display->buffer;
+      void *first_row = display->buffer;
       ptrdiff_t row_bytes = display->row_stride;
 
       /* The following expression is designed to work correctly whether it gives
@@ -3177,7 +3177,7 @@ png_image_read_colormapped(png_voidp argument)
       {
          char *ptr = png_voidcast(char*, first_row);
          ptr += (image->height-1) * (-row_bytes);
-         first_row = png_voidcast(png_voidp, ptr);
+         first_row = png_voidcast(void *, ptr);
       }
 
       display->first_row = first_row;
@@ -3187,7 +3187,7 @@ png_image_read_colormapped(png_voidp argument)
    if (passes == 0)
    {
       int result;
-      png_voidp row = png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
+      void *row = png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
 
       display->local_row = row;
       result = png_safe_execute(image, png_image_read_and_map, display);
@@ -3204,7 +3204,7 @@ png_image_read_colormapped(png_voidp argument)
       while (--passes >= 0)
       {
          png_uint_32 y = image->height;
-         png_bytep row = png_voidcast(png_bytep, display->first_row);
+         png_byte *row = png_voidcast(png_byte *, display->first_row);
 
          for (; y > 0; --y)
          {
@@ -3219,7 +3219,7 @@ png_image_read_colormapped(png_voidp argument)
 
 /* Just the row reading part of png_image_read. */
 static int
-png_image_read_composite(png_voidp argument)
+png_image_read_composite(void *argument)
 {
    png_image_read_control *display = png_voidcast(png_image_read_control*,
        argument);
@@ -3276,14 +3276,14 @@ png_image_read_composite(png_voidp argument)
 
          for (; y<height; y += stepy)
          {
-            png_bytep inrow = png_voidcast(png_bytep, display->local_row);
-            png_bytep outrow;
-            png_const_bytep end_row;
+            png_byte *inrow = png_voidcast(png_byte *, display->local_row);
+            png_byte *outrow;
+            const png_byte *end_row;
 
             /* Read the row, which is packed: */
             png_read_row(png_ptr, inrow, NULL);
 
-            outrow = png_voidcast(png_bytep, display->first_row);
+            outrow = png_voidcast(png_byte *, display->first_row);
             outrow += y * step_row;
             end_row = outrow + width * channels;
 
@@ -3346,7 +3346,7 @@ png_image_read_composite(png_voidp argument)
  * row and handles the removal or pre-multiplication of the alpha channel.
  */
 static int
-png_image_read_background(png_voidp argument)
+png_image_read_background(void *argument)
 {
    png_image_read_control *display = png_voidcast(png_image_read_control*,
        argument);
@@ -3404,7 +3404,7 @@ png_image_read_background(png_voidp argument)
           * Unlike the code above ALPHA_OPTIMIZED has *not* been done.
           */
          {
-            png_bytep first_row = png_voidcast(png_bytep, display->first_row);
+            png_byte *first_row = png_voidcast(png_byte *, display->first_row);
             ptrdiff_t step_row = display->row_bytes;
 
             for (pass = 0; pass < passes; ++pass)
@@ -3435,10 +3435,10 @@ png_image_read_background(png_voidp argument)
                {
                   for (; y<height; y += stepy)
                   {
-                     png_bytep inrow = png_voidcast(png_bytep,
+                     png_byte *inrow = png_voidcast(png_byte *,
                          display->local_row);
-                     png_bytep outrow = first_row + y * step_row;
-                     png_const_bytep end_row = outrow + width;
+                     png_byte *outrow = first_row + y * step_row;
+                     const png_byte *end_row = outrow + width;
 
                      /* Read the row, which is packed: */
                      png_read_row(png_ptr, inrow, NULL);
@@ -3480,10 +3480,10 @@ png_image_read_background(png_voidp argument)
 
                   for (; y<height; y += stepy)
                   {
-                     png_bytep inrow = png_voidcast(png_bytep,
+                     png_byte *inrow = png_voidcast(png_byte *,
                          display->local_row);
-                     png_bytep outrow = first_row + y * step_row;
-                     png_const_bytep end_row = outrow + width;
+                     png_byte *outrow = first_row + y * step_row;
+                     const png_byte *end_row = outrow + width;
 
                      /* Read the row, which is packed: */
                      png_read_row(png_ptr, inrow, NULL);
@@ -3525,7 +3525,7 @@ png_image_read_background(png_voidp argument)
           * handles the alpha-first option.
           */
          {
-            png_uint_16p first_row = png_voidcast(png_uint_16p,
+            png_uint_16 *first_row = png_voidcast(png_uint_16 *,
                 display->first_row);
             /* The division by two is safe because the caller passed in a
              * stride which was multiplied by 2 (below) to get row_bytes.
@@ -3571,14 +3571,14 @@ png_image_read_background(png_voidp argument)
 
                for (; y<height; y += stepy)
                {
-                  png_const_uint_16p inrow;
-                  png_uint_16p outrow = first_row + y*step_row;
-                  png_uint_16p end_row = outrow + width * outchannels;
+                  const png_uint_16 *inrow;
+                  png_uint_16 *outrow = first_row + y*step_row;
+                  png_uint_16 *end_row = outrow + width * outchannels;
 
                   /* Read the row, which is packed: */
-                  png_read_row(png_ptr, png_voidcast(png_bytep,
+                  png_read_row(png_ptr, png_voidcast(png_byte *,
                       display->local_row), NULL);
-                  inrow = png_voidcast(png_const_uint_16p, display->local_row);
+                  inrow = png_voidcast(const png_uint_16 *, display->local_row);
 
                   /* Now do the pre-multiplication on each pixel in this row.
                    */
@@ -3623,7 +3623,7 @@ png_image_read_background(png_voidp argument)
 
 /* The guts of png_image_finish_read as a png_safe_execute callback. */
 static int
-png_image_read_direct(png_voidp argument)
+png_image_read_direct(void *argument)
 {
    png_image_read_control *display = png_voidcast(png_image_read_control*,
        argument);
@@ -3915,7 +3915,7 @@ png_image_read_direct(png_voidp argument)
       {
          png_uint_16 le = 0x0001;
 
-         if ((*(png_const_bytep) & le) != 0)
+         if ((*(const png_byte *) & le) != 0)
             png_set_swap(png_ptr);
       }
 
@@ -3999,7 +3999,7 @@ png_image_read_direct(png_voidp argument)
     * display acts as a flag.
     */
    {
-      png_voidp first_row = display->buffer;
+      void *first_row = display->buffer;
       ptrdiff_t row_bytes = display->row_stride;
 
       if (linear != 0)
@@ -4012,7 +4012,7 @@ png_image_read_direct(png_voidp argument)
       {
          char *ptr = png_voidcast(char*, first_row);
          ptr += (image->height-1) * (-row_bytes);
-         first_row = png_voidcast(png_voidp, ptr);
+         first_row = png_voidcast(void *, ptr);
       }
 
       display->first_row = first_row;
@@ -4022,7 +4022,7 @@ png_image_read_direct(png_voidp argument)
    if (do_local_compose != 0)
    {
       int result;
-      png_voidp row = png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
+      void *row = png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
 
       display->local_row = row;
       result = png_safe_execute(image, png_image_read_composite, display);
@@ -4035,7 +4035,7 @@ png_image_read_direct(png_voidp argument)
    else if (do_local_background == 2)
    {
       int result;
-      png_voidp row = png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
+      void *row = png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
 
       display->local_row = row;
       result = png_safe_execute(image, png_image_read_background, display);
@@ -4052,7 +4052,7 @@ png_image_read_direct(png_voidp argument)
       while (--passes >= 0)
       {
          png_uint_32 y = image->height;
-         png_bytep row = png_voidcast(png_bytep, display->first_row);
+         png_byte *row = png_voidcast(png_byte *, display->first_row);
 
          for (; y > 0; --y)
          {

@@ -258,7 +258,7 @@ png_set_invert_mono(png_structrp png_ptr)
 
 /* Invert monochrome grayscale data */
 void /* PRIVATE */
-png_do_invert(png_row_infop row_info, png_bytep row)
+png_do_invert(png_row_infop row_info, png_byte *row)
 {
    png_debug(1, "in png_do_invert");
 
@@ -267,7 +267,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
    */
    if (row_info->color_type == PNG_COLOR_TYPE_GRAY)
    {
-      png_bytep rp = row;
+      png_byte *rp = row;
       size_t i;
       size_t istop = row_info->rowbytes;
 
@@ -281,7 +281,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
    else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA &&
       row_info->bit_depth == 8)
    {
-      png_bytep rp = row;
+      png_byte *rp = row;
       size_t i;
       size_t istop = row_info->rowbytes;
 
@@ -296,7 +296,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
    else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA &&
       row_info->bit_depth == 16)
    {
-      png_bytep rp = row;
+      png_byte *rp = row;
       size_t i;
       size_t istop = row_info->rowbytes;
 
@@ -315,13 +315,13 @@ png_do_invert(png_row_infop row_info, png_bytep row)
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
 /* Swaps byte order on 16-bit depth images */
 void /* PRIVATE */
-png_do_swap(png_row_infop row_info, png_bytep row)
+png_do_swap(png_row_infop row_info, png_byte *row)
 {
    png_debug(1, "in png_do_swap");
 
    if (row_info->bit_depth == 16)
    {
-      png_bytep rp = row;
+      png_byte *rp = row;
       png_uint_32 i;
       png_uint_32 istop= row_info->width * row_info->channels;
 
@@ -451,14 +451,14 @@ static const png_byte fourbppswaptable[256] = {
 
 /* Swaps pixel packing order within bytes */
 void /* PRIVATE */
-png_do_packswap(png_row_infop row_info, png_bytep row)
+png_do_packswap(png_row_infop row_info, png_byte *row)
 {
    png_debug(1, "in png_do_packswap");
 
    if (row_info->bit_depth < 8)
    {
-      png_bytep rp;
-      png_const_bytep end, table;
+      png_byte *rp;
+      const png_byte *end, *table;
 
       end = row + row_info->rowbytes;
 
@@ -491,11 +491,11 @@ png_do_packswap(png_row_infop row_info, png_bytep row)
  * end (not in the middle) of each pixel.
  */
 void /* PRIVATE */
-png_do_strip_channel(png_row_infop row_info, png_bytep row, int at_start)
+png_do_strip_channel(png_row_infop row_info, png_byte *row, int at_start)
 {
-   png_bytep sp = row; /* source pointer */
-   png_bytep dp = row; /* destination pointer */
-   png_bytep ep = row + row_info->rowbytes; /* One beyond end of row */
+   png_byte *sp = row; /* source pointer */
+   png_byte *dp = row; /* destination pointer */
+   png_byte *ep = row + row_info->rowbytes; /* One beyond end of row */
 
    png_debug(1, "in png_do_strip_channel");
 
@@ -617,7 +617,7 @@ png_do_strip_channel(png_row_infop row_info, png_bytep row, int at_start)
 #if defined(PNG_READ_BGR_SUPPORTED) || defined(PNG_WRITE_BGR_SUPPORTED)
 /* Swaps red and blue bytes within a pixel */
 void /* PRIVATE */
-png_do_bgr(png_row_infop row_info, png_bytep row)
+png_do_bgr(png_row_infop row_info, png_byte *row)
 {
    png_debug(1, "in png_do_bgr");
 
@@ -628,7 +628,7 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
       {
          if (row_info->color_type == PNG_COLOR_TYPE_RGB)
          {
-            png_bytep rp;
+            png_byte *rp;
             png_uint_32 i;
 
             for (i = 0, rp = row; i < row_width; i++, rp += 3)
@@ -641,7 +641,7 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 
          else if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
          {
-            png_bytep rp;
+            png_byte *rp;
             png_uint_32 i;
 
             for (i = 0, rp = row; i < row_width; i++, rp += 4)
@@ -658,7 +658,7 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
       {
          if (row_info->color_type == PNG_COLOR_TYPE_RGB)
          {
-            png_bytep rp;
+            png_byte *rp;
             png_uint_32 i;
 
             for (i = 0, rp = row; i < row_width; i++, rp += 6)
@@ -674,7 +674,7 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 
          else if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
          {
-            png_bytep rp;
+            png_byte *rp;
             png_uint_32 i;
 
             for (i = 0, rp = row; i < row_width; i++, rp += 8)
@@ -711,7 +711,7 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
        * forms produced on either GCC or MSVC.
        */
       int padding = PNG_PADBITS(row_info->pixel_depth, row_info->width);
-      png_bytep rp = png_ptr->row_buf + row_info->rowbytes;
+      png_byte *rp = png_ptr->row_buf + row_info->rowbytes;
 
       switch (row_info->bit_depth)
       {
@@ -802,7 +802,7 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 #ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
 void
-png_set_user_transform_info(png_structrp png_ptr, png_voidp user_transform_ptr,
+png_set_user_transform_info(png_structrp png_ptr, void *user_transform_ptr,
     int user_transform_depth, int user_transform_channels)
 {
    png_debug(1, "in png_set_user_transform_info");
@@ -832,7 +832,7 @@ png_set_user_transform_info(png_structrp png_ptr, png_voidp user_transform_ptr,
  * are called.
  */
 #ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
-png_voidp
+void *
 png_get_user_transform_ptr(png_const_structrp png_ptr)
 {
    if (png_ptr == NULL)

@@ -73,8 +73,8 @@ struct png_info_def
 
 #ifdef PNG_iCCP_SUPPORTED
    /* iCCP chunk data. */
-   png_charp iccp_name;     /* profile name */
-   png_bytep iccp_profile;  /* International Color Consortium profile data */
+   char *iccp_name;           /* profile name */
+   png_byte *iccp_profile;    /* International Color Consortium profile data */
    png_uint_32 iccp_proflen;  /* ICC profile data length */
 #endif
 
@@ -138,7 +138,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * single color specified that should be treated as fully transparent.
     * Data is valid if (valid & PNG_INFO_tRNS) is non-zero.
     */
-   png_bytep trans_alpha;    /* alpha values for paletted image */
+   png_byte *trans_alpha;    /* alpha values for paletted image */
    png_color_16 trans_color; /* transparent color for non-palette image */
 #endif
 
@@ -175,7 +175,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 
 #ifdef PNG_eXIf_SUPPORTED
    png_uint_32 num_exif;  /* Added at libpng-1.6.31 */
-   png_bytep exif;
+   png_byte *exif;
 #endif
 
 #ifdef PNG_hIST_SUPPORTED
@@ -185,7 +185,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * values in the range [0,65535]. Data valid if (valid & PNG_INFO_hIST)
     * is non-zero.
     */
-   png_uint_16p hist;
+   png_uint_16 *hist;
 #endif
 
 #ifdef PNG_pCAL_SUPPORTED
@@ -200,11 +200,11 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * implemented, and for a description of the ASCII parameter strings.
     * Data values are valid if (valid & PNG_INFO_pCAL) non-zero.
     */
-   png_charp pcal_purpose;  /* pCAL chunk description string */
+   char *pcal_purpose;      /* pCAL chunk description string */
    png_int_32 pcal_X0;      /* minimum value */
    png_int_32 pcal_X1;      /* maximum value */
-   png_charp pcal_units;    /* Latin-1 string giving physical units */
-   png_charpp pcal_params;  /* ASCII strings containing parameter values */
+   char *pcal_units;        /* Latin-1 string giving physical units */
+   char **pcal_params;      /* ASCII strings containing parameter values */
    png_byte pcal_type;      /* equation type (see PNG_EQUATION_ below) */
    png_byte pcal_nparams;   /* number of parameters given in pcal_params */
 #endif
@@ -237,15 +237,15 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * non-zero.
     */
    png_byte scal_unit;         /* unit of physical scale */
-   png_charp scal_s_width;     /* string containing height */
-   png_charp scal_s_height;    /* string containing width */
+   char *scal_s_width;     /* string containing height */
+   char *scal_s_height;    /* string containing width */
 #endif
 
 #ifdef PNG_INFO_IMAGE_SUPPORTED
    /* Memory has been allocated if (valid & PNG_ALLOCATED_INFO_ROWS)
       non-zero */
    /* Data valid if (valid & PNG_INFO_IDAT) non-zero */
-   png_bytepp row_pointers;        /* the image bits */
+   png_byte **row_pointers;        /* the image bits */
 #endif
 
 #ifdef PNG_cHRM_SUPPORTED

@@ -130,7 +130,7 @@ png_target_init_filter_functions(png_structp pp, unsigned int bpp)
 #ifdef PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE
 int
 png_target_do_expand_palette(png_structrp pp, png_row_infop rip)
-   /*png_const_bytep row, const png_bytepp ssp, const png_bytepp ddp) */
+   /*const png_byte *row, const png_byte **ssp, const png_byte **ddp) */
 {
    /* This is exactly like 'png_do_expand_palette' except that there is a check
     * on the options and target_state:

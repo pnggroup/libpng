@@ -50,8 +50,8 @@ store3(void *p, __m128i v)
 }
 
 static void
-png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
-    png_const_bytep prev)
+png_read_filter_row_sub3_sse2(png_row_infop row_info, png_byte *row,
+    const png_byte *prev)
 {
    /* The Sub filter predicts each pixel as the previous pixel, a.
     * There is no pixel to the left of the first pixel.  It's encoded directly.
@@ -84,8 +84,8 @@ png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
 }
 
 static void
-png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
-    png_const_bytep prev)
+png_read_filter_row_sub4_sse2(png_row_infop row_info, png_byte *row,
+    const png_byte *prev)
 {
    /* The Sub filter predicts each pixel as the previous pixel, a.
     * There is no pixel to the left of the first pixel.  It's encoded directly.
@@ -110,8 +110,8 @@ png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
 }
 
 static void
-png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
-    png_const_bytep prev)
+png_read_filter_row_avg3_sse2(png_row_infop row_info, png_byte *row,
+    const png_byte *prev)
 {
    /* The Avg filter predicts each pixel as the (truncated) average of a and b.
     * There's no pixel to the left of the first pixel.  Luckily, it's
@@ -166,8 +166,8 @@ png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
 }
 
 static void
-png_read_filter_row_avg4_sse2(png_row_infop row_info, png_bytep row,
-    png_const_bytep prev)
+png_read_filter_row_avg4_sse2(png_row_infop row_info, png_byte *row,
+    const png_byte *prev)
 {
    /* The Avg filter predicts each pixel as the (truncated) average of a and b.
     * There's no pixel to the left of the first pixel.  Luckily, it's
@@ -235,8 +235,8 @@ if_then_else(__m128i c, __m128i t, __m128i e)
 }
 
 static void
-png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
-    png_const_bytep prev)
+png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_byte *row,
+    const png_byte *prev)
 {
    /* Paeth tries to predict pixel d using the pixel to the left of it, a,
     * and two pixels from the previous row, b and c:
@@ -335,8 +335,8 @@ png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
 }
 
 static void
-png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
-    png_const_bytep prev)
+png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_byte *row,
+    const png_byte *prev)
 {
    /* Paeth tries to predict pixel d using the pixel to the left of it, a,
     * and two pixels from the previous row, b and c:

@@ -71,11 +71,11 @@
 /* local prototypes */
 
 static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr);
-static void readpng2_row_callback(png_structp png_ptr, png_bytep new_row,
+static void readpng2_row_callback(png_structp png_ptr, png_byte *new_row,
                                  png_uint_32 row_num, int pass);
 static void readpng2_end_callback(png_structp png_ptr, png_infop info_ptr);
-static void readpng2_error_handler(png_structp png_ptr, png_const_charp msg);
-static void readpng2_warning_handler(png_structp png_ptr, png_const_charp msg);
+static void readpng2_error_handler(png_structp png_ptr, const char *msg);
+static void readpng2_warning_handler(png_structp png_ptr, const char *msg);
 
 
 
@@ -387,7 +387,7 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
 
 
 
-static void readpng2_row_callback(png_structp png_ptr, png_bytep new_row,
+static void readpng2_row_callback(png_structp png_ptr, png_byte *new_row,
                                   png_uint_32 row_num, int pass)
 {
     mainprog_info  *mainprog_ptr;
@@ -478,7 +478,7 @@ void readpng2_cleanup(mainprog_info *mainprog_ptr)
 }
 
 
-static void readpng2_warning_handler(png_structp png_ptr, png_const_charp msg)
+static void readpng2_warning_handler(png_structp png_ptr, const char *msg)
 {
     fprintf(stderr, "readpng2 libpng warning: %s\n", msg);
     fflush(stderr);
@@ -486,7 +486,7 @@ static void readpng2_warning_handler(png_structp png_ptr, png_const_charp msg)
 }
 
 
-static void readpng2_error_handler(png_structp png_ptr, png_const_charp msg)
+static void readpng2_error_handler(png_structp png_ptr, const char *msg)
 {
     mainprog_info  *mainprog_ptr;
 

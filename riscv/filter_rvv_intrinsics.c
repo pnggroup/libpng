@@ -19,8 +19,8 @@
 #include <riscv_vector.h>
 
 void
-png_read_filter_row_up_rvv(png_row_infop row_info, png_bytep row,
-    png_const_bytep prev_row)
+png_read_filter_row_up_rvv(png_row_infop row_info, png_byte *row,
+    const png_byte *prev_row)
 {
    size_t len = row_info->rowbytes;
 
@@ -40,7 +40,7 @@ png_read_filter_row_up_rvv(png_row_infop row_info, png_bytep row,
 static inline void
 png_read_filter_row_sub_rvv(size_t len, size_t bpp, unsigned char *row)
 {
-   png_bytep rp_end = row + len;
+   png_byte *rp_end = row + len;
 
    /*
     * row:      | a | x |
@@ -72,8 +72,8 @@ png_read_filter_row_sub_rvv(size_t len, size_t bpp, unsigned char *row)
 }
 
 void
-png_read_filter_row_sub3_rvv(png_row_infop row_info, png_bytep row,
-    png_const_bytep prev_row)
+png_read_filter_row_sub3_rvv(png_row_infop row_info, png_byte *row,
+    const png_byte *prev_row)
 {
    size_t len = row_info->rowbytes;
 
@@ -83,8 +83,8 @@ png_read_filter_row_sub3_rvv(png_row_infop row_info, png_bytep row,
 }
 
 void
-png_read_filter_row_sub4_rvv(png_row_infop row_info, png_bytep row,
-    png_const_bytep prev_row)
+png_read_filter_row_sub4_rvv(png_row_infop row_info, png_byte *row,
+    const png_byte *prev_row)
 {
    size_t len = row_info->rowbytes;
 
@@ -97,7 +97,7 @@ static inline void
 png_read_filter_row_avg_rvv(size_t len, size_t bpp, unsigned char *row,
     const unsigned char *prev_row)
 {
-   png_bytep rp_end = row + len;
+   png_byte *rp_end = row + len;
 
    /*
     * row:      | a | x |
@@ -156,8 +156,8 @@ png_read_filter_row_avg_rvv(size_t len, size_t bpp, unsigned char *row,
 }
 
 void
-png_read_filter_row_avg3_rvv(png_row_infop row_info, png_bytep row,
-    png_const_bytep prev_row)
+png_read_filter_row_avg3_rvv(png_row_infop row_info, png_byte *row,
+    const png_byte *prev_row)
 {
    size_t len = row_info->rowbytes;
 
@@ -167,8 +167,8 @@ png_read_filter_row_avg3_rvv(png_row_infop row_info, png_bytep row,
 }
 
 void
-png_read_filter_row_avg4_rvv(png_row_infop row_info, png_bytep row,
-    png_const_bytep prev_row)
+png_read_filter_row_avg4_rvv(png_row_infop row_info, png_byte *row,
+    const png_byte *prev_row)
 {
    size_t len = row_info->rowbytes;
 
@@ -222,7 +222,7 @@ static inline void
 png_read_filter_row_paeth_rvv(size_t len, size_t bpp, unsigned char *row,
     const unsigned char *prev)
 {
-   png_bytep rp_end = row + len;
+   png_byte *rp_end = row + len;
 
    /*
     * row:  | a | x |
@@ -329,8 +329,8 @@ png_read_filter_row_paeth_rvv(size_t len, size_t bpp, unsigned char *row,
    }
 }
 void
-png_read_filter_row_paeth3_rvv(png_row_infop row_info, png_bytep row,
-    png_const_bytep prev_row)
+png_read_filter_row_paeth3_rvv(png_row_infop row_info, png_byte *row,
+    const png_byte *prev_row)
 {
    size_t len = row_info->rowbytes;
 
@@ -338,8 +338,8 @@ png_read_filter_row_paeth3_rvv(png_row_infop row_info, png_bytep row,
 }
 
 void
-png_read_filter_row_paeth4_rvv(png_row_infop row_info, png_bytep row,
-    png_const_bytep prev_row)
+png_read_filter_row_paeth4_rvv(png_row_infop row_info, png_byte *row,
+    const png_byte *prev_row)
 {
    size_t len = row_info->rowbytes;
 
