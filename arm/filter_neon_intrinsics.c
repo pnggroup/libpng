@@ -34,7 +34,7 @@
    (temp_pointer = png_ptr(type,pointer), *temp_pointer)
 
 static void
-png_read_filter_row_up_neon(png_row_infop row_info, png_byte *row,
+png_read_filter_row_up_neon(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    png_byte *rp = row;
@@ -55,7 +55,7 @@ png_read_filter_row_up_neon(png_row_infop row_info, png_byte *row,
 }
 
 static void
-png_read_filter_row_sub3_neon(png_row_infop row_info, png_byte *row,
+png_read_filter_row_sub3_neon(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    png_byte *rp = row;
@@ -102,7 +102,7 @@ png_read_filter_row_sub3_neon(png_row_infop row_info, png_byte *row,
 }
 
 static void
-png_read_filter_row_sub4_neon(png_row_infop row_info, png_byte *row,
+png_read_filter_row_sub4_neon(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    png_byte *rp = row;
@@ -134,7 +134,7 @@ png_read_filter_row_sub4_neon(png_row_infop row_info, png_byte *row,
 }
 
 static void
-png_read_filter_row_avg3_neon(png_row_infop row_info, png_byte *row,
+png_read_filter_row_avg3_neon(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    png_byte *rp = row;
@@ -202,7 +202,7 @@ png_read_filter_row_avg3_neon(png_row_infop row_info, png_byte *row,
 }
 
 static void
-png_read_filter_row_avg4_neon(png_row_infop row_info, png_byte *row,
+png_read_filter_row_avg4_neon(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    png_byte *rp = row;
@@ -271,7 +271,7 @@ paeth(uint8x8_t a, uint8x8_t b, uint8x8_t c)
 }
 
 static void
-png_read_filter_row_paeth3_neon(png_row_infop row_info, png_byte *row,
+png_read_filter_row_paeth3_neon(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    png_byte *rp = row;
@@ -339,7 +339,7 @@ png_read_filter_row_paeth3_neon(png_row_infop row_info, png_byte *row,
 }
 
 static void
-png_read_filter_row_paeth4_neon(png_row_infop row_info, png_byte *row,
+png_read_filter_row_paeth4_neon(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    png_byte *rp = row;

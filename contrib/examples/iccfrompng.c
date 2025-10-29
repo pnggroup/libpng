@@ -37,9 +37,9 @@ static png_byte no_profile[] = "no profile";
 static png_byte *
 extract(FILE *fp, png_uint_32 *proflen)
 {
-   png_structp png_ptr =
+   png_struct *png_ptr =
       png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-   png_infop info_ptr = NULL;
+   png_info *info_ptr = NULL;
    png_byte *result = NULL;
 
    /* Initialize for error or no profile: */

@@ -169,7 +169,7 @@ floorb(double d)
 typedef struct chunk_insert
 {
    struct chunk_insert *next;
-   void               (*insert)(png_structp, png_infop, int, char **);
+   void               (*insert)(png_struct *, png_info *, int, char **);
    int                  nparams;
    char *               parameters[1];
 } chunk_insert;
@@ -233,7 +233,7 @@ image_size_of_type(int color_type, int bit_depth, unsigned int *colors,
 }
 
 static void
-set_color(png_colorp color, png_byte *trans, unsigned int red,
+set_color(png_color *color, png_byte *trans, unsigned int red,
    unsigned int green, unsigned int blue, unsigned int alpha,
    const png_byte *gamma_table)
 {
@@ -244,7 +244,7 @@ set_color(png_colorp color, png_byte *trans, unsigned int red,
 }
 
 static int
-generate_palette(png_colorp palette, png_byte *trans, int bit_depth,
+generate_palette(png_color *palette, png_byte *trans, int bit_depth,
    const png_byte *gamma_table, unsigned int *colors)
 {
    /*
@@ -746,7 +746,7 @@ generate_row(png_byte *row, size_t rowbytes, unsigned int y, int color_type,
 
 
 static void
-makepng_warning(png_structp png_ptr, const char *message)
+makepng_warning(png_struct *png_ptr, const char *message)
 {
    const char **ep = png_get_error_ptr(png_ptr);
    const char *name;
@@ -761,7 +761,7 @@ makepng_warning(png_structp png_ptr, const char *message)
 }
 
 static void
-makepng_error(png_structp png_ptr, const char *message)
+makepng_error(png_struct *png_ptr, const char *message)
 {
    makepng_warning(png_ptr, message);
    png_longjmp(png_ptr, 1);
@@ -772,9 +772,9 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
    volatile png_fixed_point gamma, chunk_insert * volatile insert,
    unsigned int filters, unsigned int *colors, int small, int tRNS)
 {
-   png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+   png_struct *png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
       name, makepng_error, makepng_warning);
-   volatile png_infop info_ptr = NULL;
+   volatile png_info *info_ptr = NULL;
    volatile png_byte *row = NULL;
 
    if (png_ptr == NULL)
@@ -785,8 +785,8 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
 
    if (setjmp(png_jmpbuf(png_ptr)))
    {
-      png_structp nv_ptr = png_ptr;
-      png_infop nv_info = info_ptr;
+      png_struct *nv_ptr = png_ptr;
+      png_info *nv_info = info_ptr;
 
       png_ptr = NULL;
       info_ptr = NULL;
@@ -984,8 +984,8 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
    png_write_end(png_ptr, info_ptr);
 
    {
-      png_structp nv_ptr = png_ptr;
-      png_infop nv_info = info_ptr;
+      png_struct *nv_ptr = png_ptr;
+      png_info *nv_info = info_ptr;
 
       png_ptr = NULL;
       info_ptr = NULL;
@@ -1155,7 +1155,7 @@ check_param_count(int nparams, int expect)
 }
 
 static void
-insert_iCCP(png_structp png_ptr, png_infop info_ptr, int nparams,
+insert_iCCP(png_struct *png_ptr, png_info *info_ptr, int nparams,
    char **params)
 {
    png_byte *profile = NULL;
@@ -1260,7 +1260,7 @@ clear_text(png_text *text, char *keyword)
 }
 
 static void
-set_text(png_structp png_ptr, png_infop info_ptr, png_textp text, char *param)
+set_text(png_struct *png_ptr, png_info *info_ptr, png_text *text, char *param)
 {
    switch (param[0])
    {
@@ -1299,7 +1299,7 @@ set_text(png_structp png_ptr, png_infop info_ptr, png_textp text, char *param)
 }
 
 static void
-insert_tEXt(png_structp png_ptr, png_infop info_ptr, int nparams,
+insert_tEXt(png_struct *png_ptr, png_info *info_ptr, int nparams,
    char **params)
 {
    png_text text;
@@ -1310,7 +1310,7 @@ insert_tEXt(png_structp png_ptr, png_infop info_ptr, int nparams,
 }
 
 static void
-insert_zTXt(png_structp png_ptr, png_infop info_ptr, int nparams,
+insert_zTXt(png_struct *png_ptr, png_info *info_ptr, int nparams,
    char **params)
 {
    png_text text;
@@ -1322,7 +1322,7 @@ insert_zTXt(png_structp png_ptr, png_infop info_ptr, int nparams,
 }
 
 static void
-insert_iTXt(png_structp png_ptr, png_infop info_ptr, int nparams,
+insert_iTXt(png_struct *png_ptr, png_info *info_ptr, int nparams,
    char **params)
 {
    png_text text;
@@ -1336,7 +1336,7 @@ insert_iTXt(png_structp png_ptr, png_infop info_ptr, int nparams,
 }
 
 static void
-insert_hIST(png_structp png_ptr, png_infop info_ptr, int nparams,
+insert_hIST(png_struct *png_ptr, png_info *info_ptr, int nparams,
    char **params)
 {
    int i;
@@ -1365,7 +1365,7 @@ insert_hIST(png_structp png_ptr, png_infop info_ptr, int nparams,
 }
 
 static png_byte
-bval(png_const_structrp png_ptr, char *param, unsigned int maxval)
+bval(const png_struct *png_ptr, char *param, unsigned int maxval)
 {
    char *endptr = NULL;
    unsigned long int l = strtoul(param, &endptr, 0/*base*/);
@@ -1378,7 +1378,7 @@ bval(png_const_structrp png_ptr, char *param, unsigned int maxval)
 }
 
 static void
-insert_sBIT(png_structp png_ptr, png_infop info_ptr, int nparams,
+insert_sBIT(png_struct *png_ptr, png_info *info_ptr, int nparams,
    char **params)
 {
    int ct = png_get_color_type(png_ptr, info_ptr);
@@ -1416,7 +1416,7 @@ insert_sBIT(png_structp png_ptr, png_infop info_ptr, int nparams,
 
 #if 0
 static void
-insert_sPLT(png_structp png_ptr, png_infop info_ptr, int nparams, char **params)
+insert_sPLT(png_struct *png_ptr, png_info *info_ptr, int nparams, char **params)
 {
    fprintf(stderr, "insert sPLT: NYI\n");
 }
@@ -1461,7 +1461,7 @@ bad_parameter_count(const char *what, int nparams)
 
 static chunk_insert *
 make_insert(const char *what,
-   void (*insert)(png_structp, png_infop, int, char **),
+   void (*insert)(png_struct *, png_info *, int, char **),
    int nparams, char **list)
 {
    int i;

@@ -353,7 +353,7 @@
 }
 
 static void
-png_read_filter_row_up_msa(png_row_infop row_info, png_byte *row,
+png_read_filter_row_up_msa(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    size_t i, cnt, cnt16, cnt32;
@@ -445,7 +445,7 @@ png_read_filter_row_up_msa(png_row_infop row_info, png_byte *row,
 }
 
 static void
-png_read_filter_row_sub4_msa(png_row_infop row_info, png_byte *row,
+png_read_filter_row_sub4_msa(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    size_t count;
@@ -485,7 +485,7 @@ png_read_filter_row_sub4_msa(png_row_infop row_info, png_byte *row,
 }
 
 static void
-png_read_filter_row_sub3_msa(png_row_infop row_info, png_byte *row,
+png_read_filter_row_sub3_msa(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    size_t count;
@@ -531,7 +531,7 @@ png_read_filter_row_sub3_msa(png_row_infop row_info, png_byte *row,
 }
 
 static void
-png_read_filter_row_avg4_msa(png_row_infop row_info, png_byte *row,
+png_read_filter_row_avg4_msa(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    size_t i;
@@ -583,7 +583,7 @@ png_read_filter_row_avg4_msa(png_row_infop row_info, png_byte *row,
 }
 
 static void
-png_read_filter_row_avg3_msa(png_row_infop row_info, png_byte *row,
+png_read_filter_row_avg3_msa(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    size_t i;
@@ -645,7 +645,7 @@ png_read_filter_row_avg3_msa(png_row_infop row_info, png_byte *row,
 }
 
 static void
-png_read_filter_row_paeth4_msa(png_row_infop row_info, png_byte *row,
+png_read_filter_row_paeth4_msa(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    int32_t count, rp_end;
@@ -716,7 +716,7 @@ png_read_filter_row_paeth4_msa(png_row_infop row_info, png_byte *row,
 }
 
 static void
-png_read_filter_row_paeth3_msa(png_row_infop row_info, png_byte *row,
+png_read_filter_row_paeth3_msa(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    int32_t count, rp_end;

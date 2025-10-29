@@ -36,7 +36,7 @@
  * may result.
  */
 static size_t
-safe_read(png_structp png_ptr, int fd, void *buffer_in, size_t nbytes)
+safe_read(png_struct *png_ptr, int fd, void *buffer_in, size_t nbytes)
 {
    size_t ntotal = 0;
    char *buffer = png_voidcast(char*, buffer_in);
@@ -94,7 +94,7 @@ safe_read(png_structp png_ptr, int fd, void *buffer_in, size_t nbytes)
 }
 
 static int
-png_have_neon(png_structp png_ptr)
+png_have_neon(png_struct *png_ptr)
 {
    int fd = open("/proc/self/auxv", O_RDONLY);
    Elf32_auxv_t aux;

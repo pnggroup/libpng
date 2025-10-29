@@ -11,7 +11,7 @@
 
 /* Build an RGBA8 palette from the separate RGB and alpha palettes. */
 static void
-png_riffle_palette_neon(png_byte *riffled_palette, png_const_colorp palette,
+png_riffle_palette_neon(png_byte *riffled_palette, const png_color *palette,
     const png_byte *trans_alpha, int num_trans)
 {
    int i;
@@ -87,7 +87,7 @@ png_target_do_expand_palette_rgba8_neon(const png_uint_32 *riffled_palette,
 
 /* Expands a palettized row into RGB8. */
 static png_uint_32
-png_target_do_expand_palette_rgb8_neon(png_const_colorp paletteIn,
+png_target_do_expand_palette_rgb8_neon(const png_color *paletteIn,
     png_uint_32 row_width, const png_byte **ssp, png_byte **ddp)
 {
    /* TODO: This case is VERY dangerous: */

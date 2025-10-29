@@ -17,7 +17,7 @@
 #if defined(PNG_READ_BGR_SUPPORTED) || defined(PNG_WRITE_BGR_SUPPORTED)
 /* Turn on BGR-to-RGB mapping */
 void
-png_set_bgr(png_structrp png_ptr)
+png_set_bgr(png_struct *png_ptr)
 {
    png_debug(1, "in png_set_bgr");
 
@@ -31,7 +31,7 @@ png_set_bgr(png_structrp png_ptr)
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
 /* Turn on 16-bit byte swapping */
 void
-png_set_swap(png_structrp png_ptr)
+png_set_swap(png_struct *png_ptr)
 {
    png_debug(1, "in png_set_swap");
 
@@ -46,7 +46,7 @@ png_set_swap(png_structrp png_ptr)
 #if defined(PNG_READ_PACK_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
 /* Turn on pixel packing */
 void
-png_set_packing(png_structrp png_ptr)
+png_set_packing(png_struct *png_ptr)
 {
    png_debug(1, "in png_set_packing");
 
@@ -66,7 +66,7 @@ png_set_packing(png_structrp png_ptr)
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)||defined(PNG_WRITE_PACKSWAP_SUPPORTED)
 /* Turn on packed pixel swapping */
 void
-png_set_packswap(png_structrp png_ptr)
+png_set_packswap(png_struct *png_ptr)
 {
    png_debug(1, "in png_set_packswap");
 
@@ -80,7 +80,7 @@ png_set_packswap(png_structrp png_ptr)
 
 #if defined(PNG_READ_SHIFT_SUPPORTED) || defined(PNG_WRITE_SHIFT_SUPPORTED)
 void
-png_set_shift(png_structrp png_ptr, png_const_color_8p true_bits)
+png_set_shift(png_struct *png_ptr, const png_color_8 *true_bits)
 {
    png_debug(1, "in png_set_shift");
 
@@ -95,7 +95,7 @@ png_set_shift(png_structrp png_ptr, png_const_color_8p true_bits)
 #if defined(PNG_READ_INTERLACING_SUPPORTED) || \
     defined(PNG_WRITE_INTERLACING_SUPPORTED)
 int
-png_set_interlace_handling(png_structrp png_ptr)
+png_set_interlace_handling(png_struct *png_ptr)
 {
    png_debug(1, "in png_set_interlace handling");
 
@@ -116,7 +116,7 @@ png_set_interlace_handling(png_structrp png_ptr)
  * that don't like bytes as parameters.
  */
 void
-png_set_filler(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
+png_set_filler(png_struct *png_ptr, png_uint_32 filler, int filler_loc)
 {
    png_debug(1, "in png_set_filler");
 
@@ -201,7 +201,7 @@ png_set_filler(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
 
 /* Added to libpng-1.2.7 */
 void
-png_set_add_alpha(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
+png_set_add_alpha(png_struct *png_ptr, png_uint_32 filler, int filler_loc)
 {
    png_debug(1, "in png_set_add_alpha");
 
@@ -219,7 +219,7 @@ png_set_add_alpha(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
 #if defined(PNG_READ_SWAP_ALPHA_SUPPORTED) || \
     defined(PNG_WRITE_SWAP_ALPHA_SUPPORTED)
 void
-png_set_swap_alpha(png_structrp png_ptr)
+png_set_swap_alpha(png_struct *png_ptr)
 {
    png_debug(1, "in png_set_swap_alpha");
 
@@ -233,7 +233,7 @@ png_set_swap_alpha(png_structrp png_ptr)
 #if defined(PNG_READ_INVERT_ALPHA_SUPPORTED) || \
     defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
 void
-png_set_invert_alpha(png_structrp png_ptr)
+png_set_invert_alpha(png_struct *png_ptr)
 {
    png_debug(1, "in png_set_invert_alpha");
 
@@ -246,7 +246,7 @@ png_set_invert_alpha(png_structrp png_ptr)
 
 #if defined(PNG_READ_INVERT_SUPPORTED) || defined(PNG_WRITE_INVERT_SUPPORTED)
 void
-png_set_invert_mono(png_structrp png_ptr)
+png_set_invert_mono(png_struct *png_ptr)
 {
    png_debug(1, "in png_set_invert_mono");
 
@@ -258,7 +258,7 @@ png_set_invert_mono(png_structrp png_ptr)
 
 /* Invert monochrome grayscale data */
 void /* PRIVATE */
-png_do_invert(png_row_infop row_info, png_byte *row)
+png_do_invert(png_row_info *row_info, png_byte *row)
 {
    png_debug(1, "in png_do_invert");
 
@@ -315,7 +315,7 @@ png_do_invert(png_row_infop row_info, png_byte *row)
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
 /* Swaps byte order on 16-bit depth images */
 void /* PRIVATE */
-png_do_swap(png_row_infop row_info, png_byte *row)
+png_do_swap(png_row_info *row_info, png_byte *row)
 {
    png_debug(1, "in png_do_swap");
 
@@ -451,7 +451,7 @@ static const png_byte fourbppswaptable[256] = {
 
 /* Swaps pixel packing order within bytes */
 void /* PRIVATE */
-png_do_packswap(png_row_infop row_info, png_byte *row)
+png_do_packswap(png_row_info *row_info, png_byte *row)
 {
    png_debug(1, "in png_do_packswap");
 
@@ -491,7 +491,7 @@ png_do_packswap(png_row_infop row_info, png_byte *row)
  * end (not in the middle) of each pixel.
  */
 void /* PRIVATE */
-png_do_strip_channel(png_row_infop row_info, png_byte *row, int at_start)
+png_do_strip_channel(png_row_info *row_info, png_byte *row, int at_start)
 {
    png_byte *sp = row; /* source pointer */
    png_byte *dp = row; /* destination pointer */
@@ -617,7 +617,7 @@ png_do_strip_channel(png_row_infop row_info, png_byte *row, int at_start)
 #if defined(PNG_READ_BGR_SUPPORTED) || defined(PNG_WRITE_BGR_SUPPORTED)
 /* Swaps red and blue bytes within a pixel */
 void /* PRIVATE */
-png_do_bgr(png_row_infop row_info, png_byte *row)
+png_do_bgr(png_row_info *row_info, png_byte *row)
 {
    png_debug(1, "in png_do_bgr");
 
@@ -697,7 +697,7 @@ png_do_bgr(png_row_infop row_info, png_byte *row)
     defined(PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED)
 /* Added at libpng-1.5.10 */
 void /* PRIVATE */
-png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
+png_do_check_palette_indexes(png_struct *png_ptr, png_row_info *row_info)
 {
    png_debug(1, "in png_do_check_palette_indexes");
 
@@ -802,7 +802,7 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 #ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
 void
-png_set_user_transform_info(png_structrp png_ptr, void *user_transform_ptr,
+png_set_user_transform_info(png_struct *png_ptr, void *user_transform_ptr,
     int user_transform_depth, int user_transform_channels)
 {
    png_debug(1, "in png_set_user_transform_info");
@@ -833,7 +833,7 @@ png_set_user_transform_info(png_structrp png_ptr, void *user_transform_ptr,
  */
 #ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
 void *
-png_get_user_transform_ptr(png_const_structrp png_ptr)
+png_get_user_transform_ptr(const png_struct *png_ptr)
 {
    if (png_ptr == NULL)
       return NULL;
@@ -844,7 +844,7 @@ png_get_user_transform_ptr(png_const_structrp png_ptr)
 
 #ifdef PNG_USER_TRANSFORM_INFO_SUPPORTED
 png_uint_32
-png_get_current_row_number(png_const_structrp png_ptr)
+png_get_current_row_number(const png_struct *png_ptr)
 {
    /* See the comments in png.h - this is the sub-image row when reading an
     * interlaced image.
@@ -856,7 +856,7 @@ png_get_current_row_number(png_const_structrp png_ptr)
 }
 
 png_byte
-png_get_current_pass_number(png_const_structrp png_ptr)
+png_get_current_pass_number(const png_struct *png_ptr)
 {
    if (png_ptr != NULL)
       return png_ptr->pass;

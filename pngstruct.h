@@ -163,7 +163,7 @@ struct png_struct_def
    z_stream    zstream;       /* decompression structure */
 
 #ifdef PNG_WRITE_SUPPORTED
-   png_compression_bufferp zbuffer_list; /* Created on demand during write */
+   png_compression_buffer *zbuffer_list; /* Created on demand during write */
    uInt                    zbuffer_size; /* size of the actual buffer */
 
    int zlib_level;            /* holds zlib compression level */
@@ -221,7 +221,7 @@ struct png_struct_def
 
    png_uint_32 idat_size;     /* current IDAT size for read */
    png_uint_32 crc;           /* current chunk CRC value */
-   png_colorp palette;        /* palette from the input file */
+   png_color *palette;        /* palette from the input file */
    png_uint_16 num_palette;   /* number of color entries in palette */
 
 /* Added at libpng-1.5.10 */
@@ -465,7 +465,7 @@ struct png_struct_def
    png_byte *big_prev_row;
 
 /* New member added in libpng-1.5.7 */
-   void (*read_filter[PNG_FILTER_VALUE_LAST-1])(png_row_infop row_info,
+   void (*read_filter[PNG_FILTER_VALUE_LAST-1])(png_row_info *row_info,
       png_byte *row, const png_byte *prev_row);
 
 /* NOTE: prior to libpng-1.8 this also checked that PNG_ARM_NEON_IMPLEMENTATION

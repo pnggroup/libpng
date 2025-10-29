@@ -21,8 +21,8 @@
 
 #ifdef PNG_bKGD_SUPPORTED
 void
-png_set_bKGD(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_const_color_16p background)
+png_set_bKGD(const png_struct *png_ptr, png_info *info_ptr,
+    const png_color_16 *background)
 {
    png_debug1(1, "in %s storage function", "bKGD");
 
@@ -36,7 +36,7 @@ png_set_bKGD(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_cHRM_SUPPORTED
 void
-png_set_cHRM_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_cHRM_fixed(const png_struct *png_ptr, png_info *info_ptr,
     png_fixed_point white_x, png_fixed_point white_y, png_fixed_point red_x,
     png_fixed_point red_y, png_fixed_point green_x, png_fixed_point green_y,
     png_fixed_point blue_x, png_fixed_point blue_y)
@@ -59,7 +59,7 @@ png_set_cHRM_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
 }
 
 void
-png_set_cHRM_XYZ_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_cHRM_XYZ_fixed(const png_struct *png_ptr, png_info *info_ptr,
     png_fixed_point int_red_X, png_fixed_point int_red_Y,
     png_fixed_point int_red_Z, png_fixed_point int_green_X,
     png_fixed_point int_green_Y, png_fixed_point int_green_Z,
@@ -96,7 +96,7 @@ png_set_cHRM_XYZ_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 void
-png_set_cHRM(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_cHRM(const png_struct *png_ptr, png_info *info_ptr,
     double white_x, double white_y, double red_x, double red_y,
     double green_x, double green_y, double blue_x, double blue_y)
 {
@@ -112,7 +112,7 @@ png_set_cHRM(png_const_structrp png_ptr, png_inforp info_ptr,
 }
 
 void
-png_set_cHRM_XYZ(png_const_structrp png_ptr, png_inforp info_ptr, double red_X,
+png_set_cHRM_XYZ(const png_struct *png_ptr, png_info *info_ptr, double red_X,
     double red_Y, double red_Z, double green_X, double green_Y, double green_Z,
     double blue_X, double blue_Y, double blue_Z)
 {
@@ -133,7 +133,7 @@ png_set_cHRM_XYZ(png_const_structrp png_ptr, png_inforp info_ptr, double red_X,
 
 #ifdef PNG_cICP_SUPPORTED
 void
-png_set_cICP(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_cICP(const png_struct *png_ptr, png_info *info_ptr,
              png_byte colour_primaries, png_byte transfer_function,
              png_byte matrix_coefficients, png_byte video_full_range_flag)
 {
@@ -159,7 +159,7 @@ png_set_cICP(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_cLLI_SUPPORTED
 void
-png_set_cLLI_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_cLLI_fixed(const png_struct *png_ptr, png_info *info_ptr,
     /* The values below are in cd/m2 (nits) and are scaled by 10,000; not
      * 100,000 as in the case of png_fixed_point.
      */
@@ -191,7 +191,7 @@ png_set_cLLI_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 void
-png_set_cLLI(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_cLLI(const png_struct *png_ptr, png_info *info_ptr,
    double maxCLL, double maxFALL)
 {
    png_set_cLLI_fixed(png_ptr, info_ptr,
@@ -222,7 +222,7 @@ png_ITU_fixed_16(int *error, png_fixed_point v)
 }
 
 void
-png_set_mDCV_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_mDCV_fixed(const png_struct *png_ptr, png_info *info_ptr,
     png_fixed_point white_x, png_fixed_point white_y,
     png_fixed_point red_x, png_fixed_point red_y,
     png_fixed_point green_x, png_fixed_point green_y,
@@ -294,7 +294,7 @@ png_set_mDCV_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 void
-png_set_mDCV(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_mDCV(const png_struct *png_ptr, png_info *info_ptr,
     double white_x, double white_y, double red_x, double red_y, double green_x,
     double green_y, double blue_x, double blue_y,
     double maxDL, double minDL)
@@ -316,7 +316,7 @@ png_set_mDCV(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_eXIf_SUPPORTED
 void
-png_set_eXIf_1(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_eXIf_1(const png_struct *png_ptr, png_info *info_ptr,
     png_uint_32 num_exif, png_byte *exif)
 {
    png_byte *new_exif;
@@ -348,7 +348,7 @@ png_set_eXIf_1(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_gAMA_SUPPORTED
 void
-png_set_gAMA_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_gAMA_fixed(const png_struct *png_ptr, png_info *info_ptr,
     png_fixed_point file_gamma)
 {
    png_debug1(1, "in %s storage function", "gAMA");
@@ -362,7 +362,7 @@ png_set_gAMA_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 void
-png_set_gAMA(png_const_structrp png_ptr, png_inforp info_ptr, double file_gamma)
+png_set_gAMA(const png_struct *png_ptr, png_info *info_ptr, double file_gamma)
 {
    png_set_gAMA_fixed(png_ptr, info_ptr, png_fixed(png_ptr, file_gamma,
        "png_set_gAMA"));
@@ -372,7 +372,7 @@ png_set_gAMA(png_const_structrp png_ptr, png_inforp info_ptr, double file_gamma)
 
 #ifdef PNG_hIST_SUPPORTED
 void
-png_set_hIST(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_hIST(const png_struct *png_ptr, png_info *info_ptr,
     const png_uint_16 *hist)
 {
    int i;
@@ -414,7 +414,7 @@ png_set_hIST(png_const_structrp png_ptr, png_inforp info_ptr,
 #endif
 
 void
-png_set_IHDR(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_IHDR(const png_struct *png_ptr, png_info *info_ptr,
     png_uint_32 width, png_uint_32 height, int bit_depth,
     int color_type, int interlace_type, int compression_type,
     int filter_type)
@@ -462,7 +462,7 @@ png_set_IHDR(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_oFFs_SUPPORTED
 void
-png_set_oFFs(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_oFFs(const png_struct *png_ptr, png_info *info_ptr,
     png_int_32 offset_x, png_int_32 offset_y, int unit_type)
 {
    png_debug1(1, "in %s storage function", "oFFs");
@@ -479,7 +479,7 @@ png_set_oFFs(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_pCAL_SUPPORTED
 void
-png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_pCAL(const png_struct *png_ptr, png_info *info_ptr,
     const char *purpose, png_int_32 X0, png_int_32 X1, int type,
     int nparams, const char *units, char **params)
 {
@@ -595,7 +595,7 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_sCAL_SUPPORTED
 void
-png_set_sCAL_s(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_sCAL_s(const png_struct *png_ptr, png_info *info_ptr,
     int unit, const char *swidth, const char *sheight)
 {
    size_t lengthw = 0, lengthh = 0;
@@ -661,7 +661,7 @@ png_set_sCAL_s(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 void
-png_set_sCAL(png_const_structrp png_ptr, png_inforp info_ptr, int unit,
+png_set_sCAL(const png_struct *png_ptr, png_info *info_ptr, int unit,
     double width, double height)
 {
    png_debug1(1, "in %s storage function", "sCAL");
@@ -691,7 +691,7 @@ png_set_sCAL(png_const_structrp png_ptr, png_inforp info_ptr, int unit,
 
 #  ifdef PNG_FIXED_POINT_SUPPORTED
 void
-png_set_sCAL_fixed(png_const_structrp png_ptr, png_inforp info_ptr, int unit,
+png_set_sCAL_fixed(const png_struct *png_ptr, png_info *info_ptr, int unit,
     png_fixed_point width, png_fixed_point height)
 {
    png_debug1(1, "in %s storage function", "sCAL");
@@ -720,7 +720,7 @@ png_set_sCAL_fixed(png_const_structrp png_ptr, png_inforp info_ptr, int unit,
 
 #ifdef PNG_pHYs_SUPPORTED
 void
-png_set_pHYs(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_pHYs(const png_struct *png_ptr, png_info *info_ptr,
     png_uint_32 res_x, png_uint_32 res_y, int unit_type)
 {
    png_debug1(1, "in %s storage function", "pHYs");
@@ -736,8 +736,8 @@ png_set_pHYs(png_const_structrp png_ptr, png_inforp info_ptr,
 #endif
 
 void
-png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
-    png_const_colorp palette, int num_palette)
+png_set_PLTE(png_struct *png_ptr, png_info *info_ptr,
+    const png_color *palette, int num_palette)
 {
 
    png_uint_32 max_palette_length;
@@ -786,7 +786,7 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
     * of num_palette entries, in case of an invalid PNG file or incorrect
     * call to png_set_PLTE() with too-large sample values.
     */
-   png_ptr->palette = png_voidcast(png_colorp, png_calloc(png_ptr,
+   png_ptr->palette = png_voidcast(png_color *, png_calloc(png_ptr,
        PNG_MAX_PALETTE_LENGTH * (sizeof (png_color))));
 
    if (num_palette > 0)
@@ -801,8 +801,8 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_sBIT_SUPPORTED
 void
-png_set_sBIT(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_const_color_8p sig_bit)
+png_set_sBIT(const png_struct *png_ptr, png_info *info_ptr,
+    const png_color_8 *sig_bit)
 {
    png_debug1(1, "in %s storage function", "sBIT");
 
@@ -816,7 +816,7 @@ png_set_sBIT(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_sRGB_SUPPORTED
 void
-png_set_sRGB(png_const_structrp png_ptr, png_inforp info_ptr, int srgb_intent)
+png_set_sRGB(const png_struct *png_ptr, png_info *info_ptr, int srgb_intent)
 {
    png_debug1(1, "in %s storage function", "sRGB");
 
@@ -828,7 +828,7 @@ png_set_sRGB(png_const_structrp png_ptr, png_inforp info_ptr, int srgb_intent)
 }
 
 void
-png_set_sRGB_gAMA_and_cHRM(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_sRGB_gAMA_and_cHRM(const png_struct *png_ptr, png_info *info_ptr,
     int srgb_intent)
 {
    png_debug1(1, "in %s storage function", "sRGB_gAMA_and_cHRM");
@@ -856,7 +856,7 @@ png_set_sRGB_gAMA_and_cHRM(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_iCCP_SUPPORTED
 void
-png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_iCCP(const png_struct *png_ptr, png_info *info_ptr,
     const char *name, int compression_type,
     const png_byte *profile, png_uint_32 proflen)
 {
@@ -909,8 +909,8 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_TEXT_SUPPORTED
 void
-png_set_text(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_const_textp text_ptr, int num_text)
+png_set_text(const png_struct *png_ptr, png_info *info_ptr,
+    const png_text *text_ptr, int num_text)
 {
    int ret;
    ret = png_set_text_2(png_ptr, info_ptr, text_ptr, num_text);
@@ -920,8 +920,8 @@ png_set_text(png_const_structrp png_ptr, png_inforp info_ptr,
 }
 
 int /* PRIVATE */
-png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_const_textp text_ptr, int num_text)
+png_set_text_2(const png_struct *png_ptr, png_info *info_ptr,
+    const png_text *text_ptr, int num_text)
 {
    int i;
 
@@ -940,7 +940,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
    {
       int old_num_text = info_ptr->num_text;
       int max_text;
-      png_textp new_text = NULL;
+      png_text *new_text = NULL;
 
       /* Calculate an appropriate max_text, checking for overflow. */
       max_text = old_num_text;
@@ -958,7 +958,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
          /* Now allocate a new array and copy the old members in; this does all
           * the overflow checks.
           */
-         new_text = png_voidcast(png_textp,png_realloc_array(png_ptr,
+         new_text = png_voidcast(png_text *,png_realloc_array(png_ptr,
              info_ptr->text, old_num_text, max_text-old_num_text,
              sizeof *new_text));
       }
@@ -985,7 +985,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
    {
       size_t text_length, key_len;
       size_t lang_len, lang_key_len;
-      png_textp textp = &(info_ptr->text[info_ptr->num_text]);
+      png_text *textp = &(info_ptr->text[info_ptr->num_text]);
 
       if (text_ptr[i].key == NULL)
           continue;
@@ -1115,8 +1115,8 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_tIME_SUPPORTED
 void
-png_set_tIME(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_const_timep mod_time)
+png_set_tIME(const png_struct *png_ptr, png_info *info_ptr,
+    const png_time *mod_time)
 {
    png_debug1(1, "in %s storage function", "tIME");
 
@@ -1141,8 +1141,8 @@ png_set_tIME(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_tRNS_SUPPORTED
 void
-png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
-    const png_byte *trans_alpha, int num_trans, png_const_color_16p trans_color)
+png_set_tRNS(png_struct *png_ptr, png_info *info_ptr,
+    const png_byte *trans_alpha, int num_trans, const png_color_16 *trans_color)
 {
    png_debug1(1, "in %s storage function", "tRNS");
 
@@ -1212,8 +1212,8 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_sPLT_SUPPORTED
 void
-png_set_sPLT(png_const_structrp png_ptr,
-    png_inforp info_ptr, png_const_sPLT_tp entries, int nentries)
+png_set_sPLT(const png_struct *png_ptr,
+    png_info *info_ptr, const png_sPLT_t *entries, int nentries)
 /*
  *  entries        - array of png_sPLT_t structures
  *                   to be added to the list of palettes
@@ -1223,7 +1223,7 @@ png_set_sPLT(png_const_structrp png_ptr,
  *                   added.
  */
 {
-   png_sPLT_tp np;
+   png_sPLT_t *np;
 
    png_debug1(1, "in %s storage function", "sPLT");
 
@@ -1233,7 +1233,7 @@ png_set_sPLT(png_const_structrp png_ptr,
    /* Use the internal realloc function, which checks for all the possible
     * overflows.  Notice that the parameters are (int) and (size_t)
     */
-   np = png_voidcast(png_sPLT_tp,png_realloc_array(png_ptr,
+   np = png_voidcast(png_sPLT_t *,png_realloc_array(png_ptr,
        info_ptr->splt_palettes, info_ptr->splt_palettes_num, nentries,
        sizeof *np));
 
@@ -1281,7 +1281,7 @@ png_set_sPLT(png_const_structrp png_ptr,
        * goes wrong; this code must free it.  png_malloc_array produces no
        * warnings; use a png_chunk_report (below) if there is an error.
        */
-      np->entries = png_voidcast(png_sPLT_entryp, png_malloc_array(png_ptr,
+      np->entries = png_voidcast(png_sPLT_entry *, png_malloc_array(png_ptr,
           entries->nentries, sizeof (png_sPLT_entry)));
 
       if (np->entries == NULL)
@@ -1315,7 +1315,7 @@ png_set_sPLT(png_const_structrp png_ptr,
 
 #ifdef PNG_APNG_SUPPORTED
 png_uint_32 PNGAPI
-png_set_acTL(png_structp png_ptr, png_infop info_ptr,
+png_set_acTL(png_struct *png_ptr, png_info *info_ptr,
              png_uint_32 num_frames, png_uint_32 num_plays)
 {
    png_debug1(1, "in %s storage function", "acTL");
@@ -1354,7 +1354,7 @@ png_set_acTL(png_structp png_ptr, png_infop info_ptr,
 }
 
 png_uint_32 PNGAPI
-png_set_next_frame_fcTL(png_structp png_ptr, png_infop info_ptr,
+png_set_next_frame_fcTL(png_struct *png_ptr, png_info *info_ptr,
                         png_uint_32 width, png_uint_32 height,
                         png_uint_32 x_offset, png_uint_32 y_offset,
                         png_uint_16 delay_num, png_uint_16 delay_den,
@@ -1402,7 +1402,7 @@ png_set_next_frame_fcTL(png_structp png_ptr, png_infop info_ptr,
 }
 
 void /* PRIVATE */
-png_ensure_fcTL_is_valid(png_structp png_ptr,
+png_ensure_fcTL_is_valid(png_struct *png_ptr,
                          png_uint_32 width, png_uint_32 height,
                          png_uint_32 x_offset, png_uint_32 y_offset,
                          png_uint_16 delay_num, png_uint_16 delay_den,
@@ -1432,7 +1432,7 @@ png_ensure_fcTL_is_valid(png_structp png_ptr,
 }
 
 png_uint_32 PNGAPI
-png_set_first_frame_is_hidden(png_structp png_ptr, png_infop info_ptr,
+png_set_first_frame_is_hidden(png_struct *png_ptr, png_info *info_ptr,
                               png_byte is_hidden)
 {
    png_debug(1, "in png_first_frame_is_hidden");
@@ -1453,7 +1453,7 @@ png_set_first_frame_is_hidden(png_structp png_ptr, png_infop info_ptr,
 
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
 static png_byte
-check_location(png_const_structrp png_ptr, int location)
+check_location(const png_struct *png_ptr, int location)
 {
    location &= (PNG_HAVE_IHDR|PNG_HAVE_PLTE|PNG_AFTER_IDAT);
 
@@ -1490,10 +1490,10 @@ check_location(png_const_structrp png_ptr, int location)
 }
 
 void
-png_set_unknown_chunks(png_const_structrp png_ptr,
-    png_inforp info_ptr, png_const_unknown_chunkp unknowns, int num_unknowns)
+png_set_unknown_chunks(const png_struct *png_ptr,
+    png_info *info_ptr, const png_unknown_chunk *unknowns, int num_unknowns)
 {
-   png_unknown_chunkp np;
+   png_unknown_chunk *np;
 
    if (png_ptr == NULL || info_ptr == NULL || num_unknowns <= 0 ||
        unknowns == NULL)
@@ -1529,7 +1529,7 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
     * undefined behavior.  Now png_chunk_report is used to provide behavior
     * appropriate to read or write.
     */
-   np = png_voidcast(png_unknown_chunkp, png_realloc_array(png_ptr,
+   np = png_voidcast(png_unknown_chunk *, png_realloc_array(png_ptr,
        info_ptr->unknown_chunks, info_ptr->unknown_chunks_num, num_unknowns,
        sizeof *np));
 
@@ -1589,7 +1589,7 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
 }
 
 void
-png_set_unknown_chunk_location(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_unknown_chunk_location(const png_struct *png_ptr, png_info *info_ptr,
     int chunk, int location)
 {
    /* This API is pretty pointless in 1.6.0 because the location can be set
@@ -1619,7 +1619,7 @@ png_set_unknown_chunk_location(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_MNG_FEATURES_SUPPORTED
 png_uint_32
-png_permit_mng_features(png_structrp png_ptr, png_uint_32 mng_features)
+png_permit_mng_features(png_struct *png_ptr, png_uint_32 mng_features)
 {
    png_debug(1, "in png_permit_mng_features");
 
@@ -1662,7 +1662,7 @@ add_one_chunk(png_byte *list, unsigned int count, const png_byte *add, int keep)
 }
 
 void
-png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
+png_set_keep_unknown_chunks(png_struct *png_ptr, int keep,
     const png_byte *chunk_list, int num_chunks_in)
 {
    png_byte *new_list;
@@ -1827,7 +1827,7 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
 
 #ifdef PNG_READ_USER_CHUNKS_SUPPORTED
 void
-png_set_read_user_chunk_fn(png_structrp png_ptr, void *user_chunk_ptr,
+png_set_read_user_chunk_fn(png_struct *png_ptr, void *user_chunk_ptr,
     png_user_chunk_ptr read_user_chunk_fn)
 {
    png_debug(1, "in png_set_read_user_chunk_fn");
@@ -1842,7 +1842,7 @@ png_set_read_user_chunk_fn(png_structrp png_ptr, void *user_chunk_ptr,
 
 #ifdef PNG_INFO_IMAGE_SUPPORTED
 void
-png_set_rows(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_rows(const png_struct *png_ptr, png_info *info_ptr,
     png_byte **row_pointers)
 {
    png_debug(1, "in png_set_rows");
@@ -1862,7 +1862,7 @@ png_set_rows(png_const_structrp png_ptr, png_inforp info_ptr,
 #endif
 
 void
-png_set_compression_buffer_size(png_structrp png_ptr, size_t size)
+png_set_compression_buffer_size(png_struct *png_ptr, size_t size)
 {
    png_debug(1, "in png_set_compression_buffer_size");
 
@@ -1924,7 +1924,7 @@ png_set_compression_buffer_size(png_structrp png_ptr, size_t size)
 }
 
 void
-png_set_invalid(png_const_structrp png_ptr, png_inforp info_ptr, int mask)
+png_set_invalid(const png_struct *png_ptr, png_info *info_ptr, int mask)
 {
    if (png_ptr != NULL && info_ptr != NULL)
       info_ptr->valid &= (unsigned int)(~mask);
@@ -1934,7 +1934,7 @@ png_set_invalid(png_const_structrp png_ptr, png_inforp info_ptr, int mask)
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
 /* This function was added to libpng 1.2.6 */
 void
-png_set_user_limits(png_structrp png_ptr, png_uint_32 user_width_max,
+png_set_user_limits(png_struct *png_ptr, png_uint_32 user_width_max,
     png_uint_32 user_height_max)
 {
    png_debug(1, "in png_set_user_limits");
@@ -1952,7 +1952,7 @@ png_set_user_limits(png_structrp png_ptr, png_uint_32 user_width_max,
 
 /* This function was added to libpng 1.4.0 */
 void
-png_set_chunk_cache_max(png_structrp png_ptr, png_uint_32 user_chunk_cache_max)
+png_set_chunk_cache_max(png_struct *png_ptr, png_uint_32 user_chunk_cache_max)
 {
    png_debug(1, "in png_set_chunk_cache_max");
 
@@ -1962,7 +1962,7 @@ png_set_chunk_cache_max(png_structrp png_ptr, png_uint_32 user_chunk_cache_max)
 
 /* This function was added to libpng 1.4.1 */
 void
-png_set_chunk_malloc_max(png_structrp png_ptr,
+png_set_chunk_malloc_max(png_struct *png_ptr,
     png_alloc_size_t user_chunk_malloc_max)
 {
    png_debug(1, "in png_set_chunk_malloc_max");
@@ -1991,7 +1991,7 @@ png_set_chunk_malloc_max(png_structrp png_ptr,
 
 #ifdef PNG_BENIGN_ERRORS_SUPPORTED
 void
-png_set_benign_errors(png_structrp png_ptr, int allowed)
+png_set_benign_errors(png_struct *png_ptr, int allowed)
 {
    png_debug(1, "in png_set_benign_errors");
 
@@ -2021,7 +2021,7 @@ png_set_benign_errors(png_structrp png_ptr, int allowed)
     * a benign error.  This API can be used to override that behavior.
     */
 void
-png_set_check_for_invalid_index(png_structrp png_ptr, int allowed)
+png_set_check_for_invalid_index(png_struct *png_ptr, int allowed)
 {
    png_debug(1, "in png_set_check_for_invalid_index");
 
@@ -2046,7 +2046,7 @@ png_set_check_for_invalid_index(png_structrp png_ptr, int allowed)
  * valid one could not be generated, and the caller must png_error.
  */
 png_uint_32 /* PRIVATE */
-png_check_keyword(png_structrp png_ptr, const char *key, png_byte *new_key)
+png_check_keyword(png_struct *png_ptr, const char *key, png_byte *new_key)
 {
 #ifdef PNG_WARNINGS_SUPPORTED
    const char *orig_key = key;

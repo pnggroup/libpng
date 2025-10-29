@@ -26,14 +26,14 @@ const char *msg;
 
 static OPENFILENAME ofn;
 
-static png_structp png_ptr = NULL;
-static png_infop info_ptr = NULL;
+static png_struct *png_ptr = NULL;
+static png_info *info_ptr = NULL;
 
 
 /* cexcept interface */
 
 static void
-png_cexcept_error(png_structp png_ptr, const char *msg)
+png_cexcept_error(png_struct *png_ptr, const char *msg)
 {
    if(png_ptr)
      ;
@@ -328,7 +328,7 @@ BOOL PngSaveImage (PTSTR pstrFileName, png_byte *pDiData,
     info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr) {
         fclose(pfFile);
-        png_destroy_write_struct(&png_ptr, (png_infopp) NULL);
+        png_destroy_write_struct(&png_ptr, (png_info **) NULL);
         return FALSE;
     }
 
@@ -385,14 +385,14 @@ BOOL PngSaveImage (PTSTR pstrFileName, png_byte *pDiData,
 
         /* clean up after the write, and free any memory allocated */
 
-        png_destroy_write_struct(&png_ptr, (png_infopp) NULL);
+        png_destroy_write_struct(&png_ptr, (png_info **) NULL);
 
         /* yepp, done */
     }
 
     Catch (msg)
     {
-        png_destroy_write_struct(&png_ptr, (png_infopp) NULL);
+        png_destroy_write_struct(&png_ptr, (png_info **) NULL);
 
         if(ppbRowPointers)
             free (ppbRowPointers);
@@ -410,7 +410,7 @@ BOOL PngSaveImage (PTSTR pstrFileName, png_byte *pDiData,
 #ifndef PNG_STDIO_SUPPORTED
 
 static void
-png_read_data(png_structp png_ptr, png_byte *data, size_t length)
+png_read_data(png_struct *png_ptr, png_byte *data, size_t length)
 {
    size_t check;
 
@@ -426,7 +426,7 @@ png_read_data(png_structp png_ptr, png_byte *data, size_t length)
 }
 
 static void
-png_write_data(png_structp png_ptr, png_byte *data, size_t length)
+png_write_data(png_struct *png_ptr, png_byte *data, size_t length)
 {
    png_uint_32 check;
 
@@ -438,7 +438,7 @@ png_write_data(png_structp png_ptr, png_byte *data, size_t length)
 }
 
 static void
-png_flush(png_structp png_ptr)
+png_flush(png_struct *png_ptr)
 {
    FILE *io_ptr;
    io_ptr = (FILE *)CVT_PTR((png_ptr->io_ptr));

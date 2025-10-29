@@ -20,7 +20,7 @@
 #include "filter_neon_intrinsics.c"
 
 static void
-png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
+png_init_filter_functions_neon(png_struct *pp, unsigned int bpp)
 {
    png_debug(1, "in png_init_filter_functions_neon");
 
@@ -57,7 +57,7 @@ png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
  *       png_struct::target_data.  Need not be defined otherwise.
  */
 static void
-png_target_free_data_arm(png_structrp pp)
+png_target_free_data_arm(png_struct *pp)
 {
    void *ptr = pp->target_data;
    pp->target_data = NULL;
@@ -78,8 +78,8 @@ png_target_free_data_arm(png_structrp pp)
 #include "palette_neon_intrinsics.c"
 
 static int
-png_target_do_expand_palette_neon(png_structrp png_ptr, png_row_infop row_info,
-    png_byte *row, png_const_colorp palette, const png_byte *trans_alpha,
+png_target_do_expand_palette_neon(png_struct *png_ptr, png_row_info *row_info,
+    png_byte *row, const png_color *palette, const png_byte *trans_alpha,
     int num_trans)
 {
    /* NOTE: it is important that this is done. row_info->width is not a CSE

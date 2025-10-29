@@ -38,7 +38,7 @@
    }
 
 static void
-png_read_filter_row_up_vsx(png_row_infop row_info, png_byte *row,
+png_read_filter_row_up_vsx(png_row_info *row_info, png_byte *row,
    const png_byte *prev_row)
 {
    vector unsigned char rp_vec;
@@ -154,7 +154,7 @@ static const vector unsigned char VSX_SHORT_TO_CHAR4_3 = {16,16,16,16,16,16,16,1
 #endif
 
 static void
-png_read_filter_row_sub4_vsx(png_row_infop row_info, png_byte *row,
+png_read_filter_row_sub4_vsx(png_row_info *row_info, png_byte *row,
    const png_byte *prev_row)
 {
    png_byte bpp = 4;
@@ -212,7 +212,7 @@ png_read_filter_row_sub4_vsx(png_row_infop row_info, png_byte *row,
 }
 
 static void
-png_read_filter_row_sub3_vsx(png_row_infop row_info, png_byte *row,
+png_read_filter_row_sub3_vsx(png_row_info *row_info, png_byte *row,
    const png_byte *prev_row)
 {
    png_byte bpp = 3;
@@ -277,7 +277,7 @@ png_read_filter_row_sub3_vsx(png_row_infop row_info, png_byte *row,
 }
 
 static void
-png_read_filter_row_avg4_vsx(png_row_infop row_info, png_byte *row,
+png_read_filter_row_avg4_vsx(png_row_info *row_info, png_byte *row,
    const png_byte *prev_row)
 {
    png_byte bpp = 4;
@@ -365,7 +365,7 @@ png_read_filter_row_avg4_vsx(png_row_infop row_info, png_byte *row,
 }
 
 static void
-png_read_filter_row_avg3_vsx(png_row_infop row_info, png_byte *row,
+png_read_filter_row_avg3_vsx(png_row_info *row_info, png_byte *row,
    const png_byte *prev_row)
 {
   png_byte bpp = 3;
@@ -484,7 +484,7 @@ png_read_filter_row_avg3_vsx(png_row_infop row_info, png_byte *row,
       }
 
 static void
-png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_byte *row,
+png_read_filter_row_paeth4_vsx(png_row_info *row_info, png_byte *row,
    const png_byte *prev_row)
 {
    png_byte bpp = 4;
@@ -605,7 +605,7 @@ png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_byte *row,
 }
 
 static void
-png_read_filter_row_paeth3_vsx(png_row_infop row_info, png_byte *row,
+png_read_filter_row_paeth3_vsx(png_row_info *row_info, png_byte *row,
    const png_byte *prev_row)
 {
   png_byte bpp = 3;

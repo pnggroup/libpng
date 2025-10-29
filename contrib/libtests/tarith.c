@@ -31,14 +31,14 @@
 
 #define png_error png_warning
 
-void png_warning(png_const_structrp png_ptr, const char *msg)
+void png_warning(const png_struct *png_ptr, const char *msg)
 {
    fprintf(stderr, "validation: %s\n", msg);
 }
 
 #define png_fixed_error png_fixed_warning
 
-void png_fixed_warning(png_const_structrp png_ptr, const char *msg)
+void png_fixed_warning(const png_struct *png_ptr, const char *msg)
 {
    fprintf(stderr, "overflow in: %s\n", msg);
 }

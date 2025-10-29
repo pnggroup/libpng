@@ -66,8 +66,8 @@
 #endif
 
 
-static png_structp png_ptr = NULL;
-static png_infop info_ptr = NULL;
+static png_struct *png_ptr = NULL;
+static png_info *info_ptr = NULL;
 
 png_uint_32  width, height;
 int  bit_depth, color_type;
@@ -155,7 +155,7 @@ int readpng_init(FILE *infile, ulg *pWidth, ulg *pHeight)
 
 int readpng_get_bgcolor(uch *red, uch *green, uch *blue)
 {
-    png_color_16p pBackground;
+    png_color_16 *pBackground;
 
 
     /* setjmp() must be called in every function that calls a PNG-reading

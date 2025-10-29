@@ -28,7 +28,7 @@
  *       This must be a string naming the implemenation.
  *
  *    png_target_free_data_impl
- *       static void png_target_free_data_impl(png_structrp)
+ *       static void png_target_free_data_impl(png_struct *)
  *       REQUIRED if PNG_TARGET_STORES_DATA is defined
  *       UNDEFINED if PNG_TARGET_STORES_DATA is not defined
  *       A function to free data stored in png_struct::target_data.
@@ -78,7 +78,7 @@
 #endif
 
 void
-png_target_init(png_structrp pp)
+png_target_init(png_struct *pp)
 {
    /* Initialize png_struct::target_state if required. */
 #  ifdef png_target_init_filter_functions_impl
@@ -104,7 +104,7 @@ png_target_init(png_structrp pp)
 
 #ifdef PNG_TARGET_STORES_DATA
 void
-png_target_free_data(png_structrp pp)
+png_target_free_data(png_struct *pp)
 {
    /* Free any data allocated in the png_struct::target_data.
     */
@@ -119,7 +119,7 @@ png_target_free_data(png_structrp pp)
 
 #ifdef PNG_TARGET_IMPLEMENTS_FILTERS
 void
-png_target_init_filter_functions(png_structp pp, unsigned int bpp)
+png_target_init_filter_functions(png_struct *pp, unsigned int bpp)
 {
    if (((pp->options >> PNG_TARGET_SPECIFIC_CODE) & 3) == PNG_OPTION_ON &&
        (pp->target_state & png_target_filters) != 0)
@@ -129,7 +129,7 @@ png_target_init_filter_functions(png_structp pp, unsigned int bpp)
 
 #ifdef PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE
 int
-png_target_do_expand_palette(png_structrp pp, png_row_infop rip)
+png_target_do_expand_palette(png_struct *pp, png_row_info *rip)
    /*const png_byte *row, const png_byte **ssp, const png_byte **ddp) */
 {
    /* This is exactly like 'png_do_expand_palette' except that there is a check

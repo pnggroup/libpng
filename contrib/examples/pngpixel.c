@@ -73,7 +73,7 @@ component(const png_byte *row, png_uint_32 x, unsigned int c,
  * the pixel, and print the relevant information to stdout.
  */
 static void
-print_pixel(png_structp png_ptr, png_infop info_ptr, const png_byte *row,
+print_pixel(png_struct *png_ptr, png_info *info_ptr, const png_byte *row,
             png_uint_32 x)
 {
    unsigned int bit_depth = png_get_bit_depth(png_ptr, info_ptr);
@@ -91,7 +91,7 @@ print_pixel(png_structp png_ptr, png_infop info_ptr, const png_byte *row,
       case PNG_COLOR_TYPE_PALETTE:
          {
             int index = component(row, x, 0, bit_depth, 1);
-            png_colorp palette = NULL;
+            png_color *palette = NULL;
             int num_palette = 0;
 
             if ((png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette) &
@@ -169,12 +169,12 @@ main(int argc, const char **argv)
           * writes error messages to stderr.  Creating the png_struct is a
           * little tricky; just copy the following code.
           */
-         png_structp png_ptr =
+         png_struct *png_ptr =
             png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
          if (png_ptr != NULL)
          {
-            png_infop info_ptr = png_create_info_struct(png_ptr);
+            png_info *info_ptr = png_create_info_struct(png_ptr);
 
             if (info_ptr != NULL)
             {

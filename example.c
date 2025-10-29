@@ -272,8 +272,8 @@ int check_if_png(char *file_name, FILE **fp)
 #ifdef open_file /* prototype 1 */
 void read_png(char *file_name) /* We need to open the file */
 {
-   png_structp png_ptr;
-   png_infop info_ptr;
+   png_struct *png_ptr;
+   png_info *info_ptr;
    int sig_read = 0;
    png_uint_32 width, height;
    int bit_depth, color_type, interlace_type;
@@ -285,8 +285,8 @@ void read_png(char *file_name) /* We need to open the file */
 #else no_open_file /* prototype 2 */
 void read_png(FILE *fp, int sig_read) /* File is already open */
 {
-   png_structp png_ptr;
-   png_infop info_ptr;
+   png_struct *png_ptr;
+   png_info *info_ptr;
    png_uint_32 width, height;
    int bit_depth, color_type, interlace_type;
 #endif no_open_file /* Only use one prototype! */
@@ -470,7 +470,7 @@ void read_png(FILE *fp, int sig_read) /* File is already open */
    if ((color_type & PNG_COLOR_MASK_COLOR) != 0)
    {
       int num_palette;
-      png_colorp palette;
+      png_color *palette;
 
       /* This reduces the image to the application-supplied palette. */
       if (/* We have our own palette */)
@@ -500,7 +500,7 @@ void read_png(FILE *fp, int sig_read) /* File is already open */
     */
    if (png_get_valid(png_ptr, info_ptr, PNG_INFO_sBIT) != 0)
    {
-      png_color_8p sig_bit_p;
+      png_color_8 *sig_bit_p;
       png_get_sBIT(png_ptr, info_ptr, &sig_bit_p);
       png_set_shift(png_ptr, sig_bit_p);
    }
@@ -590,7 +590,7 @@ void read_png(FILE *fp, int sig_read) /* File is already open */
 /* Progressively read a file */
 
 int
-initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
+initialize_png_reader(png_struct **png_ptr, png_info **info_ptr)
 {
    /* Create and initialize the png_struct with the desired error handler
     * functions.  If you want to use the default stderr and longjump method,
@@ -635,7 +635,7 @@ initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
 }
 
 int
-process_data(png_structp *png_ptr, png_infop *info_ptr,
+process_data(png_struct **png_ptr, png_info **info_ptr,
     png_byte *buffer, png_uint_32 length)
 {
    if (setjmp(png_jmpbuf((*png_ptr))))
@@ -659,7 +659,7 @@ process_data(png_structp *png_ptr, png_infop *info_ptr,
    return OK;
 }
 
-info_callback(png_structp png_ptr, png_infop info)
+info_callback(png_struct *png_ptr, png_info *info)
 {
    /* Do any setup here, including setting any of the transformations
     * mentioned in the Reading PNG files section.  For now, you _must_
@@ -670,7 +670,7 @@ info_callback(png_structp png_ptr, png_infop info)
     */
 }
 
-row_callback(png_structp png_ptr, png_byte *new_row,
+row_callback(png_struct *png_ptr, png_byte *new_row,
     png_uint_32 row_num, int pass)
 {
    /* This function is called for every row in the image.  If the
@@ -722,7 +722,7 @@ row_callback(png_structp png_ptr, png_byte *new_row,
 #endif /* READ_INTERLACING */
 }
 
-end_callback(png_structp png_ptr, png_infop info)
+end_callback(png_struct *png_ptr, png_info *info)
 {
    /* This function is called when the whole image has been read,
     * including any chunks after the image (up to and including
@@ -739,9 +739,9 @@ end_callback(png_structp png_ptr, png_infop info)
 void write_png(char *file_name /* , ... other image information ... */)
 {
    FILE *fp;
-   png_structp png_ptr;
-   png_infop info_ptr;
-   png_colorp palette;
+   png_struct *png_ptr;
+   png_info *info_ptr;
+   png_color *palette;
 
    /* Open the file */
    fp = fopen(file_name, "wb");
@@ -821,7 +821,7 @@ void write_png(char *file_name /* , ... other image information ... */)
        PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
    /* Set the palette if there is one.  REQUIRED for indexed-color images. */
-   palette = (png_colorp)png_malloc(png_ptr,
+   palette = (png_color *)png_malloc(png_ptr,
        PNG_MAX_PALETTE_LENGTH * (sizeof (png_color)));
    /* ... Set palette colors ... */
    png_set_PLTE(png_ptr, info_ptr, palette, PNG_MAX_PALETTE_LENGTH);

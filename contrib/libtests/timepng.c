@@ -63,7 +63,7 @@ typedef struct
 }  io_data;
 
 static PNG_CALLBACK(void, read_and_copy,
-      (png_structp png_ptr, png_byte *buffer, size_t cb))
+      (png_struct *png_ptr, png_byte *buffer, size_t cb))
 {
    io_data *io = (io_data*)png_get_io_ptr(png_ptr);
 
@@ -78,7 +78,7 @@ static PNG_CALLBACK(void, read_and_copy,
    }
 }
 
-static void read_by_row(png_structp png_ptr, png_infop info_ptr,
+static void read_by_row(png_struct *png_ptr, png_info *info_ptr,
       FILE *write_ptr, FILE *read_ptr)
 {
    /* These don't get freed on error, this is fine; the program immediately
@@ -135,7 +135,7 @@ static void read_by_row(png_structp png_ptr, png_infop info_ptr,
    free(display);
 }
 
-static PNG_CALLBACK(void, no_warnings, (png_structp png_ptr,
+static PNG_CALLBACK(void, no_warnings, (png_struct *png_ptr,
          const char *warning))
 {
    (void)png_ptr;
@@ -144,9 +144,9 @@ static PNG_CALLBACK(void, no_warnings, (png_structp png_ptr,
 
 static int read_png(FILE *fp, png_int_32 transforms, FILE *write_file)
 {
-   png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,0,0,
+   png_struct *png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,0,0,
          no_warnings);
-   png_infop info_ptr = NULL;
+   png_info *info_ptr = NULL;
 
    if (png_ptr == NULL)
       return 0;

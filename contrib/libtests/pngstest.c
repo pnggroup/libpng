@@ -117,7 +117,7 @@ reseed(void)
 }
 
 static void
-random_color(png_colorp color)
+random_color(png_color *color)
 {
    make_random_bytes(color_seed, color, sizeof *color);
 }
@@ -2030,15 +2030,15 @@ static void (* const gpc_fn_colormapped[8/*in*/][8/*out*/])
 typedef struct
 {
    /* Basic pixel information: */
-   Image*       in_image;   /* Input image */
-   const Image* out_image;  /* Output image */
+   Image       *in_image;   /* Input image */
+   const Image *out_image;  /* Output image */
 
    /* 'background' is the value passed to the gpc_ routines, it may be NULL if
     * it should not be used (*this* program has an error if it crashes as a
     * result!)
     */
    Background        background_color;
-   const Background* background;
+   const Background *background;
 
    /* Precalculated values: */
    int          in_opaque;   /* Value of input alpha that is opaque */
@@ -2068,7 +2068,7 @@ Transform;
 /* Return a 'transform' as above for the given format conversion. */
 static void
 transform_from_formats(Transform *result, Image *in_image,
-   const Image *out_image, png_const_colorp background, int via_linear)
+   const Image *out_image, const png_color *background, int via_linear)
 {
    png_uint_32 in_format, out_format;
    png_uint_32 in_base, out_base;
@@ -2603,7 +2603,7 @@ component_loc(png_byte loc[4], png_uint_32 format)
  */
 static int
 compare_two_images(Image *a, Image *b, int via_linear,
-   png_const_colorp background)
+   const png_color *background)
 {
    ptrdiff_t stridea = a->stride;
    ptrdiff_t strideb = b->stride;
@@ -2957,7 +2957,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
  * input_memory have been set.
  */
 static int
-read_file(Image *image, png_uint_32 format, png_const_colorp background)
+read_file(Image *image, png_uint_32 format, const png_color *background)
 {
    memset(&image->image, 0, sizeof image->image);
    image->image.version = PNG_IMAGE_VERSION;
@@ -3351,7 +3351,7 @@ testimage(Image *image, png_uint_32 opts, format_list *pf)
          png_uint_32 format = counter >> 1;
 
          png_color background_color;
-         png_colorp background = NULL;
+         png_color *background = NULL;
 
          /* If there is a format change that removes the alpha channel then
           * the background is relevant.  If the output is 8-bit color-mapped

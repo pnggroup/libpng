@@ -35,7 +35,7 @@ struct png_info_def
    png_uint_32 height;      /* height of image in pixels (from IHDR) */
    png_uint_32 valid;       /* valid chunk data (see PNG_INFO_ below) */
    size_t rowbytes;         /* bytes needed to hold an untransformed row */
-   png_colorp palette;      /* array of color values (valid & PNG_INFO_PLTE) */
+   png_color *palette;      /* array of color values (valid & PNG_INFO_PLTE) */
    png_uint_16 num_palette; /* number of color entries in "palette" (PLTE) */
    png_uint_16 num_trans;   /* number of transparent palette color (tRNS) */
    png_byte bit_depth;      /* 1, 2, 4, 8, or 16 bits/channel (from IHDR) */
@@ -107,7 +107,7 @@ struct png_info_def
     */
    int num_text; /* number of comments read or comments to write */
    int max_text; /* current size of text array */
-   png_textp text; /* array of comments read or comments to write */
+   png_text *text; /* array of comments read or comments to write */
 #endif /* TEXT */
 
 #ifdef PNG_tIME_SUPPORTED
@@ -214,7 +214,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
    /* Storage for unknown chunks that the library doesn't recognize. */
-   png_unknown_chunkp unknown_chunks;
+   png_unknown_chunk *unknown_chunks;
 
    /* The type of this field is limited by the type of
     * png_struct::user_chunk_cache_max, else overflow can occur.
@@ -224,7 +224,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 
 #ifdef PNG_sPLT_SUPPORTED
    /* Data on sPLT chunks (there may be more than one). */
-   png_sPLT_tp splt_palettes;
+   png_sPLT_t *splt_palettes;
    int         splt_palettes_num; /* Match type returned by png_get API */
 #endif
 

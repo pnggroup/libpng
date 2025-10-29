@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 static int
-png_have_neon(png_structp png_ptr)
+png_have_neon(png_struct *png_ptr)
 {
    FILE *f = fopen("/proc/cpuinfo", "rb");
 

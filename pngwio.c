@@ -29,7 +29,7 @@
  */
 
 void /* PRIVATE */
-png_write_data(png_structrp png_ptr, const png_byte *data, size_t length)
+png_write_data(png_struct *png_ptr, const png_byte *data, size_t length)
 {
    /* NOTE: write_data_fn must not change the buffer! */
    if (png_ptr->write_data_fn != NULL )
@@ -47,7 +47,7 @@ png_write_data(png_structrp png_ptr, const png_byte *data, size_t length)
  * than changing the library.
  */
 void
-png_default_write_data(png_structp png_ptr, png_byte *data, size_t length)
+png_default_write_data(png_struct *png_ptr, png_byte *data, size_t length)
 {
    size_t check;
 
@@ -67,7 +67,7 @@ png_default_write_data(png_structp png_ptr, png_byte *data, size_t length)
  */
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
 void /* PRIVATE */
-png_flush(png_structrp png_ptr)
+png_flush(png_struct *png_ptr)
 {
    if (png_ptr->output_flush_fn != NULL)
       (*(png_ptr->output_flush_fn))(png_ptr);
@@ -75,7 +75,7 @@ png_flush(png_structrp png_ptr)
 
 #  ifdef PNG_STDIO_SUPPORTED
 void
-png_default_flush(png_structp png_ptr)
+png_default_flush(png_struct *png_ptr)
 {
    FILE *io_ptr;
 
@@ -118,7 +118,7 @@ png_default_flush(png_structp png_ptr)
  *                 *FILE structure.
  */
 void
-png_set_write_fn(png_structrp png_ptr, void *io_ptr,
+png_set_write_fn(png_struct *png_ptr, void *io_ptr,
     png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn)
 {
    if (png_ptr == NULL)

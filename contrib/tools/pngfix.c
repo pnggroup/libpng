@@ -3146,16 +3146,16 @@ read_chunk(struct file *file)
 }
 
 /* This returns a file* from a png_struct in an implementation specific way. */
-static struct file *get_control(png_const_structrp png_ptr);
+static struct file *get_control(const png_struct *png_ptr);
 
 static void
-error_handler(png_structp png_ptr, const char *message)
+error_handler(png_struct *png_ptr, const char *message)
 {
    stop(get_control(png_ptr),  LIBPNG_ERROR_CODE, message);
 }
 
 static void
-warning_handler(png_structp png_ptr, const char *message)
+warning_handler(png_struct *png_ptr, const char *message)
 {
    struct file *file = get_control(png_ptr);
 
@@ -3167,7 +3167,7 @@ warning_handler(png_structp png_ptr, const char *message)
  * passing it to libpng
  */
 static void
-read_callback(png_structp png_ptr, png_byte *buffer, size_t count)
+read_callback(png_struct *png_ptr, png_byte *buffer, size_t count)
    /* Return 'count' bytes to libpng in 'buffer' */
 {
    struct file *file = get_control(png_ptr);
@@ -3517,7 +3517,7 @@ control_end(struct control *control)
 }
 
 static struct file *
-get_control(png_const_structrp png_ptr)
+get_control(const png_struct *png_ptr)
 {
    /* This just returns the (file*).  The chunk and idat control structures
     * don't always exist.
@@ -3562,8 +3562,8 @@ read_png(struct control *control)
     * defined for file::status_code as above.
     */
 {
-   png_structp png_ptr;
-   png_infop info_ptr = NULL;
+   png_struct *png_ptr;
+   png_info *info_ptr = NULL;
    volatile int rc;
 
    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, control,

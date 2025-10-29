@@ -20,7 +20,7 @@
 #include "png.h"
 
 static int
-png_have_vsx(png_structp png_ptr)
+png_have_vsx(png_struct *png_ptr)
 {
    unsigned long auxv = getauxval(AT_HWCAP);
 

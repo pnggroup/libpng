@@ -375,8 +375,8 @@ ancillaryb(const png_byte *name)
 typedef struct
 {
    jmp_buf     error_return;
-   png_structp png_ptr;
-   png_infop   info_ptr, end_ptr;
+   png_struct *png_ptr;
+   png_info   *info_ptr, *end_ptr;
    png_uint_32 before_IDAT;
    png_uint_32 after_IDAT;
    int         error_count;
@@ -441,7 +441,7 @@ display_rc(const display *d, int strict)
 
 /* libpng error and warning callbacks */
 static PNG_NORETURN void
-error(png_structp png_ptr, const char *message)
+error(png_struct *png_ptr, const char *message)
 {
    display *d = (display*)png_get_error_ptr(png_ptr);
 
@@ -450,7 +450,7 @@ error(png_structp png_ptr, const char *message)
 }
 
 static void
-warning(png_structp png_ptr, const char *message)
+warning(png_struct *png_ptr, const char *message)
 {
    display *d = (display*)png_get_error_ptr(png_ptr);
 
@@ -459,13 +459,13 @@ warning(png_structp png_ptr, const char *message)
 }
 
 static png_uint_32
-get_valid(display *d, png_infop info_ptr)
+get_valid(display *d, png_info *info_ptr)
 {
    png_uint_32 flags = png_get_valid(d->png_ptr, info_ptr, (png_uint_32)~0);
 
    /* Map the text chunks back into the flags */
    {
-      png_textp text;
+      png_text *text;
       png_uint_32 ntext = png_get_text(d->png_ptr, info_ptr, &text, NULL);
 
       while (ntext > 0) switch (text[--ntext].compression)
@@ -492,7 +492,7 @@ get_valid(display *d, png_infop info_ptr)
 
 #ifdef PNG_READ_USER_CHUNKS_SUPPORTED
 static int
-read_callback(png_structp pp, png_unknown_chunkp pc)
+read_callback(png_struct *pp, png_unknown_chunk *pc)
 {
    /* This function mimics the behavior of png_set_keep_unknown_chunks by
     * returning '0' to keep the chunk and '1' to discard it.
@@ -568,7 +568,7 @@ read_callback(png_structp pp, png_unknown_chunkp pc)
 
 #ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
 static png_uint_32
-get_unknown(display *d, png_infop info_ptr, int after_IDAT)
+get_unknown(display *d, png_info *info_ptr, int after_IDAT)
 {
    /* Create corresponding 'unknown' flags */
    png_uint_32 flags = 0;
@@ -576,7 +576,7 @@ get_unknown(display *d, png_infop info_ptr, int after_IDAT)
    UNUSED(after_IDAT)
 
    {
-      png_unknown_chunkp unknown;
+      png_unknown_chunk *unknown;
       int num_unknown = png_get_unknown_chunks(d->png_ptr, info_ptr, &unknown);
 
       while (--num_unknown >= 0)
@@ -621,7 +621,7 @@ get_unknown(display *d, png_infop info_ptr, int after_IDAT)
 }
 #else /* SAVE_UNKNOWN_CHUNKS */
 static png_uint_32
-get_unknown(display *d, png_infop info_ptr, int after_IDAT)
+get_unknown(display *d, png_info *info_ptr, int after_IDAT)
    /* Otherwise this will return the cached values set by any user callback */
 {
    UNUSED(info_ptr);

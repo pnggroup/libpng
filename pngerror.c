@@ -32,12 +32,12 @@ static const char png_digits[] = {
 #endif
 
 static PNG_FUNCTION(void /* PRIVATE */,
-png_default_error,(png_const_structrp png_ptr, const char *error_message),
+png_default_error,(const png_struct *png_ptr, const char *error_message),
     PNG_NORETURN);
 
 #ifdef PNG_WARNINGS_SUPPORTED
 static void /* PRIVATE */
-png_default_warning(png_const_structrp png_ptr,
+png_default_warning(const png_struct *png_ptr,
     const char *warning_message);
 #endif /* WARNINGS */
 
@@ -48,11 +48,11 @@ png_default_warning(png_const_structrp png_ptr,
  */
 #ifdef PNG_ERROR_TEXT_SUPPORTED
 PNG_FUNCTION(void,
-png_error,(png_const_structrp png_ptr, const char *error_message),
+png_error,(const png_struct *png_ptr, const char *error_message),
     PNG_NORETURN)
 {
    if (png_ptr != NULL && png_ptr->error_fn != NULL)
-      (*(png_ptr->error_fn))(png_constcast(png_structrp,png_ptr),
+      (*(png_ptr->error_fn))(png_constcast(png_struct *,png_ptr),
           error_message);
 
    /* If the custom handler doesn't exist, or if it returns,
@@ -61,7 +61,7 @@ png_error,(png_const_structrp png_ptr, const char *error_message),
 }
 #else
 PNG_FUNCTION(void,
-png_err,(png_const_structrp png_ptr),
+png_err,(const png_struct *png_ptr),
     PNG_NORETURN)
 {
    /* Prior to 1.5.2 the error_fn received a NULL pointer, expressed
@@ -70,7 +70,7 @@ png_err,(png_const_structrp png_ptr),
     * will crash in this case.
     */
    if (png_ptr != NULL && png_ptr->error_fn != NULL)
-      (*(png_ptr->error_fn))(png_constcast(png_structrp,png_ptr), "");
+      (*(png_ptr->error_fn))(png_constcast(png_struct *,png_ptr), "");
 
    /* If the custom handler doesn't exist, or if it returns,
       use the default handler, which will not return. */
@@ -183,10 +183,10 @@ png_format_number(const char *start, char *end, int format,
  * png_set_error_fn() to replace the warning function at run-time.
  */
 void
-png_warning(png_const_structrp png_ptr, const char *warning_message)
+png_warning(const png_struct *png_ptr, const char *warning_message)
 {
    if (png_ptr != NULL && png_ptr->warning_fn != NULL)
-      (*(png_ptr->warning_fn))(png_constcast(png_structrp,png_ptr),
+      (*(png_ptr->warning_fn))(png_constcast(png_struct *,png_ptr),
           warning_message);
    else
       png_default_warning(png_ptr, warning_message);
@@ -235,7 +235,7 @@ png_warning_parameter_signed(png_warning_parameters p, int number, int format,
 }
 
 void
-png_formatted_warning(png_const_structrp png_ptr, png_warning_parameters p,
+png_formatted_warning(const png_struct *png_ptr, png_warning_parameters p,
     const char *message)
 {
    /* The internal buffer is just 192 bytes - enough for all our messages,
@@ -305,7 +305,7 @@ png_formatted_warning(png_const_structrp png_ptr, png_warning_parameters p,
 
 #ifdef PNG_BENIGN_ERRORS_SUPPORTED
 void
-png_benign_error(png_const_structrp png_ptr, const char *error_message)
+png_benign_error(const png_struct *png_ptr, const char *error_message)
 {
    if ((png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN) != 0)
    {
@@ -335,7 +335,7 @@ png_benign_error(png_const_structrp png_ptr, const char *error_message)
 }
 
 void /* PRIVATE */
-png_app_warning(png_const_structrp png_ptr, const char *error_message)
+png_app_warning(const png_struct *png_ptr, const char *error_message)
 {
    if ((png_ptr->flags & PNG_FLAG_APP_WARNINGS_WARN) != 0)
       png_warning(png_ptr, error_message);
@@ -348,7 +348,7 @@ png_app_warning(png_const_structrp png_ptr, const char *error_message)
 }
 
 void /* PRIVATE */
-png_app_error(png_const_structrp png_ptr, const char *error_message)
+png_app_error(const png_struct *png_ptr, const char *error_message)
 {
    if ((png_ptr->flags & PNG_FLAG_APP_ERRORS_WARN) != 0)
       png_warning(png_ptr, error_message);
@@ -371,7 +371,7 @@ png_app_error(png_const_structrp png_ptr, const char *error_message)
  * if the character is invalid.
  */
 static void /* PRIVATE */
-png_format_buffer(png_const_structrp png_ptr, char *buffer,
+png_format_buffer(const png_struct *png_ptr, char *buffer,
     const char *error_message)
 {
    png_uint_32 chunk_name = png_ptr->chunk_name;
@@ -416,7 +416,7 @@ png_format_buffer(png_const_structrp png_ptr, char *buffer,
 
 #if defined(PNG_READ_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED)
 PNG_FUNCTION(void,
-png_chunk_error,(png_const_structrp png_ptr, const char *error_message),
+png_chunk_error,(const png_struct *png_ptr, const char *error_message),
     PNG_NORETURN)
 {
    char msg[18+PNG_MAX_ERROR_TEXT];
@@ -433,7 +433,7 @@ png_chunk_error,(png_const_structrp png_ptr, const char *error_message),
 
 #ifdef PNG_WARNINGS_SUPPORTED
 void
-png_chunk_warning(png_const_structrp png_ptr, const char *warning_message)
+png_chunk_warning(const png_struct *png_ptr, const char *warning_message)
 {
    char msg[18+PNG_MAX_ERROR_TEXT];
    if (png_ptr == NULL)
@@ -450,7 +450,7 @@ png_chunk_warning(png_const_structrp png_ptr, const char *warning_message)
 #ifdef PNG_READ_SUPPORTED
 #ifdef PNG_BENIGN_ERRORS_SUPPORTED
 void
-png_chunk_benign_error(png_const_structrp png_ptr,
+png_chunk_benign_error(const png_struct *png_ptr,
     const char *error_message)
 {
    if ((png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN) != 0)
@@ -467,7 +467,7 @@ png_chunk_benign_error(png_const_structrp png_ptr,
 #endif /* READ */
 
 void /* PRIVATE */
-png_chunk_report(png_const_structrp png_ptr, const char *message, int error)
+png_chunk_report(const png_struct *png_ptr, const char *message, int error)
 {
 #  ifndef PNG_WARNINGS_SUPPORTED
       PNG_UNUSED(message)
@@ -508,7 +508,7 @@ png_chunk_report(png_const_structrp png_ptr, const char *message, int error)
 #ifdef PNG_ERROR_TEXT_SUPPORTED
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 PNG_FUNCTION(void,
-png_fixed_error,(png_const_structrp png_ptr, const char *name),
+png_fixed_error,(const png_struct *png_ptr, const char *name),
     PNG_NORETURN)
 {
 #  define fixed_message "fixed point overflow in "
@@ -534,7 +534,7 @@ png_fixed_error,(png_const_structrp png_ptr, const char *name),
  * otherwise it is necessary for png_default_error to be overridden.
  */
 jmp_buf*
-png_set_longjmp_fn(png_structrp png_ptr, png_longjmp_ptr longjmp_fn,
+png_set_longjmp_fn(png_struct *png_ptr, png_longjmp_ptr longjmp_fn,
     size_t jmp_buf_size)
 {
    /* From libpng 1.6.0 the app gets one chance to set a 'jmpbuf_size' value
@@ -603,7 +603,7 @@ png_set_longjmp_fn(png_structrp png_ptr, png_longjmp_ptr longjmp_fn,
 }
 
 void /* PRIVATE */
-png_free_jmpbuf(png_structrp png_ptr)
+png_free_jmpbuf(png_struct *png_ptr)
 {
    if (png_ptr != NULL)
    {
@@ -648,7 +648,7 @@ png_free_jmpbuf(png_structrp png_ptr)
  * error function pointer in png_set_error_fn().
  */
 static PNG_FUNCTION(void /* PRIVATE */,
-png_default_error,(png_const_structrp png_ptr, const char *error_message),
+png_default_error,(const png_struct *png_ptr, const char *error_message),
     PNG_NORETURN)
 {
 #ifdef PNG_CONSOLE_IO_SUPPORTED
@@ -661,7 +661,7 @@ png_default_error,(png_const_structrp png_ptr, const char *error_message),
 }
 
 PNG_FUNCTION(void,
-png_longjmp,(png_const_structrp png_ptr, int val),
+png_longjmp,(const png_struct *png_ptr, int val),
     PNG_NORETURN)
 {
 #ifdef PNG_SETJMP_SUPPORTED
@@ -689,7 +689,7 @@ png_longjmp,(png_const_structrp png_ptr, int val),
  * not used, but it is passed in case it may be useful.
  */
 static void /* PRIVATE */
-png_default_warning(png_const_structrp png_ptr, const char *warning_message)
+png_default_warning(const png_struct *png_ptr, const char *warning_message)
 {
 #ifdef PNG_CONSOLE_IO_SUPPORTED
    fprintf(stderr, "libpng warning: %s\n", warning_message);
@@ -706,7 +706,7 @@ png_default_warning(png_const_structrp png_ptr, const char *warning_message)
  * method used in the default routine calls longjmp(png_ptr->jmp_buf_ptr, 1).
  */
 void
-png_set_error_fn(png_structrp png_ptr, void *error_ptr,
+png_set_error_fn(png_struct *png_ptr, void *error_ptr,
     png_error_ptr error_fn, png_error_ptr warning_fn)
 {
    if (png_ptr == NULL)
@@ -727,7 +727,7 @@ png_set_error_fn(png_structrp png_ptr, void *error_ptr,
  * pointer before png_write_destroy and png_read_destroy are called.
  */
 void *
-png_get_error_ptr(png_const_structrp png_ptr)
+png_get_error_ptr(const png_struct *png_ptr)
 {
    if (png_ptr == NULL)
       return NULL;
@@ -743,11 +743,11 @@ png_get_error_ptr(png_const_structrp png_ptr)
     * way to handle the error return here:
     */
 PNG_FUNCTION(void /* PRIVATE */,
-png_safe_error,(png_structp png_nonconst_ptr, const char *error_message),
+png_safe_error,(png_struct *png_nonconst_ptr, const char *error_message),
     PNG_NORETURN)
 {
-   png_const_structrp png_ptr = png_nonconst_ptr;
-   png_imagep image = png_voidcast(png_imagep, png_ptr->error_ptr);
+   const png_struct *png_ptr = png_nonconst_ptr;
+   png_image *image = png_voidcast(png_image *, png_ptr->error_ptr);
 
    /* An error is always logged here, overwriting anything (typically a warning)
     * that is already there:
@@ -779,10 +779,10 @@ png_safe_error,(png_structp png_nonconst_ptr, const char *error_message),
 
 #ifdef PNG_WARNINGS_SUPPORTED
 void /* PRIVATE */
-png_safe_warning(png_structp png_nonconst_ptr, const char *warning_message)
+png_safe_warning(png_struct *png_nonconst_ptr, const char *warning_message)
 {
-   png_const_structrp png_ptr = png_nonconst_ptr;
-   png_imagep image = png_voidcast(png_imagep, png_ptr->error_ptr);
+   const png_struct *png_ptr = png_nonconst_ptr;
+   png_image *image = png_voidcast(png_image *, png_ptr->error_ptr);
 
    /* A warning is only logged if there is no prior warning or error. */
    if (image->warning_or_error == 0)
@@ -794,7 +794,7 @@ png_safe_warning(png_structp png_nonconst_ptr, const char *warning_message)
 #endif
 
 int /* PRIVATE */
-png_safe_execute(png_imagep image, int (*function)(void *), void *arg)
+png_safe_execute(png_image *image, int (*function)(void *), void *arg)
 {
    void *saved_error_buf = image->opaque->error_buf;
    jmp_buf safe_jmpbuf;

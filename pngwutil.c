@@ -65,7 +65,7 @@ png_save_uint_16(png_byte *buf, unsigned int i)
  * bytes have already been written.
  */
 void
-png_write_sig(png_structrp png_ptr)
+png_write_sig(png_struct *png_ptr)
 {
    png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 
@@ -87,7 +87,7 @@ png_write_sig(png_structrp png_ptr)
  * passing in png_write_chunk_data().
  */
 static void
-png_write_chunk_header(png_structrp png_ptr, png_uint_32 chunk_name,
+png_write_chunk_header(png_struct *png_ptr, png_uint_32 chunk_name,
     png_uint_32 length)
 {
    png_byte buf[8];
@@ -129,7 +129,7 @@ png_write_chunk_header(png_structrp png_ptr, png_uint_32 chunk_name,
 }
 
 void
-png_write_chunk_start(png_structrp png_ptr, const png_byte *chunk_string,
+png_write_chunk_start(png_struct *png_ptr, const png_byte *chunk_string,
     png_uint_32 length)
 {
    png_write_chunk_header(png_ptr, PNG_CHUNK_FROM_STRING(chunk_string), length);
@@ -141,7 +141,7 @@ png_write_chunk_start(png_structrp png_ptr, const png_byte *chunk_string,
  * given to png_write_chunk_header().
  */
 void
-png_write_chunk_data(png_structrp png_ptr, const png_byte *data, size_t length)
+png_write_chunk_data(png_struct *png_ptr, const png_byte *data, size_t length)
 {
    /* Write the data, and run the CRC over it */
    if (png_ptr == NULL)
@@ -160,7 +160,7 @@ png_write_chunk_data(png_structrp png_ptr, const png_byte *data, size_t length)
 
 /* Finish a chunk started with png_write_chunk_header(). */
 void
-png_write_chunk_end(png_structrp png_ptr)
+png_write_chunk_end(png_struct *png_ptr)
 {
    png_byte buf[4];
 
@@ -189,7 +189,7 @@ png_write_chunk_end(png_structrp png_ptr)
  * functions instead.
  */
 static void
-png_write_complete_chunk(png_structrp png_ptr, png_uint_32 chunk_name,
+png_write_complete_chunk(png_struct *png_ptr, png_uint_32 chunk_name,
     const png_byte *data, size_t length)
 {
    if (png_ptr == NULL)
@@ -206,7 +206,7 @@ png_write_complete_chunk(png_structrp png_ptr, png_uint_32 chunk_name,
 
 /* This is the API that calls the internal function above. */
 void
-png_write_chunk(png_structrp png_ptr, const png_byte *chunk_string,
+png_write_chunk(png_struct *png_ptr, const png_byte *chunk_string,
     const png_byte *data, size_t length)
 {
    png_write_complete_chunk(png_ptr, PNG_CHUNK_FROM_STRING(chunk_string), data,
@@ -218,7 +218,7 @@ png_write_chunk(png_structrp png_ptr, const png_byte *chunk_string,
  * point at which a lower LZ window size can be used.)
  */
 static png_alloc_size_t
-png_image_size(png_structrp png_ptr)
+png_image_size(png_struct *png_ptr)
 {
    /* Only return sizes up to the maximum of a png_uint_32; do this by limiting
     * the width and height used to 15 bits.
@@ -306,7 +306,7 @@ optimize_cmf(png_byte *data, png_alloc_size_t data_size)
 
 /* Initialize the compressor for the appropriate type of compression. */
 static int
-png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
+png_deflate_claim(png_struct *png_ptr, png_uint_32 owner,
     png_alloc_size_t data_size)
 {
    if (png_ptr->zowner != 0)
@@ -453,9 +453,9 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
 
 /* Clean up (or trim) a linked list of compression buffers. */
 void /* PRIVATE */
-png_free_buffer_list(png_structrp png_ptr, png_compression_bufferp *listp)
+png_free_buffer_list(png_struct *png_ptr, png_compression_buffer **listp)
 {
-   png_compression_bufferp list = *listp;
+   png_compression_buffer *list = *listp;
 
    if (list != NULL)
    {
@@ -463,7 +463,7 @@ png_free_buffer_list(png_structrp png_ptr, png_compression_bufferp *listp)
 
       do
       {
-         png_compression_bufferp next = list->next;
+         png_compression_buffer *next = list->next;
 
          png_free(png_ptr, list);
          list = next;
@@ -502,7 +502,7 @@ png_text_compress_init(compression_state *comp, const png_byte *input,
 
 /* Compress the data in the compression state input */
 static int
-png_text_compress(png_structrp png_ptr, png_uint_32 chunk_name,
+png_text_compress(png_struct *png_ptr, png_uint_32 chunk_name,
     compression_state *comp, png_uint_32 prefix_len)
 {
    int ret;
@@ -529,7 +529,7 @@ png_text_compress(png_structrp png_ptr, png_uint_32 chunk_name,
     * in size.
     */
    {
-      png_compression_bufferp *end = &png_ptr->zbuffer_list;
+      png_compression_buffer **end = &png_ptr->zbuffer_list;
       png_alloc_size_t input_len = comp->input_len; /* may be zero! */
       png_uint_32 output_len;
 
@@ -571,7 +571,7 @@ png_text_compress(png_structrp png_ptr, png_uint_32 chunk_name,
             next = *end;
             if (next == NULL)
             {
-               next = png_voidcast(png_compression_bufferp, png_malloc_base
+               next = png_voidcast(png_compression_buffer *, png_malloc_base
                   (png_ptr, PNG_COMPRESSION_BUFFER_SIZE(png_ptr)));
 
                if (next == NULL)
@@ -651,7 +651,7 @@ png_text_compress(png_structrp png_ptr, png_uint_32 chunk_name,
 
 /* Ship the compressed text out via chunk writes */
 static void
-png_write_compressed_data_out(png_structrp png_ptr, compression_state *comp)
+png_write_compressed_data_out(png_struct *png_ptr, compression_state *comp)
 {
    png_uint_32 output_len = comp->output_len;
    const png_byte *output = comp->output;
@@ -686,7 +686,7 @@ png_write_compressed_data_out(png_structrp png_ptr, compression_state *comp)
  * information being correct.
  */
 void /* PRIVATE */
-png_write_IHDR(png_structrp png_ptr, png_uint_32 width, png_uint_32 height,
+png_write_IHDR(png_struct *png_ptr, png_uint_32 width, png_uint_32 height,
     int bit_depth, int color_type, int compression_type, int filter_type,
     int interlace_type)
 {
@@ -861,11 +861,11 @@ png_write_IHDR(png_structrp png_ptr, png_uint_32 width, png_uint_32 height,
  * structure.
  */
 void /* PRIVATE */
-png_write_PLTE(png_structrp png_ptr, png_const_colorp palette,
+png_write_PLTE(png_struct *png_ptr, const png_color *palette,
     png_uint_32 num_pal)
 {
    png_uint_32 max_palette_length, i;
-   png_const_colorp pal_ptr;
+   const png_color *pal_ptr;
    png_byte buf[3];
 
    png_debug(1, "in png_write_PLTE");
@@ -950,7 +950,7 @@ png_write_PLTE(png_structrp png_ptr, png_const_colorp palette,
  * checks on the 'mode' flags while doing this.
  */
 void /* PRIVATE */
-png_compress_IDAT(png_structrp png_ptr, const png_byte *input,
+png_compress_IDAT(png_struct *png_ptr, const png_byte *input,
     png_alloc_size_t input_len, int flush)
 {
    if (png_ptr->zowner != png_IDAT)
@@ -962,7 +962,7 @@ png_compress_IDAT(png_structrp png_ptr, const png_byte *input,
        */
       if (png_ptr->zbuffer_list == NULL)
       {
-         png_ptr->zbuffer_list = png_voidcast(png_compression_bufferp,
+         png_ptr->zbuffer_list = png_voidcast(png_compression_buffer *,
              png_malloc(png_ptr, PNG_COMPRESSION_BUFFER_SIZE(png_ptr)));
          png_ptr->zbuffer_list->next = NULL;
       }
@@ -1112,7 +1112,7 @@ png_compress_IDAT(png_structrp png_ptr, const png_byte *input,
 
 /* Write an IEND chunk */
 void /* PRIVATE */
-png_write_IEND(png_structrp png_ptr)
+png_write_IEND(png_struct *png_ptr)
 {
    png_debug(1, "in png_write_IEND");
 
@@ -1123,7 +1123,7 @@ png_write_IEND(png_structrp png_ptr)
 #ifdef PNG_WRITE_gAMA_SUPPORTED
 /* Write a gAMA chunk */
 void /* PRIVATE */
-png_write_gAMA_fixed(png_structrp png_ptr, png_fixed_point file_gamma)
+png_write_gAMA_fixed(png_struct *png_ptr, png_fixed_point file_gamma)
 {
    png_byte buf[4];
 
@@ -1138,7 +1138,7 @@ png_write_gAMA_fixed(png_structrp png_ptr, png_fixed_point file_gamma)
 #ifdef PNG_WRITE_sRGB_SUPPORTED
 /* Write a sRGB chunk */
 void /* PRIVATE */
-png_write_sRGB(png_structrp png_ptr, int srgb_intent)
+png_write_sRGB(png_struct *png_ptr, int srgb_intent)
 {
    png_byte buf[1];
 
@@ -1156,7 +1156,7 @@ png_write_sRGB(png_structrp png_ptr, int srgb_intent)
 #ifdef PNG_WRITE_iCCP_SUPPORTED
 /* Write an iCCP chunk */
 void /* PRIVATE */
-png_write_iCCP(png_structrp png_ptr, const char *name,
+png_write_iCCP(png_struct *png_ptr, const char *name,
     const png_byte *profile, png_uint_32 profile_len)
 {
    png_uint_32 name_len;
@@ -1218,14 +1218,14 @@ png_write_iCCP(png_structrp png_ptr, const char *name,
 #ifdef PNG_WRITE_sPLT_SUPPORTED
 /* Write a sPLT chunk */
 void /* PRIVATE */
-png_write_sPLT(png_structrp png_ptr, png_const_sPLT_tp spalette)
+png_write_sPLT(png_struct *png_ptr, const png_sPLT_t *spalette)
 {
    png_uint_32 name_len;
    png_byte new_name[80];
    png_byte entrybuf[10];
    size_t entry_size = (spalette->depth == 8 ? 6 : 10);
    size_t palette_size = entry_size * (size_t)spalette->nentries;
-   png_sPLT_entryp ep;
+   png_sPLT_entry *ep;
 #ifndef PNG_POINTER_INDEXING_SUPPORTED
    int i;
 #endif
@@ -1302,7 +1302,7 @@ png_write_sPLT(png_structrp png_ptr, png_const_sPLT_tp spalette)
 #ifdef PNG_WRITE_sBIT_SUPPORTED
 /* Write the sBIT chunk */
 void /* PRIVATE */
-png_write_sBIT(png_structrp png_ptr, png_const_color_8p sbit, int color_type)
+png_write_sBIT(png_struct *png_ptr, const png_color_8 *sbit, int color_type)
 {
    png_byte buf[4];
    size_t size;
@@ -1361,7 +1361,7 @@ png_write_sBIT(png_structrp png_ptr, png_const_color_8p sbit, int color_type)
 #ifdef PNG_WRITE_cHRM_SUPPORTED
 /* Write the cHRM chunk */
 void /* PRIVATE */
-png_write_cHRM_fixed(png_structrp png_ptr, const png_xy *xy)
+png_write_cHRM_fixed(png_struct *png_ptr, const png_xy *xy)
 {
    png_byte buf[32];
 
@@ -1387,8 +1387,8 @@ png_write_cHRM_fixed(png_structrp png_ptr, const png_xy *xy)
 #ifdef PNG_WRITE_tRNS_SUPPORTED
 /* Write the tRNS chunk */
 void /* PRIVATE */
-png_write_tRNS(png_structrp png_ptr, const png_byte *trans_alpha,
-    png_const_color_16p tran, int num_trans, int color_type)
+png_write_tRNS(png_struct *png_ptr, const png_byte *trans_alpha,
+    const png_color_16 *tran, int num_trans, int color_type)
 {
    png_byte buf[6];
 
@@ -1453,7 +1453,7 @@ png_write_tRNS(png_structrp png_ptr, const png_byte *trans_alpha,
 #ifdef PNG_WRITE_bKGD_SUPPORTED
 /* Write the background chunk */
 void /* PRIVATE */
-png_write_bKGD(png_structrp png_ptr, png_const_color_16p back, int color_type)
+png_write_bKGD(png_struct *png_ptr, const png_color_16 *back, int color_type)
 {
    png_byte buf[6];
 
@@ -1516,7 +1516,7 @@ png_write_bKGD(png_structrp png_ptr, png_const_color_16p back, int color_type)
 #ifdef PNG_WRITE_cICP_SUPPORTED
 /* Write the cICP data */
 void /* PRIVATE */
-png_write_cICP(png_structrp png_ptr,
+png_write_cICP(png_struct *png_ptr,
                png_byte colour_primaries, png_byte transfer_function,
                png_byte matrix_coefficients, png_byte video_full_range_flag)
 {
@@ -1538,7 +1538,7 @@ png_write_cICP(png_structrp png_ptr,
 
 #ifdef PNG_WRITE_cLLI_SUPPORTED
 void /* PRIVATE */
-png_write_cLLI_fixed(png_structrp png_ptr, png_uint_32 maxCLL,
+png_write_cLLI_fixed(png_struct *png_ptr, png_uint_32 maxCLL,
    png_uint_32 maxFALL)
 {
    png_byte buf[8];
@@ -1554,7 +1554,7 @@ png_write_cLLI_fixed(png_structrp png_ptr, png_uint_32 maxCLL,
 
 #ifdef PNG_WRITE_mDCV_SUPPORTED
 void /* PRIVATE */
-png_write_mDCV_fixed(png_structrp png_ptr,
+png_write_mDCV_fixed(png_struct *png_ptr,
    png_uint_16 red_x, png_uint_16 red_y,
    png_uint_16 green_x, png_uint_16 green_y,
    png_uint_16 blue_x, png_uint_16 blue_y,
@@ -1583,7 +1583,7 @@ png_write_mDCV_fixed(png_structrp png_ptr,
 #ifdef PNG_WRITE_eXIf_SUPPORTED
 /* Write the Exif data */
 void /* PRIVATE */
-png_write_eXIf(png_structrp png_ptr, png_byte *exif, int num_exif)
+png_write_eXIf(png_struct *png_ptr, png_byte *exif, int num_exif)
 {
    int i;
    png_byte buf[1];
@@ -1605,7 +1605,7 @@ png_write_eXIf(png_structrp png_ptr, png_byte *exif, int num_exif)
 #ifdef PNG_WRITE_hIST_SUPPORTED
 /* Write the histogram */
 void /* PRIVATE */
-png_write_hIST(png_structrp png_ptr, const png_uint_16 *hist, int num_hist)
+png_write_hIST(png_struct *png_ptr, const png_uint_16 *hist, int num_hist)
 {
    int i;
    png_byte buf[3];
@@ -1636,7 +1636,7 @@ png_write_hIST(png_structrp png_ptr, const png_uint_16 *hist, int num_hist)
 #ifdef PNG_WRITE_tEXt_SUPPORTED
 /* Write a tEXt chunk */
 void /* PRIVATE */
-png_write_tEXt(png_structrp png_ptr, const char *key, const char *text,
+png_write_tEXt(png_struct *png_ptr, const char *key, const char *text,
     size_t text_len)
 {
    png_uint_32 key_len;
@@ -1679,7 +1679,7 @@ png_write_tEXt(png_structrp png_ptr, const char *key, const char *text,
 #ifdef PNG_WRITE_zTXt_SUPPORTED
 /* Write a compressed text chunk */
 void /* PRIVATE */
-png_write_zTXt(png_structrp png_ptr, const char *key, const char *text,
+png_write_zTXt(png_struct *png_ptr, const char *key, const char *text,
     int compression)
 {
    png_uint_32 key_len;
@@ -1730,7 +1730,7 @@ png_write_zTXt(png_structrp png_ptr, const char *key, const char *text,
 #ifdef PNG_WRITE_iTXt_SUPPORTED
 /* Write an iTXt chunk */
 void /* PRIVATE */
-png_write_iTXt(png_structrp png_ptr, int compression, const char *key,
+png_write_iTXt(png_struct *png_ptr, int compression, const char *key,
     const char *lang, const char *lang_key, const char *text)
 {
    png_uint_32 key_len, prefix_len;
@@ -1830,7 +1830,7 @@ png_write_iTXt(png_structrp png_ptr, int compression, const char *key,
 #ifdef PNG_WRITE_oFFs_SUPPORTED
 /* Write the oFFs chunk */
 void /* PRIVATE */
-png_write_oFFs(png_structrp png_ptr, png_int_32 x_offset, png_int_32 y_offset,
+png_write_oFFs(png_struct *png_ptr, png_int_32 x_offset, png_int_32 y_offset,
     int unit_type)
 {
    png_byte buf[9];
@@ -1850,7 +1850,7 @@ png_write_oFFs(png_structrp png_ptr, png_int_32 x_offset, png_int_32 y_offset,
 #ifdef PNG_WRITE_pCAL_SUPPORTED
 /* Write the pCAL chunk (described in the PNG extensions document) */
 void /* PRIVATE */
-png_write_pCAL(png_structrp png_ptr, char *purpose, png_int_32 X0,
+png_write_pCAL(png_struct *png_ptr, char *purpose, png_int_32 X0,
     png_int_32 X1, int type, int nparams, const char *units,
     char **params)
 {
@@ -1915,7 +1915,7 @@ png_write_pCAL(png_structrp png_ptr, char *purpose, png_int_32 X0,
 #ifdef PNG_WRITE_sCAL_SUPPORTED
 /* Write the sCAL chunk */
 void /* PRIVATE */
-png_write_sCAL_s(png_structrp png_ptr, int unit, const char *width,
+png_write_sCAL_s(png_struct *png_ptr, int unit, const char *width,
     const char *height)
 {
    png_byte buf[64];
@@ -1945,7 +1945,7 @@ png_write_sCAL_s(png_structrp png_ptr, int unit, const char *width,
 #ifdef PNG_WRITE_pHYs_SUPPORTED
 /* Write the pHYs chunk */
 void /* PRIVATE */
-png_write_pHYs(png_structrp png_ptr, png_uint_32 x_pixels_per_unit,
+png_write_pHYs(png_struct *png_ptr, png_uint_32 x_pixels_per_unit,
     png_uint_32 y_pixels_per_unit,
     int unit_type)
 {
@@ -1969,7 +1969,7 @@ png_write_pHYs(png_structrp png_ptr, png_uint_32 x_pixels_per_unit,
  * or png_convert_from_time_t(), or fill in the structure yourself.
  */
 void /* PRIVATE */
-png_write_tIME(png_structrp png_ptr, png_const_timep mod_time)
+png_write_tIME(png_struct *png_ptr, const png_time *mod_time)
 {
    png_byte buf[7];
 
@@ -1996,7 +1996,7 @@ png_write_tIME(png_structrp png_ptr, png_const_timep mod_time)
 
 #ifdef PNG_WRITE_APNG_SUPPORTED
 void /* PRIVATE */
-png_write_acTL(png_structp png_ptr,
+png_write_acTL(png_struct *png_ptr,
                png_uint_32 num_frames, png_uint_32 num_plays)
 {
    png_byte buf[8];
@@ -2015,7 +2015,7 @@ png_write_acTL(png_structp png_ptr,
 }
 
 void /* PRIVATE */
-png_write_fcTL(png_structp png_ptr,
+png_write_fcTL(png_struct *png_ptr,
                png_uint_32 width, png_uint_32 height,
                png_uint_32 x_offset, png_uint_32 y_offset,
                png_uint_16 delay_num, png_uint_16 delay_den,
@@ -2052,7 +2052,7 @@ png_write_fcTL(png_structp png_ptr,
 }
 
 void /* PRIVATE */
-png_write_fdAT(png_structp png_ptr,
+png_write_fdAT(png_struct *png_ptr,
                const png_byte *data, png_size_t length)
 {
    png_byte buf[4];
@@ -2072,7 +2072,7 @@ png_write_fdAT(png_structp png_ptr,
 
 /* Initializes the row writing capability of libpng */
 void /* PRIVATE */
-png_write_start_row(png_structrp png_ptr)
+png_write_start_row(png_struct *png_ptr)
 {
    png_alloc_size_t buf_size;
    int usr_pixel_depth;
@@ -2172,7 +2172,7 @@ png_write_start_row(png_structrp png_ptr)
 
 /* Internal use only.  Called when finished processing a row of data. */
 void /* PRIVATE */
-png_write_finish_row(png_structrp png_ptr)
+png_write_finish_row(png_struct *png_ptr)
 {
    png_debug(1, "in png_write_finish_row");
 
@@ -2247,7 +2247,7 @@ png_write_finish_row(png_structrp png_ptr)
  * See the default: case for the easiest code to understand.
  */
 void /* PRIVATE */
-png_do_write_interlace(png_row_infop row_info, png_byte *row, int pass)
+png_do_write_interlace(png_row_info *row_info, png_byte *row, int pass)
 {
    png_debug(1, "in png_do_write_interlace");
 
@@ -2417,12 +2417,12 @@ png_do_write_interlace(png_row_infop row_info, png_byte *row, int pass)
  * chosen filter.
  */
 static void /* PRIVATE */
-png_write_filtered_row(png_structrp png_ptr, png_byte *filtered_row,
+png_write_filtered_row(png_struct *png_ptr, png_byte *filtered_row,
     size_t row_bytes);
 
 #ifdef PNG_WRITE_FILTER_SUPPORTED
 static size_t /* PRIVATE */
-png_setup_sub_row(png_structrp png_ptr, png_uint_32 bpp,
+png_setup_sub_row(png_struct *png_ptr, png_uint_32 bpp,
     size_t row_bytes, size_t lmins)
 {
    png_byte *rp, *dp, *lp;
@@ -2461,7 +2461,7 @@ png_setup_sub_row(png_structrp png_ptr, png_uint_32 bpp,
 }
 
 static void /* PRIVATE */
-png_setup_sub_row_only(png_structrp png_ptr, png_uint_32 bpp,
+png_setup_sub_row_only(png_struct *png_ptr, png_uint_32 bpp,
     size_t row_bytes)
 {
    png_byte *rp, *dp, *lp;
@@ -2483,7 +2483,7 @@ png_setup_sub_row_only(png_structrp png_ptr, png_uint_32 bpp,
 }
 
 static size_t /* PRIVATE */
-png_setup_up_row(png_structrp png_ptr, size_t row_bytes, size_t lmins)
+png_setup_up_row(png_struct *png_ptr, size_t row_bytes, size_t lmins)
 {
    png_byte *rp, *dp, *pp;
    size_t i;
@@ -2510,7 +2510,7 @@ png_setup_up_row(png_structrp png_ptr, size_t row_bytes, size_t lmins)
    return sum;
 }
 static void /* PRIVATE */
-png_setup_up_row_only(png_structrp png_ptr, size_t row_bytes)
+png_setup_up_row_only(png_struct *png_ptr, size_t row_bytes)
 {
    png_byte *rp, *dp, *pp;
    size_t i;
@@ -2526,7 +2526,7 @@ png_setup_up_row_only(png_structrp png_ptr, size_t row_bytes)
 }
 
 static size_t /* PRIVATE */
-png_setup_avg_row(png_structrp png_ptr, png_uint_32 bpp,
+png_setup_avg_row(png_struct *png_ptr, png_uint_32 bpp,
     size_t row_bytes, size_t lmins)
 {
    png_byte *rp, *dp, *pp, *lp;
@@ -2566,7 +2566,7 @@ png_setup_avg_row(png_structrp png_ptr, png_uint_32 bpp,
    return sum;
 }
 static void /* PRIVATE */
-png_setup_avg_row_only(png_structrp png_ptr, png_uint_32 bpp,
+png_setup_avg_row_only(png_struct *png_ptr, png_uint_32 bpp,
     size_t row_bytes)
 {
    png_byte *rp, *dp, *pp, *lp;
@@ -2588,7 +2588,7 @@ png_setup_avg_row_only(png_structrp png_ptr, png_uint_32 bpp,
 }
 
 static size_t /* PRIVATE */
-png_setup_paeth_row(png_structrp png_ptr, png_uint_32 bpp,
+png_setup_paeth_row(png_struct *png_ptr, png_uint_32 bpp,
     size_t row_bytes, size_t lmins)
 {
    png_byte *rp, *dp, *pp, *cp, *lp;
@@ -2649,7 +2649,7 @@ png_setup_paeth_row(png_structrp png_ptr, png_uint_32 bpp,
    return sum;
 }
 static void /* PRIVATE */
-png_setup_paeth_row_only(png_structrp png_ptr, png_uint_32 bpp,
+png_setup_paeth_row_only(png_struct *png_ptr, png_uint_32 bpp,
     size_t row_bytes)
 {
    png_byte *rp, *dp, *pp, *cp, *lp;
@@ -2693,7 +2693,7 @@ png_setup_paeth_row_only(png_structrp png_ptr, png_uint_32 bpp,
 #endif /* WRITE_FILTER */
 
 void /* PRIVATE */
-png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
+png_write_find_filter(png_struct *png_ptr, png_row_info *row_info)
 {
 #ifndef PNG_WRITE_FILTER_SUPPORTED
    png_write_filtered_row(png_ptr, png_ptr->row_buf, row_info->rowbytes+1);
@@ -2889,7 +2889,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
 
 /* Do the actual writing of a previously filtered row. */
 static void
-png_write_filtered_row(png_structrp png_ptr, png_byte *filtered_row,
+png_write_filtered_row(png_struct *png_ptr, png_byte *filtered_row,
     size_t full_row_length/*includes filter byte*/)
 {
    png_debug(1, "in png_write_filtered_row");
@@ -2926,7 +2926,7 @@ png_write_filtered_row(png_structrp png_ptr, png_byte *filtered_row,
 
 #ifdef PNG_WRITE_APNG_SUPPORTED
 void /* PRIVATE */
-png_write_reset(png_structp png_ptr)
+png_write_reset(png_struct *png_ptr)
 {
    png_ptr->row_number = 0;
    png_ptr->pass = 0;
@@ -2934,7 +2934,7 @@ png_write_reset(png_structp png_ptr)
 }
 
 void /* PRIVATE */
-png_write_reinit(png_structp png_ptr, png_infop info_ptr,
+png_write_reinit(png_struct *png_ptr, png_info *info_ptr,
                  png_uint_32 width, png_uint_32 height)
 {
    if (png_ptr->num_frames_written == 0 &&

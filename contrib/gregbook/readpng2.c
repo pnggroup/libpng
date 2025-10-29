@@ -70,12 +70,12 @@
 
 /* local prototypes */
 
-static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr);
-static void readpng2_row_callback(png_structp png_ptr, png_byte *new_row,
-                                 png_uint_32 row_num, int pass);
-static void readpng2_end_callback(png_structp png_ptr, png_infop info_ptr);
-static void readpng2_error_handler(png_structp png_ptr, const char *msg);
-static void readpng2_warning_handler(png_structp png_ptr, const char *msg);
+static void readpng2_info_callback(png_struct *png_ptr, png_info *info_ptr);
+static void readpng2_row_callback(png_struct *png_ptr, png_byte *new_row,
+                                  png_uint_32 row_num, int pass);
+static void readpng2_end_callback(png_struct *png_ptr, png_info *info_ptr);
+static void readpng2_error_handler(png_struct *png_ptr, const char *msg);
+static void readpng2_warning_handler(png_struct *png_ptr, const char *msg);
 
 
 
@@ -104,8 +104,8 @@ int readpng2_check_sig(uch *sig, int num)
 
 int readpng2_init(mainprog_info *mainprog_ptr)
 {
-    png_structp  png_ptr;       /* note:  temporary variables! */
-    png_infop  info_ptr;
+    png_struct *png_ptr;        /* note:  temporary variables! */
+    png_info *info_ptr;
 
 
     /* could also replace libpng warning-handler (final NULL), but no need: */
@@ -189,8 +189,8 @@ int readpng2_init(mainprog_info *mainprog_ptr)
 
 int readpng2_decode_data(mainprog_info *mainprog_ptr, uch *rawbuf, ulg length)
 {
-    png_structp png_ptr = (png_structp)mainprog_ptr->png_ptr;
-    png_infop info_ptr = (png_infop)mainprog_ptr->info_ptr;
+    png_struct *png_ptr = (png_struct *)mainprog_ptr->png_ptr;
+    png_info *info_ptr = (png_info *)mainprog_ptr->info_ptr;
 
 
     /* setjmp() must be called in every function that calls a PNG-reading
@@ -214,7 +214,7 @@ int readpng2_decode_data(mainprog_info *mainprog_ptr, uch *rawbuf, ulg length)
 
 
 
-static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
+static void readpng2_info_callback(png_struct *png_ptr, png_info *info_ptr)
 {
     mainprog_info  *mainprog_ptr;
     int  color_type, bit_depth;
@@ -269,7 +269,7 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
 
     if (mainprog_ptr->need_bgcolor)
     {
-        png_color_16p pBackground;
+        png_color_16 *pBackground;
 
         /* it is not obvious from the libpng documentation, but this function
          * takes a pointer to a pointer, and it always returns valid red,
@@ -387,7 +387,7 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
 
 
 
-static void readpng2_row_callback(png_structp png_ptr, png_byte *new_row,
+static void readpng2_row_callback(png_struct *png_ptr, png_byte *new_row,
                                   png_uint_32 row_num, int pass)
 {
     mainprog_info  *mainprog_ptr;
@@ -434,7 +434,7 @@ static void readpng2_row_callback(png_structp png_ptr, png_byte *new_row,
 
 
 
-static void readpng2_end_callback(png_structp png_ptr, png_infop info_ptr)
+static void readpng2_end_callback(png_struct *png_ptr, png_info *info_ptr)
 {
     mainprog_info  *mainprog_ptr;
 
@@ -467,8 +467,8 @@ static void readpng2_end_callback(png_structp png_ptr, png_infop info_ptr)
 
 void readpng2_cleanup(mainprog_info *mainprog_ptr)
 {
-    png_structp png_ptr = (png_structp)mainprog_ptr->png_ptr;
-    png_infop info_ptr = (png_infop)mainprog_ptr->info_ptr;
+    png_struct *png_ptr = (png_struct *)mainprog_ptr->png_ptr;
+    png_info *info_ptr = (png_info *)mainprog_ptr->info_ptr;
 
     if (png_ptr && info_ptr)
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
@@ -478,7 +478,7 @@ void readpng2_cleanup(mainprog_info *mainprog_ptr)
 }
 
 
-static void readpng2_warning_handler(png_structp png_ptr, const char *msg)
+static void readpng2_warning_handler(png_struct *png_ptr, const char *msg)
 {
     fprintf(stderr, "readpng2 libpng warning: %s\n", msg);
     fflush(stderr);
@@ -486,7 +486,7 @@ static void readpng2_warning_handler(png_structp png_ptr, const char *msg)
 }
 
 
-static void readpng2_error_handler(png_structp png_ptr, const char *msg)
+static void readpng2_error_handler(png_struct *png_ptr, const char *msg)
 {
     mainprog_info  *mainprog_ptr;
 
