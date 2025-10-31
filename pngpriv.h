@@ -1996,15 +1996,16 @@ PNG_INTERNAL_FUNCTION(int, png_xy_from_XYZ,
 /* SIMPLIFIED READ/WRITE SUPPORT */
 #if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
     defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
+
 /* The internal structure that png_image::opaque points to. */
-struct png_control
+struct png_control_def
 {
    png_struct *png_ptr;
    png_info   *info_ptr;
-   void       *error_buf;           /* Always a jmp_buf at present. */
+   void       *error_buf;           /* Currently this can only be jmp_buf */
 
-   const png_byte *memory;          /* Memory buffer. */
-   size_t          size;            /* Size of the memory buffer. */
+   const png_byte *memory;          /* Memory buffer */
+   size_t          size;            /* Size of the memory buffer */
 
    unsigned int for_write       :1; /* Otherwise it is a read structure */
    unsigned int owned_file      :1; /* We own the file in io_ptr */

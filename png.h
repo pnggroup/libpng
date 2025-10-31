@@ -2826,8 +2826,8 @@ PNG_EXPORT(int, png_get_palette_max,
 
 #define PNG_IMAGE_VERSION 1
 
-typedef struct png_control png_control; /* [Opaque] */
-typedef png_control *png_controlp;      /* [Deprecated] */
+typedef struct png_control_def png_control; /* [Opaque] */
+typedef png_control *png_controlp;          /* [Deprecated] */
 
 typedef struct
 {
