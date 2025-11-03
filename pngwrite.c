@@ -2236,7 +2236,7 @@ png_image_write_main(void *argument)
 }
 
 static void
-image_memory_write(png_struct *png_ptr, png_byte */*const*/ data, size_t size)
+image_memory_write(png_struct *png_ptr, png_byte *data, size_t size)
 {
    png_image_write_control *display = png_voidcast(png_image_write_control*,
        png_ptr->io_ptr/*backdoor: png_get_io_ptr(png_ptr)*/);
