@@ -774,8 +774,8 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
 {
    png_struct *png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
       name, makepng_error, makepng_warning);
-   volatile png_info *info_ptr = NULL;
-   volatile png_byte *row = NULL;
+   png_info * volatile info_ptr = NULL;
+   png_byte * volatile row = NULL;
 
    if (png_ptr == NULL)
    {

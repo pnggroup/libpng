@@ -159,7 +159,7 @@ main(int argc, const char **argv)
       long x = atol(argv[1]);
       long y = atol(argv[2]);
       FILE *f = fopen(argv[3], "rb");
-      volatile png_byte *row = NULL;
+      png_byte * volatile row = NULL;
 
       if (f != NULL)
       {
