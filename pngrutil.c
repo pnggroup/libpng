@@ -614,7 +614,7 @@ png_inflate(png_structrp png_ptr, png_uint_32 owner, int finish,
           * the previous chunk of input data.  Tell zlib if we have reached the
           * end of the output buffer.
           */
-         ret = PNG_INFLATE(png_ptr, avail_out > 0 ? Z_NO_FLUSH :
+         ret = png_zlib_inflate(png_ptr, avail_out > 0 ? Z_NO_FLUSH :
              (finish ? Z_FINISH : Z_SYNC_FLUSH));
       } while (ret == Z_OK);
 
@@ -855,7 +855,7 @@ png_inflate_read(png_structrp png_ptr, png_byte *read_buffer, uInt read_size,
           * the available output is produced; this allows reading of truncated
           * streams.
           */
-         ret = PNG_INFLATE(png_ptr, *chunk_bytes > 0 ?
+         ret = png_zlib_inflate(png_ptr, *chunk_bytes > 0 ?
              Z_NO_FLUSH : (finish ? Z_FINISH : Z_SYNC_FLUSH));
       }
       while (ret == Z_OK && (*out_size > 0 || png_ptr->zstream.avail_out > 0));
@@ -4448,7 +4448,7 @@ png_read_IDAT_data(png_structrp png_ptr, png_byte *output,
        *
        * TODO: deal more elegantly with truncated IDAT lists.
        */
-      ret = PNG_INFLATE(png_ptr, Z_NO_FLUSH);
+      ret = png_zlib_inflate(png_ptr, Z_NO_FLUSH);
 
       /* Take the unconsumed output back. */
       if (output != NULL)

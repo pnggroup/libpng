@@ -1380,7 +1380,6 @@ PNG_INTERNAL_FUNCTION(void, png_read_start_row,
 PNG_INTERNAL_FUNCTION(int, png_zlib_inflate,
    (png_structrp png_ptr, int flush),
    PNG_EMPTY);
-#  define PNG_INFLATE(pp, flush) png_zlib_inflate(pp, flush)
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
 /* Optional call to update the users info structure */
