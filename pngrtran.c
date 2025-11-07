@@ -4721,7 +4721,8 @@ png_do_expand_16(png_row_infop row_info, png_bytep row)
 #ifdef PNG_READ_QUANTIZE_SUPPORTED
 static void
 png_do_quantize(png_row_infop row_info, png_bytep row,
-    png_const_bytep palette_lookup, png_const_bytep quantize_lookup)
+    png_const_bytep palette_lookup, png_const_bytep quantize_lookup,
+    int num_palette)
 {
    png_bytep sp, dp;
    png_uint_32 i;
@@ -4801,11 +4802,22 @@ png_do_quantize(png_row_infop row_info, png_bytep row,
       else if (row_info->color_type == PNG_COLOR_TYPE_PALETTE &&
          quantize_lookup)
       {
-         sp = row;
+         /* Validate palette indices from untrusted image data before using
+          * them as array indices. The quantize_lookup array was allocated
+          * with num_palette entries in png_set_quantize().
+          */
+         png_byte index;
 
-         for (i = 0; i < row_width; i++, sp++)
+         for (i = 0, sp = row; i < row_width; i++, sp++)
          {
-            *sp = quantize_lookup[*sp];
+            index = *sp;
+            if (index >= num_palette)
+            {
+               /* Invalid palette index. */
+               row_info->rowbytes = 0;
+               return;
+            }
+            *sp = quantize_lookup[index];
          }
       }
    }
@@ -5011,10 +5023,14 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
    if ((png_ptr->transformations & PNG_QUANTIZE) != 0)
    {
       png_do_quantize(row_info, png_ptr->row_buf + 1,
-          png_ptr->palette_lookup, png_ptr->quantize_index);
+          png_ptr->palette_lookup, png_ptr->quantize_index,
+          png_ptr->num_palette);
 
       if (row_info->rowbytes == 0)
+      {
+         /* TODO: write a better error message */
          png_error(png_ptr, "png_do_quantize returned rowbytes=0");
+      }
    }
 #endif /* READ_QUANTIZE */
 
