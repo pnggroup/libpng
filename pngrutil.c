@@ -1564,7 +1564,8 @@ static png_handle_result_code /* PRIVATE */
 png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 /* Note: this does not properly handle chunks that are > 64K under DOS */
 {
-   png_bytep entry_start, buffer;
+   png_bytep buffer;
+   png_bytep entry_start;
    png_sPLT_t new_palette;
    png_sPLT_entryp pp;
    png_uint_32 data_length;
@@ -2155,9 +2156,13 @@ png_handle_oFFs(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 static png_handle_result_code /* PRIVATE */
 png_handle_pCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 {
+   png_bytep buffer;
+   png_bytep buf;
+   png_bytep endptr;
    png_int_32 X0, X1;
-   png_byte type, nparams;
-   png_bytep buffer, buf, units, endptr;
+   png_byte type;
+   png_byte nparams;
+   png_byte *units;
    png_charpp params;
    int i;
 

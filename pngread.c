@@ -2874,7 +2874,7 @@ png_image_read_and_map(png_voidp argument)
          {
             png_bytep inrow = png_voidcast(png_bytep, display->local_row);
             png_bytep outrow = first_row + y * row_step;
-            png_const_bytep end_row = outrow + width;
+            png_const_bytep row_end = outrow + width;
 
             /* Read read the libpng data into the temporary buffer. */
             png_read_row(png_ptr, inrow, NULL);
@@ -2887,7 +2887,7 @@ png_image_read_and_map(png_voidp argument)
             switch (proc)
             {
                case PNG_CMAP_GA:
-                  for (; outrow < end_row; outrow += stepx)
+                  for (; outrow < row_end; outrow += stepx)
                   {
                      /* The data is always in the PNG order */
                      unsigned int gray = *inrow++;
@@ -2916,7 +2916,7 @@ png_image_read_and_map(png_voidp argument)
                   break;
 
                case PNG_CMAP_TRANS:
-                  for (; outrow < end_row; outrow += stepx)
+                  for (; outrow < row_end; outrow += stepx)
                   {
                      png_byte gray = *inrow++;
                      png_byte alpha = *inrow++;
@@ -2933,7 +2933,7 @@ png_image_read_and_map(png_voidp argument)
                   break;
 
                case PNG_CMAP_RGB:
-                  for (; outrow < end_row; outrow += stepx)
+                  for (; outrow < row_end; outrow += stepx)
                   {
                      *outrow = PNG_RGB_INDEX(inrow[0], inrow[1], inrow[2]);
                      inrow += 3;
@@ -2941,7 +2941,7 @@ png_image_read_and_map(png_voidp argument)
                   break;
 
                case PNG_CMAP_RGB_ALPHA:
-                  for (; outrow < end_row; outrow += stepx)
+                  for (; outrow < row_end; outrow += stepx)
                   {
                      unsigned int alpha = inrow[3];
 
@@ -3248,18 +3248,18 @@ png_image_read_composite(png_voidp argument)
          {
             png_bytep inrow = png_voidcast(png_bytep, display->local_row);
             png_bytep outrow;
-            png_const_bytep end_row;
+            png_const_bytep row_end;
 
             /* Read the row, which is packed: */
             png_read_row(png_ptr, inrow, NULL);
 
             outrow = png_voidcast(png_bytep, display->first_row);
             outrow += y * row_step;
-            end_row = outrow + width * channels;
+            row_end = outrow + width * channels;
 
             /* Now do the composition on each pixel in this row. */
             outrow += startx;
-            for (; outrow < end_row; outrow += stepx)
+            for (; outrow < row_end; outrow += stepx)
             {
                png_byte alpha = inrow[channels];
 
@@ -3432,14 +3432,14 @@ png_image_read_background(png_voidp argument)
                      png_bytep inrow = png_voidcast(png_bytep,
                          display->local_row);
                      png_bytep outrow = first_row + y * row_step;
-                     png_const_bytep end_row = outrow + width;
+                     png_const_bytep row_end = outrow + width;
 
                      /* Read the row, which is packed: */
                      png_read_row(png_ptr, inrow, NULL);
 
                      /* Now do the composition on each pixel in this row. */
                      outrow += startx;
-                     for (; outrow < end_row; outrow += stepx)
+                     for (; outrow < row_end; outrow += stepx)
                      {
                         png_byte alpha = inrow[1];
 
@@ -3477,14 +3477,14 @@ png_image_read_background(png_voidp argument)
                      png_bytep inrow = png_voidcast(png_bytep,
                          display->local_row);
                      png_bytep outrow = first_row + y * row_step;
-                     png_const_bytep end_row = outrow + width;
+                     png_const_bytep row_end = outrow + width;
 
                      /* Read the row, which is packed: */
                      png_read_row(png_ptr, inrow, NULL);
 
                      /* Now do the composition on each pixel in this row. */
                      outrow += startx;
-                     for (; outrow < end_row; outrow += stepx)
+                     for (; outrow < row_end; outrow += stepx)
                      {
                         png_byte alpha = inrow[1];
 
@@ -3567,7 +3567,7 @@ png_image_read_background(png_voidp argument)
                {
                   png_const_uint_16p inrow;
                   png_uint_16p outrow = first_row + y * row_step;
-                  png_uint_16p end_row = outrow + width * outchannels;
+                  png_uint_16p row_end = outrow + width * outchannels;
 
                   /* Read the row, which is packed: */
                   png_read_row(png_ptr, png_voidcast(png_bytep,
@@ -3577,7 +3577,7 @@ png_image_read_background(png_voidp argument)
                   /* Now do the pre-multiplication on each pixel in this row.
                    */
                   outrow += startx;
-                  for (; outrow < end_row; outrow += stepx)
+                  for (; outrow < row_end; outrow += stepx)
                   {
                      png_uint_32 component = inrow[0];
                      png_uint_16 alpha = inrow[1];
