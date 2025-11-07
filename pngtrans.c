@@ -457,10 +457,9 @@ png_do_packswap(png_row_info *row_info, png_byte *row)
 
    if (row_info->bit_depth < 8)
    {
+      const png_byte *table;
       png_byte *rp;
-      const png_byte *end, *table;
-
-      end = row + row_info->rowbytes;
+      png_byte *row_end = row + row_info->rowbytes;
 
       if (row_info->bit_depth == 1)
          table = onebppswaptable;
@@ -474,7 +473,7 @@ png_do_packswap(png_row_info *row_info, png_byte *row)
       else
          return;
 
-      for (rp = row; rp < end; rp++)
+      for (rp = row; rp < row_end; rp++)
          *rp = table[*rp];
    }
 }

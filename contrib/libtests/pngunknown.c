@@ -376,7 +376,8 @@ typedef struct
 {
    jmp_buf     error_return;
    png_struct *png_ptr;
-   png_info   *info_ptr, *end_ptr;
+   png_info   *info_ptr;
+   png_info   *end_ptr;
    png_uint_32 before_IDAT;
    png_uint_32 after_IDAT;
    int         error_count;

@@ -858,7 +858,8 @@ test_one_file(const char *inname, const char *outname)
    static FILE *fpout;  /* "static" prevents setjmp corruption */
    pngtest_error_parameters error_parameters;
    png_struct *read_ptr;
-   png_info *read_info_ptr, *end_info_ptr;
+   png_info *read_info_ptr;
+   png_info *end_info_ptr;
 #ifdef PNG_WRITE_SUPPORTED
    png_struct *write_ptr;
    png_info *write_info_ptr;
@@ -1303,7 +1304,8 @@ test_one_file(const char *inname, const char *outname)
 #endif
 #ifdef PNG_pCAL_SUPPORTED
    {
-      char *purpose, *units;
+      char *purpose;
+      char *units;
       char **params;
       png_int_32 X0, X1;
       int type, nparams;
