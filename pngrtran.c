@@ -503,13 +503,17 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
 
       /* Initialize the array to index colors.
        *
+       * Ensure quantize_index can fit 256 elements (PNG_MAX_PALETTE_LENGTH)
+       * rather than num_palette elements. This is to prevent buffer overflows
+       * caused by malformed PNG files with out-of-range palette indices.
+       *
        * Be careful to avoid leaking memory. Applications are allowed to call
        * this function more than once per png_struct.
        */
       png_free(png_ptr, png_ptr->quantize_index);
       png_ptr->quantize_index = (png_bytep)png_malloc(png_ptr,
-          (png_alloc_size_t)num_palette);
-      for (i = 0; i < num_palette; i++)
+          PNG_MAX_PALETTE_LENGTH);
+      for (i = 0; i < PNG_MAX_PALETTE_LENGTH; i++)
          png_ptr->quantize_index[i] = (png_byte)i;
    }
 
