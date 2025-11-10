@@ -330,7 +330,7 @@ png_deflate_claim(png_struct *png_ptr, png_uint_32 owner,
          /* Attempt sane error recovery */
          if (png_ptr->zowner == png_IDAT) /* don't steal from IDAT */
          {
-            png_ptr->zstream.msg = PNGZ_MSG_CAST("in use by IDAT");
+            png_ptr->zstream.msg = "in use by IDAT";
             return Z_STREAM_ERROR;
          }
 
@@ -534,7 +534,7 @@ png_text_compress(png_struct *png_ptr, png_uint_32 chunk_name,
       png_uint_32 output_len;
 
       /* zlib updates these for us: */
-      png_ptr->zstream.next_in = PNGZ_INPUT_CAST(comp->input);
+      png_ptr->zstream.next_in = comp->input;
       png_ptr->zstream.avail_in = 0; /* Set below */
       png_ptr->zstream.next_out = comp->output;
       png_ptr->zstream.avail_out = (sizeof comp->output);
@@ -618,7 +618,7 @@ png_text_compress(png_struct *png_ptr, png_uint_32 chunk_name,
        */
       if (output_len + prefix_len >= PNG_UINT_31_MAX)
       {
-         png_ptr->zstream.msg = PNGZ_MSG_CAST("compressed data too long");
+         png_ptr->zstream.msg = "compressed data too long";
          ret = Z_MEM_ERROR;
       }
 
@@ -985,7 +985,7 @@ png_compress_IDAT(png_struct *png_ptr, const png_byte *input,
     * terminates the operation.  The _out values are maintained across calls to
     * this function, but the input must be reset each time.
     */
-   png_ptr->zstream.next_in = PNGZ_INPUT_CAST(input);
+   png_ptr->zstream.next_in = input;
    png_ptr->zstream.avail_in = 0; /* set below */
    for (;;)
    {

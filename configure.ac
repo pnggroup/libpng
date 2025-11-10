@@ -174,6 +174,19 @@ AC_CHECK_LIB([z], [zlibVersion], ,
   [AC_CHECK_LIB([z], [${ZPREFIX}zlibVersion], ,
      [AC_MSG_ERROR([zlib not installed])])])
 
+AC_MSG_CHECKING([zlib version])
+AC_COMPILE_IFELSE(
+  [AC_LANG_SOURCE([
+#include <zlib.h>
+#if !defined(ZLIB_VERNUM) || ZLIB_VERNUM < 0x1280
+#error zlib version 1.2.8 or later is required
+#endif
+int main(void) { return 0; }
+])],
+  [AC_MSG_RESULT([acceptable])],
+  [AC_MSG_RESULT([too old or ZLIB_VERNUM not defined])
+   AC_MSG_ERROR([zlib version 1.2.8 or later is required])])
+
 # The following is for pngvalid, to ensure it catches FP errors even on
 # platforms that don't enable FP exceptions, the function appears in the math
 # library (typically), it's not an error if it is not found.
