@@ -4040,6 +4040,20 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
                   int result;
                   png_image_read_control display;
 
+                  /* Reject bit depth mismatches to avoid buffer overflows. */
+                  png_uint_32 ihdr_bit_depth =
+                      image->opaque->png_ptr->bit_depth;
+                  int requested_linear =
+                      (image->format & PNG_FORMAT_FLAG_LINEAR) != 0;
+                  if (ihdr_bit_depth == 16 && !requested_linear)
+                     return png_image_error(image,
+                         "png_image_finish_read: "
+                         "16-bit PNG must use 16-bit output format");
+                  if (ihdr_bit_depth < 16 && requested_linear)
+                     return png_image_error(image,
+                         "png_image_finish_read: "
+                         "8-bit PNG must not use 16-bit output format");
+
                   memset(&display, 0, (sizeof display));
                   display.image = image;
                   display.buffer = buffer;
