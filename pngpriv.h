@@ -302,8 +302,7 @@
 #   define PNG_LOONGARCH_LSX_IMPLEMENTATION 0
 #endif
 
-#if PNG_RISCV_RVV_OPT > 0
-#if __riscv_v >= 1000000 && __riscv_v < 1900000
+#if PNG_RISCV_RVV_OPT > 0 && __riscv_v >= 1000000
 #  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_rvv
 #  ifndef PNG_RISCV_RVV_IMPLEMENTATION
       /* Use the intrinsics code by default. */
@@ -311,8 +310,7 @@
 #  endif
 #else
 #  define PNG_RISCV_RVV_IMPLEMENTATION 0
-#endif /* __riscv_v >= 1000000 && __riscv_v < 1900000 */
-#endif /* PNG_RISCV_RVV_OPT > 0 */
+#endif /* PNG_RISCV_RVV_OPT > 0 && __riscv_v >= 1000000 */
 
 /* Is this a build of a DLL where compilation of the object modules requires
  * different preprocessor settings to those required for a simple library?  If
