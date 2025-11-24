@@ -192,15 +192,15 @@
 #define PNG_LIBPNG_VER_STRING "1.8.0.git"
 #define PNG_HEADER_VERSION_STRING " libpng version " PNG_LIBPNG_VER_STRING "\n"
 
-/* The versions of shared library builds should stay in sync, going forward */
-#define PNG_LIBPNG_VER_SHAREDLIB 18
-#define PNG_LIBPNG_VER_SONUM     PNG_LIBPNG_VER_SHAREDLIB /* [Deprecated] */
-#define PNG_LIBPNG_VER_DLLNUM    PNG_LIBPNG_VER_SHAREDLIB /* [Deprecated] */
-
 /* These should match the first 3 components of PNG_LIBPNG_VER_STRING: */
 #define PNG_LIBPNG_VER_MAJOR   1
 #define PNG_LIBPNG_VER_MINOR   8
 #define PNG_LIBPNG_VER_RELEASE 0
+
+/* The versions of shared library builds should stay in sync, going forward */
+#define PNG_LIBPNG_VER_SHAREDLIB 18
+#define PNG_LIBPNG_VER_SONUM     PNG_LIBPNG_VER_SHAREDLIB /* [Deprecated] */
+#define PNG_LIBPNG_VER_DLLNUM    PNG_LIBPNG_VER_SHAREDLIB /* [Deprecated] */
 
 /* This should be zero for a public release, or non-zero for a
  * development version.
