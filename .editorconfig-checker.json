@@ -1,5 +1,6 @@
 {
   "Disable": {
+    "Charset": true,
     "IndentSize": true
   },
   "Exclude": [

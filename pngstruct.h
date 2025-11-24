@@ -410,7 +410,6 @@ struct png_struct_def
 
 #ifdef PNG_READ_QUANTIZE_SUPPORTED
 /* The following three members were added at version 1.0.14 and 1.2.4 */
-   png_byte *quantize_sort;          /* working sort array */
    png_byte *index_to_palette;       /* where the original index currently is
                                         in the palette */
    png_byte *palette_to_index;       /* which original index points to this

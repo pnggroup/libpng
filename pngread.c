@@ -3217,6 +3217,54 @@ png_image_read_colormapped(void *argument)
    }
 }
 
+/* Row reading for interlaced 16-to-8 bit depth conversion with local buffer. */
+static int
+png_image_read_direct_scaled(void *argument)
+{
+   png_image_read_control *display = png_voidcast(png_image_read_control*,
+       argument);
+   png_image *image = display->image;
+   png_struct *png_ptr = image->opaque->png_ptr;
+   png_byte *local_row = png_voidcast(png_byte *, display->local_row);
+   png_byte *first_row = png_voidcast(png_byte *, display->first_row);
+   ptrdiff_t row_bytes = display->row_bytes;
+   int passes;
+
+   /* Handle interlacing. */
+   switch (png_ptr->interlaced)
+   {
+      case PNG_INTERLACE_NONE:
+         passes = 1;
+         break;
+
+      case PNG_INTERLACE_ADAM7:
+         passes = PNG_INTERLACE_ADAM7_PASSES;
+         break;
+
+      default:
+         png_error(png_ptr, "unknown interlace type");
+   }
+
+   /* Read each pass using local_row as intermediate buffer. */
+   while (--passes >= 0)
+   {
+      png_uint_32 y = image->height;
+      png_byte *output_row = first_row;
+
+      for (; y > 0; --y)
+      {
+         /* Read into local_row (gets transformed 8-bit data). */
+         png_read_row(png_ptr, local_row, NULL);
+
+         /* Copy from local_row to user buffer. */
+         memcpy(output_row, local_row, (size_t)row_bytes);
+         output_row += row_bytes;
+      }
+   }
+
+   return 1;
+}
+
 /* Just the row reading part of png_image_read. */
 static int
 png_image_read_composite(void *argument)
@@ -3635,6 +3683,7 @@ png_image_read_direct(void *argument)
    int linear = (format & PNG_FORMAT_FLAG_LINEAR) != 0;
    int do_local_compose = 0;
    int do_local_background = 0; /* to avoid double gamma correction bug */
+   int do_local_scale = 0; /* for interlaced 16-to-8 bit conversion */
    int passes = 0;
 
    /* Add transforms to ensure the correct output format is produced then check
@@ -3768,7 +3817,15 @@ png_image_read_direct(void *argument)
             png_set_expand_16(png_ptr);
 
          else /* 8-bit output */
+         {
             png_set_scale_16(png_ptr);
+
+            /* For interlaced images, use local_row buffer to avoid overflow
+             * in png_combine_row() which writes using IHDR bit-depth.
+             */
+            if (png_ptr->interlaced != 0)
+               do_local_scale = 1;
+         }
 
          change &= ~PNG_FORMAT_FLAG_LINEAR;
       }
@@ -4039,6 +4096,24 @@ png_image_read_direct(void *argument)
 
       display->local_row = row;
       result = png_safe_execute(image, png_image_read_background, display);
+      display->local_row = NULL;
+      png_free(png_ptr, row);
+
+      return result;
+   }
+
+   else if (do_local_scale != 0)
+   {
+      /* For interlaced 16-to-8 conversion, use an intermediate row buffer
+       * to avoid buffer overflows in png_combine_row. The local_row is sized
+       * for the transformed (8-bit) output, preventing the overflow that would
+       * occur if png_combine_row wrote 16-bit data directly to the user buffer.
+       */
+      int result;
+      void *row = png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
+
+      display->local_row = row;
+      result = png_safe_execute(image, png_image_read_direct_scaled, display);
       display->local_row = NULL;
       png_free(png_ptr, row);
 
