@@ -42,7 +42,7 @@ main(int argc, const char **argv)
 
       if (png_image_begin_read_from_file(&image, argv[1]))
       {
-         png_bytep buffer;
+         png_byte *buffer;
 
          /* Change this to try different formats!  If you set a colormap format
           * then you must also supply a colormap below.

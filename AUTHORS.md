@@ -34,6 +34,7 @@ Authors, for copyright and licensing purposes.
  * Samuel Williams
  * Simon-Pierre Cadieux
  * Tim Wegner
+ * Tobias Stoeckmann
  * Tom Lane
  * Tom Tanner
  * Vadim Barkov

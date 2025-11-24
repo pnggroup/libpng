@@ -35,7 +35,7 @@ struct png_info_def
    png_uint_32 height;      /* height of image in pixels (from IHDR) */
    png_uint_32 valid;       /* valid chunk data (see PNG_INFO_ below) */
    size_t rowbytes;         /* bytes needed to hold an untransformed row */
-   png_colorp palette;      /* array of color values (valid & PNG_INFO_PLTE) */
+   png_color *palette;      /* array of color values (valid & PNG_INFO_PLTE) */
    png_uint_16 num_palette; /* number of color entries in "palette" (PLTE) */
    png_uint_16 num_trans;   /* number of transparent palette color (tRNS) */
    png_byte bit_depth;      /* 1, 2, 4, 8, or 16 bits/channel (from IHDR) */
@@ -73,8 +73,8 @@ struct png_info_def
 
 #ifdef PNG_iCCP_SUPPORTED
    /* iCCP chunk data. */
-   png_charp iccp_name;     /* profile name */
-   png_bytep iccp_profile;  /* International Color Consortium profile data */
+   char *iccp_name;           /* profile name */
+   png_byte *iccp_profile;    /* International Color Consortium profile data */
    png_uint_32 iccp_proflen;  /* ICC profile data length */
 #endif
 
@@ -107,7 +107,7 @@ struct png_info_def
     */
    int num_text; /* number of comments read or comments to write */
    int max_text; /* current size of text array */
-   png_textp text; /* array of comments read or comments to write */
+   png_text *text; /* array of comments read or comments to write */
 #endif /* TEXT */
 
 #ifdef PNG_tIME_SUPPORTED
@@ -138,7 +138,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * single color specified that should be treated as fully transparent.
     * Data is valid if (valid & PNG_INFO_tRNS) is non-zero.
     */
-   png_bytep trans_alpha;    /* alpha values for paletted image */
+   png_byte *trans_alpha;    /* alpha values for paletted image */
    png_color_16 trans_color; /* transparent color for non-palette image */
 #endif
 
@@ -175,7 +175,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 
 #ifdef PNG_eXIf_SUPPORTED
    png_uint_32 num_exif;  /* Added at libpng-1.6.31 */
-   png_bytep exif;
+   png_byte *exif;
 #endif
 
 #ifdef PNG_hIST_SUPPORTED
@@ -185,7 +185,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * values in the range [0,65535]. Data valid if (valid & PNG_INFO_hIST)
     * is non-zero.
     */
-   png_uint_16p hist;
+   png_uint_16 *hist;
 #endif
 
 #ifdef PNG_pCAL_SUPPORTED
@@ -200,11 +200,11 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * implemented, and for a description of the ASCII parameter strings.
     * Data values are valid if (valid & PNG_INFO_pCAL) non-zero.
     */
-   png_charp pcal_purpose;  /* pCAL chunk description string */
+   char *pcal_purpose;      /* pCAL chunk description string */
    png_int_32 pcal_X0;      /* minimum value */
    png_int_32 pcal_X1;      /* maximum value */
-   png_charp pcal_units;    /* Latin-1 string giving physical units */
-   png_charpp pcal_params;  /* ASCII strings containing parameter values */
+   char *pcal_units;        /* Latin-1 string giving physical units */
+   char **pcal_params;      /* ASCII strings containing parameter values */
    png_byte pcal_type;      /* equation type (see PNG_EQUATION_ below) */
    png_byte pcal_nparams;   /* number of parameters given in pcal_params */
 #endif
@@ -214,7 +214,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
    /* Storage for unknown chunks that the library doesn't recognize. */
-   png_unknown_chunkp unknown_chunks;
+   png_unknown_chunk *unknown_chunks;
 
    /* The type of this field is limited by the type of
     * png_struct::user_chunk_cache_max, else overflow can occur.
@@ -224,7 +224,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 
 #ifdef PNG_sPLT_SUPPORTED
    /* Data on sPLT chunks (there may be more than one). */
-   png_sPLT_tp splt_palettes;
+   png_sPLT_t *splt_palettes;
    int         splt_palettes_num; /* Match type returned by png_get API */
 #endif
 
@@ -237,15 +237,15 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * non-zero.
     */
    png_byte scal_unit;         /* unit of physical scale */
-   png_charp scal_s_width;     /* string containing height */
-   png_charp scal_s_height;    /* string containing width */
+   char *scal_s_width;     /* string containing height */
+   char *scal_s_height;    /* string containing width */
 #endif
 
 #ifdef PNG_INFO_IMAGE_SUPPORTED
    /* Memory has been allocated if (valid & PNG_ALLOCATED_INFO_ROWS)
       non-zero */
    /* Data valid if (valid & PNG_INFO_IDAT) non-zero */
-   png_bytepp row_pointers;        /* the image bits */
+   png_byte **row_pointers;        /* the image bits */
 #endif
 
 #ifdef PNG_cHRM_SUPPORTED

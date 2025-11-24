@@ -52,7 +52,7 @@
 struct sprite
 {
    FILE *file;
-   png_uint_16p buffer;
+   png_uint_16 *buffer;
    unsigned int width;
    unsigned int height;
    char name[sprite_name_chars + 1];
@@ -108,7 +108,7 @@ main(void)
 
 static void
 sprite_op(const struct sprite *sprite, int x_offset, int y_offset,
-          png_imagep image, const png_uint_16 *buffer)
+          png_image *image, const png_uint_16 *buffer)
 {
    /* This is where the Porter-Duff 'Over' operator is evaluated; change this
     * code to change the operator (this could be parameterized).  Any other
@@ -223,7 +223,7 @@ create_sprite(struct sprite *sprite, int *argc, const char ***argv)
 
          if (png_image_begin_read_from_file(&image, (*argv)[0]))
          {
-            png_uint_16p buffer;
+            png_uint_16 *buffer;
 
             image.format = PNG_FORMAT_LINEAR_RGB_ALPHA;
 
@@ -320,7 +320,7 @@ create_sprite(struct sprite *sprite, int *argc, const char ***argv)
 }
 
 static int
-add_sprite(png_imagep output, png_bytep out_buf, struct sprite *sprite,
+add_sprite(png_image *output, png_byte *out_buf, struct sprite *sprite,
            int *argc, const char ***argv)
 {
    /* Given a --add argument naming this sprite, perform the operations listed
@@ -396,7 +396,7 @@ add_sprite(png_imagep output, png_bytep out_buf, struct sprite *sprite,
 }
 
 static int
-simpleover_process(png_imagep output, png_bytep out_buf, int argc,
+simpleover_process(png_image *output, png_byte *out_buf, int argc,
                    const char **argv)
 {
    int result = 1; /* success */
@@ -561,7 +561,7 @@ main(int argc, const char **argv)
 
       if (png_image_begin_read_from_file(&image, argv[1]))
       {
-         png_bytep buffer;
+         png_byte *buffer;
 
          image.format = PNG_FORMAT_RGB; /* 24-bit RGB */
 

@@ -396,10 +396,10 @@ struct display
     * image.
     */
    png_alloc_size_t read_size;
-   png_structp      read_pp;
-   png_infop        ip;
+   png_struct      *read_pp;
+   png_info        *ip;
 #  if defined PNG_TEXT_SUPPORTED
-      png_textp     text_ptr; /* stash of text chunks */
+      png_text     *text_ptr; /* stash of text chunks */
       int           num_text;
       int           text_stashed;
 #  endif
@@ -415,7 +415,7 @@ struct display
 #  define MAX_SIZE ((png_alloc_size_t)(-1))
    png_alloc_size_t write_size;
    png_alloc_size_t best_size;
-   png_structp      write_pp;
+   png_struct      *write_pp;
 
    /* Base file information */
    png_alloc_size_t size;
@@ -554,7 +554,7 @@ display_destroy(struct display *dp)
 }
 
 static struct display *
-get_dp(png_structp pp)
+get_dp(png_struct *pp)
    /* The display pointer is always stored in the png_struct error pointer */
 {
    struct display *dp = (struct display*)png_get_error_ptr(pp);
@@ -655,13 +655,13 @@ text_stash(struct display *dp)
     * copied; since the old strings are actually preserved (in 1.6 and earlier)
     * this happens to work.
     */
-   png_textp chunks = NULL;
+   png_text *chunks = NULL;
 
    dp->num_text = png_get_text(dp->write_pp, dp->ip, &chunks, NULL);
 
    if (dp->num_text > 0)
    {
-      dp->text_ptr = voidcast(png_textp, malloc(dp->num_text * sizeof *chunks));
+      dp->text_ptr = voidcast(png_text *, malloc(dp->num_text * sizeof *chunks));
 
       if (dp->text_ptr == NULL)
          display_log(dp, APP_ERROR, "text chunks: stash malloc failed");
@@ -1675,7 +1675,7 @@ makename(struct display *dp, const char *dir, const char *infile)
 
 /* error handler callbacks for libpng */
 static void
-display_warning(png_structp pp, png_const_charp warning)
+display_warning(png_struct *pp, const char *warning)
 {
    struct display *dp = get_dp(pp);
 
@@ -1685,7 +1685,7 @@ display_warning(png_structp pp, png_const_charp warning)
 }
 
 static void
-display_error(png_structp pp, png_const_charp error)
+display_error(png_struct *pp, const char *error)
 {
    struct display *dp = get_dp(pp);
 
@@ -1717,7 +1717,7 @@ display_start_read(struct display *dp, const char *filename)
 }
 
 static void
-read_function(png_structp pp, png_bytep data, size_t size)
+read_function(png_struct *pp, png_byte *data, size_t size)
 {
    struct display *dp = get_dp(pp);
 
@@ -1902,7 +1902,7 @@ read_png(struct display *dp, const char *filename)
    if (dp->ct == PNG_COLOR_TYPE_PALETTE && (dp->options & FIX_INDEX) != 0)
    {
       int max = png_get_palette_max(dp->read_pp, dp->ip);
-      png_colorp palette = NULL;
+      png_color *palette = NULL;
       int num = -1;
 
       if (png_get_PLTE(dp->read_pp, dp->ip, &palette, &num) != PNG_INFO_PLTE
@@ -1971,7 +1971,7 @@ display_start_write(struct display *dp, const char *filename)
 }
 
 static void
-write_function(png_structp pp, png_bytep data, size_t size)
+write_function(png_struct *pp, png_byte *data, size_t size)
 {
    struct display *dp = get_dp(pp);
 

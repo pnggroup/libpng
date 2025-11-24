@@ -57,7 +57,7 @@
  */
 #if ZLIB_VERNUM < 0x1260
 #  define PNGZ_MSG_CAST(s) constcast(char*,s)
-#  define PNGZ_INPUT_CAST(b) constcast(png_bytep,b)
+#  define PNGZ_INPUT_CAST(b) constcast(png_byte *,b)
 #else
 #  define PNGZ_MSG_CAST(s) (s)
 #  define PNGZ_INPUT_CAST(b) (b)
@@ -147,8 +147,8 @@
  * normally be an error).
  */
 typedef png_uint_16  udigit; /* A 'unum' is an array of these */
-typedef png_uint_16p uarb;
-typedef png_const_uint_16p uarbc;
+typedef png_uint_16 *uarb;
+typedef const png_uint_16 *uarbc;
 
 #define UDIGITS(unum) ((sizeof unum)/(sizeof (udigit))
    /* IMPORTANT: only apply this to an array, applied to a pointer the result
@@ -421,10 +421,10 @@ uarb_print(uarb num, int digits, FILE *out)
  * (Copied from contrib/libtests/pngvalid.c)
  */
 static void
-make_random_bytes(png_uint_32* seed, void* pv, size_t size)
+make_random_bytes(png_uint_32 *seed, void *pv, size_t size)
 {
    png_uint_32 u0 = seed[0], u1 = seed[1];
-   png_bytep bytes = voidcast(png_bytep, pv);
+   png_byte *bytes = voidcast(png_byte *, pv);
 
    /* There are thirty-three bits; the next bit in the sequence is bit-33 XOR
     * bit-20.  The top 1 bit is in u1, the bottom 32 are in u0.
@@ -700,7 +700,6 @@ struct global
 static int
 global_end(struct global *global)
 {
-
    int rc;
 
    IDAT_list_end(&global->idat_cache);
@@ -1470,7 +1469,7 @@ calc_image_size(struct file *file)
 
                if (pw > 0)
                {
-                  int  digits;
+                  int digits;
 
                   /* calculate 1+((pw*pd+7)>>3) in row_bytes */
                   digits = uarb_mult_digit(row_bytes, uarb_set(row_bytes, 7),
@@ -1492,7 +1491,7 @@ calc_image_size(struct file *file)
 
       case PNG_INTERLACE_NONE:
          {
-            int  digits;
+            int digits;
             udigit row_width[2], row_bytes[3];
 
             /* As above, but use image_width in place of the pass width: */
@@ -1563,7 +1562,7 @@ chunk_end(struct chunk **chunk_var)
 }
 
 static void
-chunk_init(struct chunk * const chunk, struct file * const file)
+chunk_init(struct chunk *chunk, struct file *file)
    /* When a chunk is initialized the file length/type/pos are copied into the
     * corresponding chunk fields and the new chunk is registered in the file
     * structure.  There can only be one chunk at a time.
@@ -1772,7 +1771,7 @@ IDAT_end(struct IDAT **idat_var)
 }
 
 static void
-IDAT_init(struct IDAT * const idat, struct file * const file)
+IDAT_init(struct IDAT *idat, struct file *file)
    /* When the chunk is png_IDAT instantiate an IDAT control structure in place
     * of a chunk control structure.  The IDAT will instantiate a chunk control
     * structure using the file alloc routine.
@@ -2486,7 +2485,7 @@ zlib_run(struct zlib *zlib)
    {
       struct IDAT_list *list = zlib->idat->idat_list_head;
       struct IDAT_list *last = zlib->idat->idat_list_tail;
-      int        skip = 0;
+      int skip = 0;
 
       /* 'rewrite_offset' is the offset of the LZ data within the chunk, for
        * IDAT it should be 0:
@@ -2933,7 +2932,7 @@ skip_chunk:
 }
 
 static png_uint_32
-get32(png_bytep buffer, int offset)
+get32(png_byte *buffer, int offset)
    /* Read a 32-bit value from an 8-byte circular buffer (used only below).
     */
 {
@@ -3147,16 +3146,16 @@ read_chunk(struct file *file)
 }
 
 /* This returns a file* from a png_struct in an implementation specific way. */
-static struct file *get_control(png_const_structrp png_ptr);
+static struct file *get_control(const png_struct *png_ptr);
 
 static void
-error_handler(png_structp png_ptr, png_const_charp message)
+error_handler(png_struct *png_ptr, const char *message)
 {
    stop(get_control(png_ptr),  LIBPNG_ERROR_CODE, message);
 }
 
 static void
-warning_handler(png_structp png_ptr, png_const_charp message)
+warning_handler(png_struct *png_ptr, const char *message)
 {
    struct file *file = get_control(png_ptr);
 
@@ -3168,7 +3167,7 @@ warning_handler(png_structp png_ptr, png_const_charp message)
  * passing it to libpng
  */
 static void
-read_callback(png_structp png_ptr, png_bytep buffer, size_t count)
+read_callback(png_struct *png_ptr, png_byte *buffer, size_t count)
    /* Return 'count' bytes to libpng in 'buffer' */
 {
    struct file *file = get_control(png_ptr);
@@ -3518,7 +3517,7 @@ control_end(struct control *control)
 }
 
 static struct file *
-get_control(png_const_structrp png_ptr)
+get_control(const png_struct *png_ptr)
 {
    /* This just returns the (file*).  The chunk and idat control structures
     * don't always exist.
@@ -3563,8 +3562,8 @@ read_png(struct control *control)
     * defined for file::status_code as above.
     */
 {
-   png_structp png_ptr;
-   png_infop info_ptr = NULL;
+   png_struct *png_ptr;
+   png_info *info_ptr = NULL;
    volatile int rc;
 
    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, control,
@@ -3842,11 +3841,11 @@ int
 main(int argc, const char **argv)
 {
    char temp_name[FILENAME_MAX+1];
-   const char *  prog = *argv;
-   const char *  outfile = NULL;
-   const char *  suffix = NULL;
-   const char *  prefix = NULL;
-   int           done = 0; /* if at least one file is processed */
+   const char *prog = *argv;
+   const char *outfile = NULL;
+   const char *suffix = NULL;
+   const char *prefix = NULL;
+   int done = 0; /* if at least one file is processed */
    struct global global;
 
    global_init(&global);

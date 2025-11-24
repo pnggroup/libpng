@@ -20,7 +20,7 @@
 #include "filter_neon_intrinsics.c"
 
 static void
-png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
+png_init_filter_functions_neon(png_struct *pp, unsigned int bpp)
 {
    png_debug(1, "in png_init_filter_functions_neon");
 
@@ -57,9 +57,9 @@ png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
  *       png_struct::target_data.  Need not be defined otherwise.
  */
 static void
-png_target_free_data_arm(png_structrp pp)
+png_target_free_data_arm(png_struct *pp)
 {
-   png_voidp ptr = pp->target_data;
+   void *ptr = pp->target_data;
    pp->target_data = NULL;
    png_free(pp, ptr);
 }
@@ -78,9 +78,9 @@ png_target_free_data_arm(png_structrp pp)
 #include "palette_neon_intrinsics.c"
 
 static int
-png_target_do_expand_palette_neon(png_structrp png_ptr, png_row_infop row_info,
-      png_bytep row, png_const_colorp palette, png_const_bytep trans_alpha,
-      int num_trans)
+png_target_do_expand_palette_neon(png_struct *png_ptr, png_row_info *row_info,
+    png_byte *row, const png_color *palette, const png_byte *trans_alpha,
+    int num_trans)
 {
    /* NOTE: it is important that this is done. row_info->width is not a CSE
     * because the pointer is not declared with the 'restrict' parameter, this
@@ -112,7 +112,7 @@ png_target_do_expand_palette_neon(png_structrp png_ptr, png_row_infop row_info,
    if (row_info->color_type == PNG_COLOR_TYPE_PALETTE &&
        row_info->bit_depth == 8 /* <8 requires a bigger "riffled" palette */)
    {
-      png_const_bytep sp = row + (row_width - 1); /* 8 bit palette index */
+      const png_byte *sp = row + (row_width - 1); /* 8 bit palette index */
       if (num_trans > 0)
       {
          /* This case needs a "riffled" palette.  In this implementation the
@@ -145,7 +145,7 @@ png_target_do_expand_palette_neon(png_structrp png_ptr, png_row_infop row_info,
           * way despite the fact that the comments in the neon palette code
           * obfuscate what is happening.
           */
-         png_bytep dp = row + (4/*RGBA*/*row_width - 1);
+         png_byte *dp = row + (4/*RGBA*/*row_width - 1);
 
          /* Cosmin Truta: "Sometimes row_info->bit_depth has been changed to 8.
           * In these cases, the palette hasn't been riffled."
@@ -194,7 +194,7 @@ png_target_do_expand_palette_neon(png_structrp png_ptr, png_row_infop row_info,
       else
       {
          /* No tRNS chunk (num_trans == 0), expand to RGB not RGBA. */
-         png_bytep dp = row + (3/*RGB*/*row_width - 1);
+         png_byte *dp = row + (3/*RGB*/*row_width - 1);
 
          png_uint_32 i = png_target_do_expand_palette_rgb8_neon(palette,
                row_info->width, &sp, &dp);

@@ -125,7 +125,7 @@ function ci_build {
     }
     # Spawn "autogen.sh" if the configure script is not available.
     [[ -x "$CI_SRC_DIR/configure" ]] || {
-        ci_spawn "$CI_SRC_DIR/autogen.sh" --maintainer
+        ci_spawn "$CI_SRC_DIR/autogen.sh"
     }
     # And... build!
     ci_spawn mkdir -p "$CI_BUILD_DIR"

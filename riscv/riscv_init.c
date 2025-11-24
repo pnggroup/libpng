@@ -21,7 +21,7 @@
 #endif
 
 void
-png_init_filter_functions_rvv(png_structp pp, unsigned int bpp)
+png_init_filter_functions_rvv(png_struct *pp, unsigned int bpp)
 {
    png_debug(1, "in png_init_filter_functions_rvv");
 

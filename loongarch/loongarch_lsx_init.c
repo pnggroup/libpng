@@ -17,7 +17,8 @@
 #include <sys/auxv.h>
 
 #define LA_HWCAP_LSX    (1<<4)
-static int png_has_lsx(void)
+static int
+png_has_lsx(void)
 {
     int flags = 0;
     int flag  = (int)getauxval(AT_HWCAP);
@@ -29,7 +30,7 @@ static int png_has_lsx(void)
 }
 
 void
-png_init_filter_functions_lsx(png_structp pp, unsigned int bpp)
+png_init_filter_functions_lsx(png_struct *pp, unsigned int bpp)
 {
    /* IMPORTANT: any new external functions used here must be declared using
     * PNG_INTERNAL_FUNCTION in ../pngpriv.h.  This is required so that the

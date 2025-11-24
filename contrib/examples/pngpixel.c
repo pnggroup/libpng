@@ -34,7 +34,7 @@
 
 /* Return component 'c' of pixel 'x' from the given row. */
 static unsigned int
-component(png_const_bytep row, png_uint_32 x, unsigned int c,
+component(const png_byte *row, png_uint_32 x, unsigned int c,
           unsigned int bit_depth, unsigned int channels)
 {
    /* PNG images can be up to 2^31 pixels wide, which means they can be up to
@@ -45,7 +45,7 @@ component(png_const_bytep row, png_uint_32 x, unsigned int c,
    png_uint_32 bit_offset_hi = bit_depth * ((x >> 6) * channels);
    png_uint_32 bit_offset_lo = bit_depth * ((x & 0x3f) * channels + c);
 
-   row = (png_const_bytep)(((const png_byte(*)[8])row) + bit_offset_hi);
+   row = (const png_byte *)(((const png_byte(*)[8])row) + bit_offset_hi);
    row += bit_offset_lo >> 3;
    bit_offset_lo &= 0x07;
 
@@ -73,7 +73,7 @@ component(png_const_bytep row, png_uint_32 x, unsigned int c,
  * the pixel, and print the relevant information to stdout.
  */
 static void
-print_pixel(png_structp png_ptr, png_infop info_ptr, png_const_bytep row,
+print_pixel(png_struct *png_ptr, png_info *info_ptr, const png_byte *row,
             png_uint_32 x)
 {
    unsigned int bit_depth = png_get_bit_depth(png_ptr, info_ptr);
@@ -91,7 +91,7 @@ print_pixel(png_structp png_ptr, png_infop info_ptr, png_const_bytep row,
       case PNG_COLOR_TYPE_PALETTE:
          {
             int index = component(row, x, 0, bit_depth, 1);
-            png_colorp palette = NULL;
+            png_color *palette = NULL;
             int num_palette = 0;
 
             if ((png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette) &
@@ -99,7 +99,7 @@ print_pixel(png_structp png_ptr, png_infop info_ptr, png_const_bytep row,
                 (num_palette > 0) &&
                 (palette != NULL))
             {
-               png_bytep trans_alpha = NULL;
+               png_byte *trans_alpha = NULL;
                int num_trans = 0;
                if ((png_get_tRNS(png_ptr, info_ptr, &trans_alpha, &num_trans,
                                  NULL) & PNG_INFO_tRNS) &&
@@ -159,7 +159,7 @@ main(int argc, const char **argv)
       long x = atol(argv[1]);
       long y = atol(argv[2]);
       FILE *f = fopen(argv[3], "rb");
-      volatile png_bytep row = NULL;
+      png_byte * volatile row = NULL;
 
       if (f != NULL)
       {
@@ -169,12 +169,12 @@ main(int argc, const char **argv)
           * writes error messages to stderr.  Creating the png_struct is a
           * little tricky; just copy the following code.
           */
-         png_structp png_ptr =
+         png_struct *png_ptr =
             png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
          if (png_ptr != NULL)
          {
-            png_infop info_ptr = png_create_info_struct(png_ptr);
+            png_info *info_ptr = png_create_info_struct(png_ptr);
 
             if (info_ptr != NULL)
             {
@@ -188,7 +188,7 @@ main(int argc, const char **argv)
                   png_uint_32 width, height;
                   int bit_depth, color_type, interlace_method,
                      compression_method, filter_method;
-                  png_bytep row_tmp;
+                  png_byte *row_tmp;
 
                   /* Now associate the recently opened FILE object with the
                    * default libpng initialization functions.  Sometimes libpng
@@ -352,7 +352,7 @@ main(int argc, const char **argv)
                       * way of using it is still to clear 'row' before calling
                       * png_free:
                       */
-                     png_bytep row_tmp = row;
+                     png_byte *row_tmp = row;
                      row = NULL;
                      png_free(png_ptr, row_tmp);
                   }

@@ -187,7 +187,6 @@ EXPORTS
  png_get_header_version
  png_get_libpng_ver
  png_permit_mng_features
- png_set_strip_error_numbers
  png_set_user_limits
  png_get_user_width_max
  png_get_user_height_max

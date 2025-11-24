@@ -24,7 +24,7 @@
 #include <unistd.h>
 
 static int
-png_have_msa(png_structp png_ptr)
+png_have_msa(png_struct *png_ptr)
 {
    Elf64_auxv_t aux;
    int fd;

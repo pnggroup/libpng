@@ -34,7 +34,6 @@
  * from, or to, 'disabled' this needs updating!
  */
 #define PNG_BENIGN_ERRORS_SUPPORTED
-#define PNG_ERROR_NUMBERS_SUPPORTED
 #define PNG_READ_BIG_ENDIAN_SUPPORTED  /* should do nothing! */
 #define PNG_INCH_CONVERSIONS_SUPPORTED
 #define PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED

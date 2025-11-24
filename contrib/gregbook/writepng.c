@@ -63,7 +63,7 @@
 
 /* local prototype */
 
-static void writepng_error_handler(png_structp png_ptr, png_const_charp msg);
+static void writepng_error_handler(png_struct *png_ptr, const char *msg);
 
 
 
@@ -83,8 +83,8 @@ void writepng_version_info(void)
 
 int writepng_init(mainprog_info *mainprog_ptr)
 {
-    png_structp  png_ptr;       /* note:  temporary variables! */
-    png_infop  info_ptr;
+    png_struct *png_ptr;        /* note:  temporary variables! */
+    png_info *info_ptr;
     int color_type, interlace_type;
 
 
@@ -258,8 +258,8 @@ int writepng_init(mainprog_info *mainprog_ptr)
 
 int writepng_encode_image(mainprog_info *mainprog_ptr)
 {
-    png_structp png_ptr = (png_structp)mainprog_ptr->png_ptr;
-    png_infop info_ptr = (png_infop)mainprog_ptr->info_ptr;
+    png_struct *png_ptr = (png_struct *)mainprog_ptr->png_ptr;
+    png_info *info_ptr = (png_info *)mainprog_ptr->info_ptr;
 
 
     /* as always, setjmp() must be called in every function that calls a
@@ -296,8 +296,8 @@ int writepng_encode_image(mainprog_info *mainprog_ptr)
 
 int writepng_encode_row(mainprog_info *mainprog_ptr)  /* NON-interlaced only! */
 {
-    png_structp png_ptr = (png_structp)mainprog_ptr->png_ptr;
-    png_infop info_ptr = (png_infop)mainprog_ptr->info_ptr;
+    png_struct *png_ptr = (png_struct *)mainprog_ptr->png_ptr;
+    png_info *info_ptr = (png_info *)mainprog_ptr->info_ptr;
 
 
     /* as always, setjmp() must be called in every function that calls a
@@ -326,8 +326,8 @@ int writepng_encode_row(mainprog_info *mainprog_ptr)  /* NON-interlaced only! */
 
 int writepng_encode_finish(mainprog_info *mainprog_ptr)   /* NON-interlaced! */
 {
-    png_structp png_ptr = (png_structp)mainprog_ptr->png_ptr;
-    png_infop info_ptr = (png_infop)mainprog_ptr->info_ptr;
+    png_struct *png_ptr = (png_struct *)mainprog_ptr->png_ptr;
+    png_info *info_ptr = (png_info *)mainprog_ptr->info_ptr;
 
 
     /* as always, setjmp() must be called in every function that calls a
@@ -355,8 +355,8 @@ int writepng_encode_finish(mainprog_info *mainprog_ptr)   /* NON-interlaced! */
 
 void writepng_cleanup(mainprog_info *mainprog_ptr)
 {
-    png_structp png_ptr = (png_structp)mainprog_ptr->png_ptr;
-    png_infop info_ptr = (png_infop)mainprog_ptr->info_ptr;
+    png_struct *png_ptr = (png_struct *)mainprog_ptr->png_ptr;
+    png_info *info_ptr = (png_info *)mainprog_ptr->info_ptr;
 
     if (png_ptr && info_ptr)
         png_destroy_write_struct(&png_ptr, &info_ptr);
@@ -366,7 +366,7 @@ void writepng_cleanup(mainprog_info *mainprog_ptr)
 
 
 
-static void writepng_error_handler(png_structp png_ptr, png_const_charp msg)
+static void writepng_error_handler(png_struct *png_ptr, const char *msg)
 {
     mainprog_info  *mainprog_ptr;
 

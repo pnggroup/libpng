@@ -14,7 +14,7 @@
 #include "filter_vsx_intrinsics.c"
 
 static void
-png_init_filter_functions_vsx(png_structp pp, unsigned int bpp)
+png_init_filter_functions_vsx(png_struct *pp, unsigned int bpp)
 {
    /* IMPORTANT: DO NOT DEFINE EXTERNAL FUNCTIONS HERE
     *

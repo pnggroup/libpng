@@ -27,7 +27,7 @@
 #include <cpu-features.h>
 
 static int
-png_have_neon(png_structp png_ptr)
+png_have_neon(png_struct *png_ptr)
 {
    /* This is a whole lot easier than the linux code, however it is probably
     * implemented as below, therefore it is better to cache the result (these

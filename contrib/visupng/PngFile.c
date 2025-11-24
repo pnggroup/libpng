@@ -22,18 +22,18 @@
 define_exception_type(const char *);
 extern struct exception_context the_exception_context[1];
 struct exception_context the_exception_context[1];
-png_const_charp msg;
+const char *msg;
 
 static OPENFILENAME ofn;
 
-static png_structp png_ptr = NULL;
-static png_infop info_ptr = NULL;
+static png_struct *png_ptr = NULL;
+static png_info *info_ptr = NULL;
 
 
 /* cexcept interface */
 
 static void
-png_cexcept_error(png_structp png_ptr, png_const_charp msg)
+png_cexcept_error(png_struct *png_ptr, const char *msg)
 {
    if(png_ptr)
      ;
@@ -160,7 +160,7 @@ BOOL PngLoadImage (PTSTR pstrFileName, png_byte **ppbImageData,
 #ifdef PNG_STDIO_SUPPORTED
         png_init_io(png_ptr, pfFile);
 #else
-        png_set_read_fn(png_ptr, (png_voidp)pfFile, png_read_data);
+        png_set_read_fn(png_ptr, (void *)pfFile, png_read_data);
 #endif
 
         png_set_sig_bytes(png_ptr, 8);
@@ -249,8 +249,8 @@ BOOL PngLoadImage (PTSTR pstrFileName, png_byte **ppbImageData,
 
         /* and allocate memory for an array of row-pointers */
 
-        if ((ppbRowPointers = (png_bytepp) malloc((*piHeight)
-                            * sizeof(png_bytep))) == NULL)
+        if ((ppbRowPointers = (png_byte **) malloc((*piHeight)
+                            * sizeof(png_byte *))) == NULL)
         {
             png_error(png_ptr, "Visual PNG: out of memory");
         }
@@ -328,7 +328,7 @@ BOOL PngSaveImage (PTSTR pstrFileName, png_byte *pDiData,
     info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr) {
         fclose(pfFile);
-        png_destroy_write_struct(&png_ptr, (png_infopp) NULL);
+        png_destroy_write_struct(&png_ptr, (png_info **) NULL);
         return FALSE;
     }
 
@@ -339,7 +339,7 @@ BOOL PngSaveImage (PTSTR pstrFileName, png_byte *pDiData,
 #ifdef PNG_STDIO_SUPPORTED
         png_init_io(png_ptr, pfFile);
 #else
-        png_set_write_fn(png_ptr, (png_voidp)pfFile, png_write_data, png_flush);
+        png_set_write_fn(png_ptr, (void *)pfFile, png_write_data, png_flush);
 #endif
 
         /* we're going to write a very simple 3x8-bit RGB image */
@@ -362,7 +362,7 @@ BOOL PngSaveImage (PTSTR pstrFileName, png_byte *pDiData,
 
         /* we can allocate memory for an array of row-pointers */
 
-        if ((ppbRowPointers = (png_bytepp) malloc(iHeight * sizeof(png_bytep))) == NULL)
+        if ((ppbRowPointers = (png_byte **) malloc(iHeight * sizeof(png_byte *))) == NULL)
             Throw "Visualpng: Out of memory";
 
         /* set the individual row-pointers to point at the correct offsets */
@@ -385,14 +385,14 @@ BOOL PngSaveImage (PTSTR pstrFileName, png_byte *pDiData,
 
         /* clean up after the write, and free any memory allocated */
 
-        png_destroy_write_struct(&png_ptr, (png_infopp) NULL);
+        png_destroy_write_struct(&png_ptr, (png_info **) NULL);
 
         /* yepp, done */
     }
 
     Catch (msg)
     {
-        png_destroy_write_struct(&png_ptr, (png_infopp) NULL);
+        png_destroy_write_struct(&png_ptr, (png_info **) NULL);
 
         if(ppbRowPointers)
             free (ppbRowPointers);
@@ -410,7 +410,7 @@ BOOL PngSaveImage (PTSTR pstrFileName, png_byte *pDiData,
 #ifndef PNG_STDIO_SUPPORTED
 
 static void
-png_read_data(png_structp png_ptr, png_bytep data, size_t length)
+png_read_data(png_struct *png_ptr, png_byte *data, size_t length)
 {
    size_t check;
 
@@ -426,7 +426,7 @@ png_read_data(png_structp png_ptr, png_bytep data, size_t length)
 }
 
 static void
-png_write_data(png_structp png_ptr, png_bytep data, size_t length)
+png_write_data(png_struct *png_ptr, png_byte *data, size_t length)
 {
    png_uint_32 check;
 
@@ -438,7 +438,7 @@ png_write_data(png_structp png_ptr, png_bytep data, size_t length)
 }
 
 static void
-png_flush(png_structp png_ptr)
+png_flush(png_struct *png_ptr)
 {
    FILE *io_ptr;
    io_ptr = (FILE *)CVT_PTR((png_ptr->io_ptr));

@@ -13,7 +13,7 @@
 #include "filter_msa_intrinsics.c"
 
 static void
-png_init_filter_functions_msa(png_structp pp, unsigned int bpp)
+png_init_filter_functions_msa(png_struct *pp, unsigned int bpp)
 {
    pp->read_filter[PNG_FILTER_VALUE_UP-1] = png_read_filter_row_up_msa;
 

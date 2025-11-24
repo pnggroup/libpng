@@ -701,7 +701,7 @@ read_wh(const char *name, const char *str)
 }
 
 static void
-pixel(png_uint_16p p, struct arg *args, int nargs, double x, double y)
+pixel(png_uint_16 *p, struct arg *args, int nargs, double x, double y)
 {
    /* Fill in the pixel by checking each shape (args[nargs]) for effects on
     * the corresponding sample:
@@ -756,7 +756,7 @@ main(int argc, const char **argv)
 
    if (argc >= 3)
    {
-      png_uint_16p buffer;
+      png_uint_16 *buffer;
       int nshapes;
       png_image image;
 #     define max_shapes 256

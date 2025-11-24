@@ -27,7 +27,7 @@
 #endif
 
 static int
-png_have_vsx(png_structp png_ptr)
+png_have_vsx(png_struct *png_ptr)
 {
    FILE *f;
 

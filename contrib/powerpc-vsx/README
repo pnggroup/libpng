@@ -44,7 +44,7 @@ BUG REPORTS: an email address to which to send reports of problems
 The file is a fragment of C code. It should not define any 'extern' symbols;
 everything should be static.  It must define the function:
 
-static int png_have_vsx(png_structp png_ptr);
+static int png_have_vsx(png_struct *png_ptr);
 
 That function must return 1 if POWERPC_VSX instructions are supported, 0 if not.
 It must not execute png_error unless it detects a bug.  A png_error will prevent

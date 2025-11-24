@@ -1,6 +1,6 @@
 /* pngunknown.c - test the read side unknown chunk handling
  *
- * Copyright (c) 2021-2024 Cosmin Truta
+ * Copyright (c) 2021-2025 Cosmin Truta
  * Copyright (c) 2015,2017 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -32,7 +32,7 @@
 /* 1.6.1 added support for the configure test harness, which uses 77 to indicate
  * a skipped test, in earlier versions we need to succeed on a skipped test, so:
  */
-#if PNG_LIBPNG_VER >= 10601 && defined(HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  define SKIP 77
 #else
 #  define SKIP 0
@@ -54,48 +54,7 @@
 #if defined(PNG_READ_USER_CHUNKS_SUPPORTED) ||\
    defined(PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED)
 
-#if PNG_LIBPNG_VER < 10500
-/* This deliberately lacks the const. */
-typedef png_byte *png_const_bytep;
 
-/* This is copied from 1.5.1 png.h: */
-#define PNG_INTERLACE_ADAM7_PASSES 7
-#define PNG_PASS_START_ROW(pass) (((1U&~(pass))<<(3-((pass)>>1)))&7)
-#define PNG_PASS_START_COL(pass) (((1U& (pass))<<(3-(((pass)+1)>>1)))&7)
-#define PNG_PASS_ROW_SHIFT(pass) ((pass)>2?(8-(pass))>>1:3)
-#define PNG_PASS_COL_SHIFT(pass) ((pass)>1?(7-(pass))>>1:3)
-#define PNG_PASS_ROWS(height, pass) (((height)+(((1<<PNG_PASS_ROW_SHIFT(pass))\
-   -1)-PNG_PASS_START_ROW(pass)))>>PNG_PASS_ROW_SHIFT(pass))
-#define PNG_PASS_COLS(width, pass) (((width)+(((1<<PNG_PASS_COL_SHIFT(pass))\
-   -1)-PNG_PASS_START_COL(pass)))>>PNG_PASS_COL_SHIFT(pass))
-#define PNG_ROW_FROM_PASS_ROW(yIn, pass) \
-   (((yIn)<<PNG_PASS_ROW_SHIFT(pass))+PNG_PASS_START_ROW(pass))
-#define PNG_COL_FROM_PASS_COL(xIn, pass) \
-   (((xIn)<<PNG_PASS_COL_SHIFT(pass))+PNG_PASS_START_COL(pass))
-#define PNG_PASS_MASK(pass,off) ( \
-   ((0x110145AFU>>(((7-(off))-(pass))<<2)) & 0xFU) | \
-   ((0x01145AF0U>>(((7-(off))-(pass))<<2)) & 0xF0U))
-#define PNG_ROW_IN_INTERLACE_PASS(y, pass) \
-   ((PNG_PASS_MASK(pass,0) >> ((y)&7)) & 1)
-#define PNG_COL_IN_INTERLACE_PASS(x, pass) \
-   ((PNG_PASS_MASK(pass,1) >> ((x)&7)) & 1)
-
-/* These are needed too for the default build: */
-#define PNG_WRITE_16BIT_SUPPORTED
-#define PNG_READ_16BIT_SUPPORTED
-
-/* This comes from pnglibconf.h after 1.5: */
-#define PNG_FP_1 100000
-#define PNG_GAMMA_THRESHOLD_FIXED\
-   ((png_fixed_point)(PNG_GAMMA_THRESHOLD * PNG_FP_1))
-#endif
-
-#if PNG_LIBPNG_VER < 10600
-   /* 1.6.0 constifies many APIs. The following exists to allow pngvalid to be
-    * compiled against earlier versions.
-    */
-#  define png_const_structp png_structp
-#endif
 
    /* Copied from libpng 1.7.0 png.h */
 #define PNG_u2(b1, b2) (((unsigned int)(b1) << 8) + (b2))
@@ -416,8 +375,9 @@ ancillaryb(const png_byte *name)
 typedef struct
 {
    jmp_buf     error_return;
-   png_structp png_ptr;
-   png_infop   info_ptr, end_ptr;
+   png_struct *png_ptr;
+   png_info   *info_ptr;
+   png_info   *end_ptr;
    png_uint_32 before_IDAT;
    png_uint_32 after_IDAT;
    int         error_count;
@@ -482,7 +442,7 @@ display_rc(const display *d, int strict)
 
 /* libpng error and warning callbacks */
 static PNG_NORETURN void
-error(png_structp png_ptr, const char *message)
+error(png_struct *png_ptr, const char *message)
 {
    display *d = (display*)png_get_error_ptr(png_ptr);
 
@@ -491,7 +451,7 @@ error(png_structp png_ptr, const char *message)
 }
 
 static void
-warning(png_structp png_ptr, const char *message)
+warning(png_struct *png_ptr, const char *message)
 {
    display *d = (display*)png_get_error_ptr(png_ptr);
 
@@ -500,13 +460,13 @@ warning(png_structp png_ptr, const char *message)
 }
 
 static png_uint_32
-get_valid(display *d, png_infop info_ptr)
+get_valid(display *d, png_info *info_ptr)
 {
    png_uint_32 flags = png_get_valid(d->png_ptr, info_ptr, (png_uint_32)~0);
 
    /* Map the text chunks back into the flags */
    {
-      png_textp text;
+      png_text *text;
       png_uint_32 ntext = png_get_text(d->png_ptr, info_ptr, &text, NULL);
 
       while (ntext > 0) switch (text[--ntext].compression)
@@ -533,7 +493,7 @@ get_valid(display *d, png_infop info_ptr)
 
 #ifdef PNG_READ_USER_CHUNKS_SUPPORTED
 static int
-read_callback(png_structp pp, png_unknown_chunkp pc)
+read_callback(png_struct *pp, png_unknown_chunk *pc)
 {
    /* This function mimics the behavior of png_set_keep_unknown_chunks by
     * returning '0' to keep the chunk and '1' to discard it.
@@ -609,7 +569,7 @@ read_callback(png_structp pp, png_unknown_chunkp pc)
 
 #ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
 static png_uint_32
-get_unknown(display *d, png_infop info_ptr, int after_IDAT)
+get_unknown(display *d, png_info *info_ptr, int after_IDAT)
 {
    /* Create corresponding 'unknown' flags */
    png_uint_32 flags = 0;
@@ -617,7 +577,7 @@ get_unknown(display *d, png_infop info_ptr, int after_IDAT)
    UNUSED(after_IDAT)
 
    {
-      png_unknown_chunkp unknown;
+      png_unknown_chunk *unknown;
       int num_unknown = png_get_unknown_chunks(d->png_ptr, info_ptr, &unknown);
 
       while (--num_unknown >= 0)
@@ -662,7 +622,7 @@ get_unknown(display *d, png_infop info_ptr, int after_IDAT)
 }
 #else /* SAVE_UNKNOWN_CHUNKS */
 static png_uint_32
-get_unknown(display *d, png_infop info_ptr, int after_IDAT)
+get_unknown(display *d, png_info *info_ptr, int after_IDAT)
    /* Otherwise this will return the cached values set by any user callback */
 {
    UNUSED(info_ptr);
@@ -683,7 +643,7 @@ get_unknown(display *d, png_infop info_ptr, int after_IDAT)
 #endif /* SAVE_UNKNOWN_CHUNKS */
 
 static int
-check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/,
+check(FILE *fp, int argc, const char **argv, png_uint_32 *flags/*out*/,
    display *d, int set_callback)
 {
    int i, npasses, ipass;

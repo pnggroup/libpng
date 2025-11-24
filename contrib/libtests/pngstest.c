@@ -1,6 +1,6 @@
 /* pngstest.c
  *
- * Copyright (c) 2021-2024 Cosmin Truta
+ * Copyright (c) 2021-2025 Cosmin Truta
  * Copyright (c) 2013-2017 John Cunningham Bowler
  *
  * This code is released under the libpng license.
@@ -37,7 +37,7 @@
 /* 1.6.1 added support for the configure test harness, which uses 77 to indicate
  * a skipped test, in earlier versions we need to succeed on a skipped test, so:
  */
-#if PNG_LIBPNG_VER >= 10601 && defined(HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  define SKIP 77
 #else
 #  define SKIP 0
@@ -83,10 +83,10 @@ static char tmpf[23] = "TMP";
  * Hill, "The Art of Electronics".
  */
 static void
-make_random_bytes(png_uint_32* seed, void* pv, size_t size)
+make_random_bytes(png_uint_32 *seed, void *pv, size_t size)
 {
    png_uint_32 u0 = seed[0], u1 = seed[1];
-   png_bytep bytes = voidcast(png_bytep, pv);
+   png_byte *bytes = voidcast(png_byte *, pv);
 
    /* There are thirty three bits, the next bit in the sequence is bit-33 XOR
     * bit-20.  The top 1 bit is in u1, the bottom 32 are in u0.
@@ -117,7 +117,7 @@ reseed(void)
 }
 
 static void
-random_color(png_colorp color)
+random_color(png_color *color)
 {
    make_random_bytes(color_seed, color, sizeof *color);
 }
@@ -473,7 +473,8 @@ typedef struct
 }
 format_list;
 
-static void format_init(format_list *pf)
+static void
+format_init(format_list *pf)
 {
    int i;
    for (i=0; i<FORMAT_SET_COUNT; ++i)
@@ -481,7 +482,8 @@ static void format_init(format_list *pf)
 }
 
 #if 0 /* currently unused */
-static void format_clear(format_list *pf)
+static void
+format_clear(format_list *pf)
 {
    int i;
    for (i=0; i<FORMAT_SET_COUNT; ++i)
@@ -489,7 +491,8 @@ static void format_clear(format_list *pf)
 }
 #endif
 
-static int format_is_initial(format_list *pf)
+static int
+format_is_initial(format_list *pf)
 {
    int i;
    for (i=0; i<FORMAT_SET_COUNT; ++i)
@@ -499,7 +502,8 @@ static int format_is_initial(format_list *pf)
    return 1;
 }
 
-static int format_set(format_list *pf, png_uint_32 format)
+static int
+format_set(format_list *pf, png_uint_32 format)
 {
    if (format < FORMAT_COUNT)
       return pf->bits[format >> 5] |= ((png_uint_32)1) << (format & 31);
@@ -508,7 +512,8 @@ static int format_set(format_list *pf, png_uint_32 format)
 }
 
 #if 0 /* currently unused */
-static int format_unset(format_list *pf, png_uint_32 format)
+static int
+format_unset(format_list *pf, png_uint_32 format)
 {
    if (format < FORMAT_COUNT)
       return pf->bits[format >> 5] &= ~((png_uint_32)1) << (format & 31);
@@ -517,13 +522,15 @@ static int format_unset(format_list *pf, png_uint_32 format)
 }
 #endif
 
-static int format_isset(format_list *pf, png_uint_32 format)
+static int
+format_isset(format_list *pf, png_uint_32 format)
 {
    return format < FORMAT_COUNT &&
       (pf->bits[format >> 5] & (((png_uint_32)1) << (format & 31))) != 0;
 }
 
-static void format_default(format_list *pf, int redundant)
+static void
+format_default(format_list *pf, int redundant)
 {
    if (redundant)
    {
@@ -575,9 +582,9 @@ typedef struct
    const char *file_name;
    int         stride_extra;
    FILE       *input_file;
-   png_voidp   input_memory;
+   void       *input_memory;
    size_t      input_memory_size;
-   png_bytep   buffer;
+   png_byte   *buffer;
    ptrdiff_t   stride;
    size_t      bufsize;
    size_t      allocsize;
@@ -647,7 +654,8 @@ freeimage(Image *image)
 /* This is actually a re-initializer; allows an image structure to be re-used by
  * freeing everything that relates to an old image.
  */
-static void initimage(Image *image, png_uint_32 opts, const char *file_name,
+static void
+initimage(Image *image, png_uint_32 opts, const char *file_name,
    int stride_extra)
 {
    freeimage(image);
@@ -669,7 +677,7 @@ allocbuffer(Image *image)
    if (size+32 > image->bufsize)
    {
       freebuffer(image);
-      image->buffer = voidcast(png_bytep, malloc(size+32));
+      image->buffer = voidcast(png_byte *, malloc(size+32));
       if (image->buffer == NULL)
       {
          fflush(stdout);
@@ -688,7 +696,7 @@ allocbuffer(Image *image)
 
 /* Make sure 16 bytes match the given byte. */
 static int
-check16(png_const_bytep bp, int b)
+check16(const png_byte *bp, int b)
 {
    int i = 16;
 
@@ -809,18 +817,18 @@ typedef struct
  * the format in a function pointer, these are the routines:
  */
 static void
-gp_g8(Pixel *p, png_const_voidp pb)
+gp_g8(Pixel *p, const void *pb)
 {
-   png_const_bytep pp = voidcast(png_const_bytep, pb);
+   const png_byte *pp = voidcast(const png_byte *, pb);
 
    p->r = p->g = p->b = pp[0];
    p->a = 255;
 }
 
 static void
-gp_ga8(Pixel *p, png_const_voidp pb)
+gp_ga8(Pixel *p, const void *pb)
 {
-   png_const_bytep pp = voidcast(png_const_bytep, pb);
+   const png_byte *pp = voidcast(const png_byte *, pb);
 
    p->r = p->g = p->b = pp[0];
    p->a = pp[1];
@@ -828,9 +836,9 @@ gp_ga8(Pixel *p, png_const_voidp pb)
 
 #ifdef PNG_FORMAT_AFIRST_SUPPORTED
 static void
-gp_ag8(Pixel *p, png_const_voidp pb)
+gp_ag8(Pixel *p, const void *pb)
 {
-   png_const_bytep pp = voidcast(png_const_bytep, pb);
+   const png_byte *pp = voidcast(const png_byte *, pb);
 
    p->r = p->g = p->b = pp[1];
    p->a = pp[0];
@@ -838,9 +846,9 @@ gp_ag8(Pixel *p, png_const_voidp pb)
 #endif
 
 static void
-gp_rgb8(Pixel *p, png_const_voidp pb)
+gp_rgb8(Pixel *p, const void *pb)
 {
-   png_const_bytep pp = voidcast(png_const_bytep, pb);
+   const png_byte *pp = voidcast(const png_byte *, pb);
 
    p->r = pp[0];
    p->g = pp[1];
@@ -850,9 +858,9 @@ gp_rgb8(Pixel *p, png_const_voidp pb)
 
 #ifdef PNG_FORMAT_BGR_SUPPORTED
 static void
-gp_bgr8(Pixel *p, png_const_voidp pb)
+gp_bgr8(Pixel *p, const void *pb)
 {
-   png_const_bytep pp = voidcast(png_const_bytep, pb);
+   const png_byte *pp = voidcast(const png_byte *, pb);
 
    p->r = pp[2];
    p->g = pp[1];
@@ -862,9 +870,9 @@ gp_bgr8(Pixel *p, png_const_voidp pb)
 #endif
 
 static void
-gp_rgba8(Pixel *p, png_const_voidp pb)
+gp_rgba8(Pixel *p, const void *pb)
 {
-   png_const_bytep pp = voidcast(png_const_bytep, pb);
+   const png_byte *pp = voidcast(const png_byte *, pb);
 
    p->r = pp[0];
    p->g = pp[1];
@@ -874,9 +882,9 @@ gp_rgba8(Pixel *p, png_const_voidp pb)
 
 #ifdef PNG_FORMAT_BGR_SUPPORTED
 static void
-gp_bgra8(Pixel *p, png_const_voidp pb)
+gp_bgra8(Pixel *p, const void *pb)
 {
-   png_const_bytep pp = voidcast(png_const_bytep, pb);
+   const png_byte *pp = voidcast(const png_byte *, pb);
 
    p->r = pp[2];
    p->g = pp[1];
@@ -887,9 +895,9 @@ gp_bgra8(Pixel *p, png_const_voidp pb)
 
 #ifdef PNG_FORMAT_AFIRST_SUPPORTED
 static void
-gp_argb8(Pixel *p, png_const_voidp pb)
+gp_argb8(Pixel *p, const void *pb)
 {
-   png_const_bytep pp = voidcast(png_const_bytep, pb);
+   const png_byte *pp = voidcast(const png_byte *, pb);
 
    p->r = pp[1];
    p->g = pp[2];
@@ -900,9 +908,9 @@ gp_argb8(Pixel *p, png_const_voidp pb)
 
 #if defined(PNG_FORMAT_AFIRST_SUPPORTED) && defined(PNG_FORMAT_BGR_SUPPORTED)
 static void
-gp_abgr8(Pixel *p, png_const_voidp pb)
+gp_abgr8(Pixel *p, const void *pb)
 {
-   png_const_bytep pp = voidcast(png_const_bytep, pb);
+   const png_byte *pp = voidcast(const png_byte *, pb);
 
    p->r = pp[3];
    p->g = pp[2];
@@ -912,18 +920,18 @@ gp_abgr8(Pixel *p, png_const_voidp pb)
 #endif
 
 static void
-gp_g16(Pixel *p, png_const_voidp pb)
+gp_g16(Pixel *p, const void *pb)
 {
-   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+   const png_uint_16 *pp = voidcast(const png_uint_16 *, pb);
 
    p->r = p->g = p->b = pp[0];
    p->a = 65535;
 }
 
 static void
-gp_ga16(Pixel *p, png_const_voidp pb)
+gp_ga16(Pixel *p, const void *pb)
 {
-   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+   const png_uint_16 *pp = voidcast(const png_uint_16 *, pb);
 
    p->r = p->g = p->b = pp[0];
    p->a = pp[1];
@@ -931,9 +939,9 @@ gp_ga16(Pixel *p, png_const_voidp pb)
 
 #ifdef PNG_FORMAT_AFIRST_SUPPORTED
 static void
-gp_ag16(Pixel *p, png_const_voidp pb)
+gp_ag16(Pixel *p, const void *pb)
 {
-   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+   const png_uint_16 *pp = voidcast(const png_uint_16 *, pb);
 
    p->r = p->g = p->b = pp[1];
    p->a = pp[0];
@@ -941,9 +949,9 @@ gp_ag16(Pixel *p, png_const_voidp pb)
 #endif
 
 static void
-gp_rgb16(Pixel *p, png_const_voidp pb)
+gp_rgb16(Pixel *p, const void *pb)
 {
-   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+   const png_uint_16 *pp = voidcast(const png_uint_16 *, pb);
 
    p->r = pp[0];
    p->g = pp[1];
@@ -953,9 +961,9 @@ gp_rgb16(Pixel *p, png_const_voidp pb)
 
 #ifdef PNG_FORMAT_BGR_SUPPORTED
 static void
-gp_bgr16(Pixel *p, png_const_voidp pb)
+gp_bgr16(Pixel *p, const void *pb)
 {
-   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+   const png_uint_16 *pp = voidcast(const png_uint_16 *, pb);
 
    p->r = pp[2];
    p->g = pp[1];
@@ -965,9 +973,9 @@ gp_bgr16(Pixel *p, png_const_voidp pb)
 #endif
 
 static void
-gp_rgba16(Pixel *p, png_const_voidp pb)
+gp_rgba16(Pixel *p, const void *pb)
 {
-   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+   const png_uint_16 *pp = voidcast(const png_uint_16 *, pb);
 
    p->r = pp[0];
    p->g = pp[1];
@@ -977,9 +985,9 @@ gp_rgba16(Pixel *p, png_const_voidp pb)
 
 #ifdef PNG_FORMAT_BGR_SUPPORTED
 static void
-gp_bgra16(Pixel *p, png_const_voidp pb)
+gp_bgra16(Pixel *p, const void *pb)
 {
-   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+   const png_uint_16 *pp = voidcast(const png_uint_16 *, pb);
 
    p->r = pp[2];
    p->g = pp[1];
@@ -990,9 +998,9 @@ gp_bgra16(Pixel *p, png_const_voidp pb)
 
 #ifdef PNG_FORMAT_AFIRST_SUPPORTED
 static void
-gp_argb16(Pixel *p, png_const_voidp pb)
+gp_argb16(Pixel *p, const void *pb)
 {
-   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+   const png_uint_16 *pp = voidcast(const png_uint_16 *, pb);
 
    p->r = pp[1];
    p->g = pp[2];
@@ -1003,9 +1011,9 @@ gp_argb16(Pixel *p, png_const_voidp pb)
 
 #if defined(PNG_FORMAT_AFIRST_SUPPORTED) && defined(PNG_FORMAT_BGR_SUPPORTED)
 static void
-gp_abgr16(Pixel *p, png_const_voidp pb)
+gp_abgr16(Pixel *p, const void *pb)
 {
-   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+   const png_uint_16 *pp = voidcast(const png_uint_16 *, pb);
 
    p->r = pp[3];
    p->g = pp[2];
@@ -1016,7 +1024,7 @@ gp_abgr16(Pixel *p, png_const_voidp pb)
 
 /* Given a format, return the correct one of the above functions. */
 static void (*
-get_pixel(png_uint_32 format))(Pixel *p, png_const_voidp pb)
+get_pixel(png_uint_32 format))(Pixel *p, const void *pb)
 {
    /* The color-map flag is irrelevant here - the caller of the function
     * returned must either pass the buffer or, for a color-mapped image, the
@@ -2022,15 +2030,15 @@ static void (* const gpc_fn_colormapped[8/*in*/][8/*out*/])
 typedef struct
 {
    /* Basic pixel information: */
-   Image*       in_image;   /* Input image */
-   const Image* out_image;  /* Output image */
+   Image       *in_image;   /* Input image */
+   const Image *out_image;  /* Output image */
 
    /* 'background' is the value passed to the gpc_ routines, it may be NULL if
     * it should not be used (*this* program has an error if it crashes as a
     * result!)
     */
    Background        background_color;
-   const Background* background;
+   const Background *background;
 
    /* Precalculated values: */
    int          in_opaque;   /* Value of input alpha that is opaque */
@@ -2038,8 +2046,8 @@ typedef struct
    int          accumulate;  /* Accumulate component errors (don't log) */
    int          output_8bit; /* Output is 8-bit (else 16-bit) */
 
-   void (*in_gp)(Pixel*, png_const_voidp);
-   void (*out_gp)(Pixel*, png_const_voidp);
+   void (*in_gp)(Pixel*, const void *);
+   void (*out_gp)(Pixel*, const void *);
 
    void (*transform)(Pixel *out, const Pixel *in, const Background *back);
       /* A function to perform the required transform */
@@ -2060,7 +2068,7 @@ Transform;
 /* Return a 'transform' as above for the given format conversion. */
 static void
 transform_from_formats(Transform *result, Image *in_image,
-   const Image *out_image, png_const_colorp background, int via_linear)
+   const Image *out_image, const png_color *background, int via_linear)
 {
    png_uint_32 in_format, out_format;
    png_uint_32 in_base, out_base;
@@ -2415,11 +2423,11 @@ logpixel(const Transform *transform, png_uint_32 x, png_uint_32 y,
 }
 
 static int
-cmppixel(Transform *transform, png_const_voidp in, png_const_voidp out,
+cmppixel(Transform *transform, const void *in, const void *out,
    png_uint_32 x, png_uint_32 y/*or palette index*/)
 {
    int maxerr;
-   png_const_charp errmsg;
+   const char *errmsg;
    Pixel pixel_in, pixel_calc, pixel_out;
 
    transform->in_gp(&pixel_in, in);
@@ -2595,12 +2603,12 @@ component_loc(png_byte loc[4], png_uint_32 format)
  */
 static int
 compare_two_images(Image *a, Image *b, int via_linear,
-   png_const_colorp background)
+   const png_color *background)
 {
    ptrdiff_t stridea = a->stride;
    ptrdiff_t strideb = b->stride;
-   png_const_bytep rowa = a->buffer+16;
-   png_const_bytep rowb = b->buffer+16;
+   const png_byte *rowa = a->buffer+16;
+   const png_byte *rowb = b->buffer+16;
    png_uint_32 width = a->image.width;
    png_uint_32 height = a->image.height;
    png_uint_32 formata = a->image.format;
@@ -2641,7 +2649,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
    if (formata & formatb & PNG_FORMAT_FLAG_COLORMAP)
    {
       /* Only check colormap entries that actually exist; */
-      png_const_bytep ppa, ppb;
+      const png_byte *ppa, *ppb;
       int match;
       png_byte in_use[256], amax = 0, bmax = 0;
 
@@ -2681,8 +2689,8 @@ compare_two_images(Image *a, Image *b, int via_linear,
          /* Do the color-maps match, entry by entry?  Only check the 'in_use'
           * entries.  An error here should be logged as a color-map error.
           */
-         png_const_bytep a_cmap = (png_const_bytep)a->colormap;
-         png_const_bytep b_cmap = (png_const_bytep)b->colormap;
+         const png_byte *a_cmap = (const png_byte *)a->colormap;
+         const png_byte *b_cmap = (const png_byte *)b->colormap;
          int result = 1; /* match by default */
 
          /* This is used in logpixel to get the error message correct. */
@@ -2851,20 +2859,20 @@ compare_two_images(Image *a, Image *b, int via_linear,
 
    for (y=0; y<height; ++y, rowa += stridea, rowb += strideb)
    {
-      png_const_bytep ppa, ppb;
+      const png_byte *ppa, *ppb;
       png_uint_32 x;
 
       for (x=0, ppa=rowa, ppb=rowb; x<width; ++x)
       {
-         png_const_bytep psa, psb;
+         const png_byte *psa, *psb;
 
          if (formata & PNG_FORMAT_FLAG_COLORMAP)
-            psa = (png_const_bytep)a->colormap + a_sample * *ppa++;
+            psa = (const png_byte *)a->colormap + a_sample * *ppa++;
          else
             psa = ppa, ppa += a_sample;
 
          if (formatb & PNG_FORMAT_FLAG_COLORMAP)
-            psb = (png_const_bytep)b->colormap + b_sample * *ppb++;
+            psb = (const png_byte *)b->colormap + b_sample * *ppb++;
          else
             psb = ppb, ppb += b_sample;
 
@@ -2879,8 +2887,8 @@ compare_two_images(Image *a, Image *b, int via_linear,
              */
             if (formatb & PNG_FORMAT_FLAG_LINEAR) /* 16-bit checks */
             {
-               png_const_uint_16p pua = aligncastconst(png_const_uint_16p, psa);
-               png_const_uint_16p pub = aligncastconst(png_const_uint_16p, psb);
+               const png_uint_16 *pua = aligncastconst(const png_uint_16 *, psa);
+               const png_uint_16 *pub = aligncastconst(const png_uint_16 *, psb);
 
                switch (bchannels)
                {
@@ -2949,7 +2957,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
  * input_memory have been set.
  */
 static int
-read_file(Image *image, png_uint_32 format, png_const_colorp background)
+read_file(Image *image, png_uint_32 format, const png_color *background)
 {
    memset(&image->image, 0, sizeof image->image);
    image->image.version = PNG_IMAGE_VERSION;
@@ -3074,7 +3082,7 @@ read_one_file(Image *image)
                   if ((unsigned long int)cb <= (size_t)~(size_t)0)
 #endif
                   {
-                     png_bytep b = voidcast(png_bytep, malloc((size_t)cb));
+                     png_byte *b = voidcast(png_byte *, malloc((size_t)cb));
 
                      if (b != NULL)
                      {
@@ -3343,7 +3351,7 @@ testimage(Image *image, png_uint_32 opts, format_list *pf)
          png_uint_32 format = counter >> 1;
 
          png_color background_color;
-         png_colorp background = NULL;
+         png_color *background = NULL;
 
          /* If there is a format change that removes the alpha channel then
           * the background is relevant.  If the output is 8-bit color-mapped
@@ -3821,7 +3829,8 @@ main(int argc, char **argv)
 }
 
 #else /* !PNG_SIMPLIFIED_READ_SUPPORTED */
-int main(void)
+int
+main(void)
 {
    fprintf(stderr, "pngstest: no read support in libpng, test skipped\n");
    /* So the test is skipped: */
