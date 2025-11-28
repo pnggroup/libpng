@@ -3273,9 +3273,14 @@ png_image_read_composite(png_voidp argument)
                         component += (255-alpha)*png_sRGB_table[outrow[c]];
 
                         /* So 'component' is scaled by 255*65535 and is
-                         * therefore appropriate for the sRGB to linear
-                         * conversion table.
+                         * therefore appropriate for the sRGB-to-linear
+                         * conversion table.  Clamp to the valid range
+                         * as a defensive measure against an internal
+                         * libpng bug where the data is sRGB rather than
+                         * linear premultiplied.
                          */
+                        if (component > 255*65535)
+                           component = 255*65535;
                         component = PNG_sRGB_FROM_LINEAR(component);
                      }
 
