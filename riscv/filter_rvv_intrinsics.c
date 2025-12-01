@@ -4,6 +4,7 @@
  * Written by Manfred SCHLAEGL, 2022
  *            Dragoș Tiselice <dtiselice@google.com>, May 2023.
  *            Filip Wasil     <f.wasil@samsung.com>, March 2025.
+ *            Liang Junzhao   <junzhao.liang@spacemit.com>, Nov 2025.
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -140,11 +141,8 @@ png_read_filter_row_avg_rvv(size_t len, size_t bpp, unsigned char* row,
       /* x = *row */
       x = __riscv_vle8_v_u8m1(row, vl);
 
-      /* tmp = a + b */
-      vuint16m2_t tmp = __riscv_vwaddu_vv_u16m2(a, b, vl);
-
-      /* a = tmp/2 */
-      a = __riscv_vnsrl_wx_u8m1(tmp, 1, vl);
+      /* a = (a + b) / 2, round to zero with vxrm = 2 */
+      a = __riscv_vaaddu_wx_u8m1(a, b, 2, vl);
 
       /* a += x */
       a = __riscv_vadd_vv_u8m1(a, x, vl);
