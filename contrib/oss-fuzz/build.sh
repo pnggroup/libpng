@@ -42,6 +42,15 @@ $CXX $CXXFLAGS -std=c++11 -I. \
      -o $OUT/libpng_read_fuzzer \
      -lFuzzingEngine .libs/libpng16.a -lz
 
+# wrapper script to duplicate target, run with env var NALLOC_FREQ=32
+# having a separate target with allocations failures
+cat << EOF > $OUT/libpng_read_fuzzer_nalloc
+#!/bin/sh
+# LLVMFuzzerTestOneInput for fuzzer detection.
+this_dir=\$(dirname "\$0")
+NALLOC_FREQ=32 \$this_dir/libpng_read_fuzzer \$@
+EOF
+
 # add seed corpus.
 find $SRC/libpng -name "*.png" | grep -v crashers | \
      xargs zip $OUT/libpng_read_fuzzer_seed_corpus.zip
