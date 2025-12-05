@@ -3243,7 +3243,7 @@ read_chunks[PNG_INDEX_unknown] =
 #  define CDiTXt  NoCheck,    6U,      0, hIHDR,        1
       /* Allocates 'length+1'; checked in the handler */
 #  define CDbKGD       6U,    1U,  hIDAT, hIHDR,        0
-#  define CDhIST    1024U,    0U,  hPLTE, hIHDR,        0
+#  define CDhIST    1024U,    0U,  hIDAT, hPLTE,        0
 #  define CDpHYs       9U,    9U,  hIDAT, hIHDR,        0
 #  define CDsPLT  NoCheck,    3U,  hIDAT, hIHDR,        1
       /* Allocates 'length+1'; checked in the handler */
