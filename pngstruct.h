@@ -30,17 +30,6 @@
 #  undef const
 #endif
 
-/* zlib.h has mediocre z_const use before 1.2.6, this stuff is for compatibility
- * with older builds.
- */
-#if ZLIB_VERNUM < 0x1260
-#  define PNGZ_MSG_CAST(s) png_constcast(char*,s)
-#  define PNGZ_INPUT_CAST(b) png_constcast(png_byte *,b)
-#else
-#  define PNGZ_MSG_CAST(s) (s)
-#  define PNGZ_INPUT_CAST(b) (b)
-#endif
-
 /* zlib.h declares a magic type 'uInt' that limits the amount of data that zlib
  * can handle at once.  This type need be no larger than 16 bits (so maximum of
  * 65535), this define allows us to discover how big it is, but limited by the
@@ -247,9 +236,7 @@ struct png_struct_def
                               /* pixel depth used for the row buffers */
    png_byte transformed_pixel_depth;
                               /* pixel depth after read/write transforms */
-#if ZLIB_VERNUM >= 0x1240
    png_byte zstream_start;    /* at start of an input zlib stream */
-#endif /* Zlib >= 1.2.4 */
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
    png_uint_16 filler;           /* filler bytes for pixel expansion */
 #endif

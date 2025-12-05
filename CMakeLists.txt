@@ -14,7 +14,7 @@
 #
 # SPDX-License-Identifier: libpng-2.0
 
-cmake_minimum_required(VERSION 3.14...4.0)
+cmake_minimum_required(VERSION 3.14...4.2)
 
 set(PNGLIB_MAJOR 2)
 set(PNGLIB_MINOR 0)

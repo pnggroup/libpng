@@ -982,48 +982,48 @@ png_zstream_error(png_struct *png_ptr, int ret)
    {
       default:
       case Z_OK:
-         png_ptr->zstream.msg = PNGZ_MSG_CAST("unexpected zlib return code");
+         png_ptr->zstream.msg = "unexpected zlib return code";
          break;
 
       case Z_STREAM_END:
          /* Normal exit */
-         png_ptr->zstream.msg = PNGZ_MSG_CAST("unexpected end of LZ stream");
+         png_ptr->zstream.msg = "unexpected end of LZ stream";
          break;
 
       case Z_NEED_DICT:
          /* This means the deflate stream did not have a dictionary; this
           * indicates a bogus PNG.
           */
-         png_ptr->zstream.msg = PNGZ_MSG_CAST("missing LZ dictionary");
+         png_ptr->zstream.msg = "missing LZ dictionary";
          break;
 
       case Z_ERRNO:
          /* gz APIs only: should not happen */
-         png_ptr->zstream.msg = PNGZ_MSG_CAST("zlib IO error");
+         png_ptr->zstream.msg = "zlib IO error";
          break;
 
       case Z_STREAM_ERROR:
          /* internal libpng error */
-         png_ptr->zstream.msg = PNGZ_MSG_CAST("bad parameters to zlib");
+         png_ptr->zstream.msg = "bad parameters to zlib";
          break;
 
       case Z_DATA_ERROR:
-         png_ptr->zstream.msg = PNGZ_MSG_CAST("damaged LZ stream");
+         png_ptr->zstream.msg = "damaged LZ stream";
          break;
 
       case Z_MEM_ERROR:
-         png_ptr->zstream.msg = PNGZ_MSG_CAST("insufficient memory");
+         png_ptr->zstream.msg = "insufficient memory";
          break;
 
       case Z_BUF_ERROR:
          /* End of input or output; not a problem if the caller is doing
           * incremental read or write.
           */
-         png_ptr->zstream.msg = PNGZ_MSG_CAST("truncated");
+         png_ptr->zstream.msg = "truncated";
          break;
 
       case Z_VERSION_ERROR:
-         png_ptr->zstream.msg = PNGZ_MSG_CAST("unsupported zlib version");
+         png_ptr->zstream.msg = "unsupported zlib version";
          break;
 
       case PNG_UNEXPECTED_ZLIB_RETURN:
@@ -1032,7 +1032,7 @@ png_zstream_error(png_struct *png_ptr, int ret)
           * and change pngpriv.h.  Note that this message is "... return",
           * whereas the default/Z_OK one is "... return code".
           */
-         png_ptr->zstream.msg = PNGZ_MSG_CAST("unexpected zlib return");
+         png_ptr->zstream.msg = "unexpected zlib return";
          break;
    }
 }

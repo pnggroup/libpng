@@ -52,22 +52,9 @@
 #  undef const
 #endif
 
-/* zlib.h has mediocre z_const use before 1.2.6, this stuff is for compatibility
- * with older builds.
- */
-#if ZLIB_VERNUM < 0x1260
-#  define PNGZ_MSG_CAST(s) constcast(char*,s)
-#  define PNGZ_INPUT_CAST(b) constcast(png_byte *,b)
-#else
-#  define PNGZ_MSG_CAST(s) (s)
-#  define PNGZ_INPUT_CAST(b) (b)
-#endif
-
 #ifndef PNG_MAXIMUM_INFLATE_WINDOW
 #  error pngfix requires libpng with PNG_MAXIMUM_INFLATE_WINDOW supported
 #endif
-
-#if ZLIB_VERNUM >= 0x1240
 
 /* Copied from pngpriv.h */
 #ifdef __cplusplus
@@ -2653,7 +2640,7 @@ zlib_check(struct file *file, png_uint_32 offset)
 
          case ZLIB_OK:
             /* Truncated stream; unrecoverable, gets converted to ZLIB_FATAL */
-            zlib.z.msg = PNGZ_MSG_CAST("[truncated]");
+            zlib.z.msg = "[truncated]";
             zlib_message(&zlib, 0/*expected*/);
             /* FALLTHROUGH */
 
@@ -2692,8 +2679,7 @@ zlib_check(struct file *file, png_uint_32 offset)
 
                      /* Output the error that wasn't output before: */
                      if (zlib.z.msg == NULL)
-                        zlib.z.msg = PNGZ_MSG_CAST(
-                           "invalid distance too far back");
+                        zlib.z.msg = "invalid distance too far back";
                      zlib_message(&zlib, 0/*stream error*/);
                      zlib_end(&zlib);
                      return 0;
@@ -4008,17 +3994,6 @@ main(int argc, const char **argv)
 
    return global_end(&global);
 }
-
-#else /* ZLIB_VERNUM < 0x1240 */
-int
-main(void)
-{
-   fprintf(stderr,
-      "pngfix needs libpng with a zlib >=1.2.4 (not 0x%x)\n",
-      ZLIB_VERNUM);
-   return 77;
-}
-#endif /* ZLIB_VERNUM */
 
 #else /* No read support */
 

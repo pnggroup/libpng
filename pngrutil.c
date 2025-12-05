@@ -439,14 +439,9 @@ png_inflate_claim(png_struct *png_ptr, png_uint_32 owner)
     * follow that because, for systems with with limited capabilities, we
     * would otherwise reject the application's attempts to use a smaller window
     * size (zlib doesn't have an interface to say "this or lower"!).
-    *
-    * inflateReset2 was added to zlib 1.2.4; before this the window could not be
-    * reset, therefore it is necessary to always allocate the maximum window
-    * size with earlier zlibs just in case later compressed chunks need it.
     */
    {
       int ret; /* zlib return code */
-#if ZLIB_VERNUM >= 0x1240
       int window_bits = 0;
 
       if (((png_ptr->options >> PNG_MAXIMUM_INFLATE_WINDOW) & 3) ==
@@ -460,7 +455,6 @@ png_inflate_claim(png_struct *png_ptr, png_uint_32 owner)
       {
          png_ptr->zstream_start = 1;
       }
-#endif /* ZLIB_VERNUM >= 0x1240 */
 
       /* Set this for safety, just in case the previous owner left pointers to
        * memory allocations.
@@ -472,20 +466,12 @@ png_inflate_claim(png_struct *png_ptr, png_uint_32 owner)
 
       if ((png_ptr->flags & PNG_FLAG_ZSTREAM_INITIALIZED) != 0)
       {
-#if ZLIB_VERNUM >= 0x1240
          ret = inflateReset2(&png_ptr->zstream, window_bits);
-#else
-         ret = inflateReset(&png_ptr->zstream);
-#endif
       }
 
       else
       {
-#if ZLIB_VERNUM >= 0x1240
          ret = inflateInit2(&png_ptr->zstream, window_bits);
-#else
-         ret = inflateInit(&png_ptr->zstream);
-#endif
 
          if (ret == Z_OK)
             png_ptr->flags |= PNG_FLAG_ZSTREAM_INITIALIZED;
@@ -511,7 +497,6 @@ png_inflate_claim(png_struct *png_ptr, png_uint_32 owner)
 #endif
 }
 
-#if ZLIB_VERNUM >= 0x1240
 /* Handle the start of the inflate stream if we called inflateInit2(strm,0);
  * in this case some zlib versions skip validation of the CINFO field and, in
  * certain circumstances, libpng may end up displaying an invalid image, in
@@ -534,7 +519,6 @@ png_zlib_inflate(png_struct *png_ptr, int flush)
 
    return inflate(&png_ptr->zstream, flush);
 }
-#endif /* Zlib >= 1.2.4 */
 
 #ifdef PNG_READ_COMPRESSED_TEXT_SUPPORTED
 #if defined(PNG_READ_zTXt_SUPPORTED) || defined (PNG_READ_iTXt_SUPPORTED)
@@ -569,7 +553,7 @@ png_inflate(png_struct *png_ptr, png_uint_32 owner, int finish,
        * a performance advantage, because it reduces the amount of data accessed
        * at each step and that may give the OS more time to page it in.
        */
-      png_ptr->zstream.next_in = PNGZ_INPUT_CAST(input);
+      png_ptr->zstream.next_in = input;
       /* avail_in and avail_out are set below from 'size' */
       png_ptr->zstream.avail_in = 0;
       png_ptr->zstream.avail_out = 0;
@@ -630,7 +614,7 @@ png_inflate(png_struct *png_ptr, png_uint_32 owner, int finish,
           * the previous chunk of input data.  Tell zlib if we have reached the
           * end of the output buffer.
           */
-         ret = PNG_INFLATE(png_ptr, avail_out > 0 ? Z_NO_FLUSH :
+         ret = png_zlib_inflate(png_ptr, avail_out > 0 ? Z_NO_FLUSH :
              (finish ? Z_FINISH : Z_SYNC_FLUSH));
       } while (ret == Z_OK);
 
@@ -662,7 +646,7 @@ png_inflate(png_struct *png_ptr, png_uint_32 owner, int finish,
        * pointer, which is not owned by the caller, but this is safe; it's only
        * used on errors!
        */
-      png_ptr->zstream.msg = PNGZ_MSG_CAST("zstream unclaimed");
+      png_ptr->zstream.msg = "zstream unclaimed";
       return Z_STREAM_ERROR;
    }
 }
@@ -871,7 +855,7 @@ png_inflate_read(png_struct *png_ptr, png_byte *read_buffer, uInt read_size,
           * the available output is produced; this allows reading of truncated
           * streams.
           */
-         ret = PNG_INFLATE(png_ptr, *chunk_bytes > 0 ?
+         ret = png_zlib_inflate(png_ptr, *chunk_bytes > 0 ?
              Z_NO_FLUSH : (finish ? Z_FINISH : Z_SYNC_FLUSH));
       }
       while (ret == Z_OK && (*out_size > 0 || png_ptr->zstream.avail_out > 0));
@@ -886,7 +870,7 @@ png_inflate_read(png_struct *png_ptr, png_byte *read_buffer, uInt read_size,
 
    else
    {
-      png_ptr->zstream.msg = PNGZ_MSG_CAST("zstream unclaimed");
+      png_ptr->zstream.msg = "zstream unclaimed";
       return Z_STREAM_ERROR;
    }
 }
@@ -4469,7 +4453,7 @@ png_read_IDAT_data(png_struct *png_ptr, png_byte *output,
        *
        * TODO: deal more elegantly with truncated IDAT lists.
        */
-      ret = PNG_INFLATE(png_ptr, Z_NO_FLUSH);
+      ret = png_zlib_inflate(png_ptr, Z_NO_FLUSH);
 
       /* Take the unconsumed output back. */
       if (output != NULL)
