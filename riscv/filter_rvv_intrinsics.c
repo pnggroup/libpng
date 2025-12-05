@@ -2,9 +2,11 @@
  *
  * Copyright (c) 2023 Google LLC
  * Written by Manfred SCHLAEGL, 2022
- *            Dragoș Tiselice <dtiselice@google.com>, May 2023.
- *            Filip Wasil <f.wasil@samsung.com>, March 2025.
- *            Liang Junzhao <junzhao.liang@spacemit.com>, November 2025.
+ * Revised by:
+ *  - Dragoș Tiselice <dtiselice@google.com>, May 2023
+ *  - Filip Wasil <f.wasil@samsung.com>, March 2025
+ *  - Liang Junzhao <junzhao.liang@spacemit.com>, November 2025
+ *  - Alexander Smorkalov <alexander.smorkalov@opencv.ai>, December 2025
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
