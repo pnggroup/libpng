@@ -46,6 +46,21 @@
 
 #if PNG_ARM_NEON_OPT > 0
 
+/* MemorySanitizer (MSan) has known compatibility issues with ARM NEON intrinsics,
+ * causing false positives for uninitialized memory. The no_sanitize attribute
+ * suppresses these false warnings for NEON-optimized filter functions.
+ */
+#if defined(__clang__) && defined(__has_attribute)
+#  if __has_attribute(no_sanitize)
+#    define PNG_MSAN_NEON_SAFE __attribute__((no_sanitize("memory")))
+#  else
+#    define PNG_MSAN_NEON_SAFE
+#  endif
+#else
+#  define PNG_MSAN_NEON_SAFE
+#endif
+
+PNG_MSAN_NEON_SAFE
 void
 png_read_filter_row_up_neon(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
@@ -67,6 +82,7 @@ png_read_filter_row_up_neon(png_row_infop row_info, png_bytep row,
    }
 }
 
+PNG_MSAN_NEON_SAFE
 void
 png_read_filter_row_sub3_neon(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
@@ -114,6 +130,7 @@ png_read_filter_row_sub3_neon(png_row_infop row_info, png_bytep row,
    PNG_UNUSED(prev_row)
 }
 
+PNG_MSAN_NEON_SAFE
 void
 png_read_filter_row_sub4_neon(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
@@ -146,6 +163,7 @@ png_read_filter_row_sub4_neon(png_row_infop row_info, png_bytep row,
    PNG_UNUSED(prev_row)
 }
 
+PNG_MSAN_NEON_SAFE
 void
 png_read_filter_row_avg3_neon(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
@@ -214,6 +232,7 @@ png_read_filter_row_avg3_neon(png_row_infop row_info, png_bytep row,
    }
 }
 
+PNG_MSAN_NEON_SAFE
 void
 png_read_filter_row_avg4_neon(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
@@ -256,6 +275,7 @@ png_read_filter_row_avg4_neon(png_row_infop row_info, png_bytep row,
    }
 }
 
+PNG_MSAN_NEON_SAFE
 static uint8x8_t
 paeth(uint8x8_t a, uint8x8_t b, uint8x8_t c)
 {
@@ -283,6 +303,7 @@ paeth(uint8x8_t a, uint8x8_t b, uint8x8_t c)
    return e;
 }
 
+PNG_MSAN_NEON_SAFE
 void
 png_read_filter_row_paeth3_neon(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
@@ -351,6 +372,7 @@ png_read_filter_row_paeth3_neon(png_row_infop row_info, png_bytep row,
    }
 }
 
+PNG_MSAN_NEON_SAFE
 void
 png_read_filter_row_paeth4_neon(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
