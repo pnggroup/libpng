@@ -52,6 +52,7 @@ cat << EOF > $OUT/${f}_nalloc
 this_dir=\$(dirname "\$0")
 NALLOC_FREQ=32 \$this_dir/${f} \$@
 EOF
+chmod +x $OUT/${f}_nalloc
 
 # add seed corpus.
 find $SRC/libpng -name "*.png" | \

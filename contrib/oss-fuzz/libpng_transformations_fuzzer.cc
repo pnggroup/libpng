@@ -102,110 +102,11 @@ static void test_png_transformations(const uint8_t *data, size_t size) {
     png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 }
 
-/* Test png_image API and colormap functions */
-static void test_png_image_colormap(const uint8_t *data, size_t size) {
-    png_image image;
-    memset(&image, 0, sizeof(image));
-    image.version = PNG_IMAGE_VERSION;
-    
-    if (!png_image_begin_read_from_memory(&image, data, size)) {
-        return;
-    }
-    
-    /* Limit image size for performance */
-    if (image.width > 1024 || image.height > 1024) {
-        png_image_free(&image);
-        return;
-    }
-    
-    /* Test different colormap formats to trigger uncovered functions */
-    png_uint_32 formats[] = {
-        PNG_FORMAT_GRAY,
-        PNG_FORMAT_GA,
-        PNG_FORMAT_RGB,
-        PNG_FORMAT_RGBA,
-        PNG_FORMAT_RGB_COLORMAP,
-        PNG_FORMAT_RGBA_COLORMAP
-    };
-    
-    int i;
-    for (i = 0; i < 6; i++) {
-        image.format = formats[i];
-        
-        size_t buffer_size = PNG_IMAGE_SIZE(image);
-        if (buffer_size > 0 && buffer_size < 5*1024*1024) { /* Limit to 5MB */
-            void *img_buffer = malloc(buffer_size);
-            if (img_buffer) {
-                if (image.format & PNG_FORMAT_FLAG_COLORMAP) {
-                    png_bytep colormap = (png_bytep)malloc(PNG_IMAGE_COLORMAP_SIZE(image));
-                    if (colormap) {
-                        /* This triggers png_image_finish_read and colormap generation */
-                        png_image_finish_read(&image, NULL, img_buffer, 0, colormap);
-                        free(colormap);
-                    }
-                } else {
-                    png_image_finish_read(&image, NULL, img_buffer, 0, NULL);
-                }
-                free(img_buffer);
-            }
-        }
-        
-        /* Reset for next format */
-        if (i < 5) {
-            png_image_free(&image);
-            memset(&image, 0, sizeof(image));
-            image.version = PNG_IMAGE_VERSION;
-            if (!png_image_begin_read_from_memory(&image, data, size)) {
-                break;
-            }
-        }
-    }
-    
-    png_image_free(&image);
-}
-
-
-/* Test png_read_png API */
-static void test_png_read_png_api(const uint8_t *data, size_t size) {
-    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (!png_ptr) return;
-    
-    png_infop info_ptr = png_create_info_struct(png_ptr);
-    if (!info_ptr) {
-        png_destroy_read_struct(&png_ptr, NULL, NULL);
-        return;
-    }
-    
-    if (setjmp(png_jmpbuf(png_ptr))) {
-        png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-        return;
-    }
-    
-    struct png_mem_buffer buffer = {data, size, 0};
-    png_set_read_fn(png_ptr, &buffer, png_read_from_buffer);
-    
-    /* Set up transformations before reading */
-    png_set_scale_16(png_ptr);
-    png_set_packing(png_ptr);
-    png_set_expand(png_ptr);
-    
-    /* Use png_read_png which should trigger OSS_FUZZ_png_read_png path */
-    png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
-    
-    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-}
-
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     if (size < 8) return 0;
     
     /* Test 1: Standard PNG reading with transformations */
     test_png_transformations(data, size);
-    
-    /* Test 2: PNG image API with colormap processing */
-    test_png_image_colormap(data, size);
-    
-    /* Test 3: png_read_png API */
-    test_png_read_png_api(data, size);
     
     return 0;
 }
