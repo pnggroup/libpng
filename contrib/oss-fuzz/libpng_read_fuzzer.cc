@@ -24,7 +24,7 @@
 #include "nalloc.h"
 
 #define PNG_CLEANUP \
-  nalloc_end(); \
+  nalloc_end(); \
   if(png_handler.png_ptr) \
   { \
     if (png_handler.row_ptr) \
