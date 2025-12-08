@@ -27,7 +27,7 @@ set(PNGLIB_SHARED_VERSION ${PNGLIB_VERSION}.${PNGLIB_SUBREVISION})
 
 project(libpng
         VERSION ${PNGLIB_VERSION}
-        LANGUAGES C ASM)
+        LANGUAGES C)
 
 include(CheckCSourceCompiles)
 include(CheckLibraryExists)
