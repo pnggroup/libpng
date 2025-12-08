@@ -31,6 +31,7 @@ Author List
  * Jon Creighton
  * Joost Nieuwenhuijse
  * Kyle Bentley
+ * Luis Caro Campos
  * Martin Storsjö
  * Owen Rudge
  * Philip Lowman
