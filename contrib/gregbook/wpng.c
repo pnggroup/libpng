@@ -686,12 +686,49 @@ int main(int argc, char **argv)
      * more complicated if we choose to support PBM type, ASCII PNM types, or
      * 16-bit-per-sample binary data [currently not an official NetPBM type] */
 
+    /* SECURITY: compute all sizes in size_t with overflow checks */
+    size_t rowbytes_sz = 0;
+
     if (wpng_info.pnmtype == 5)
-        rowbytes = wpng_info.width;
+    {
+        if (wpng_info.width <= 0) { /* paranoia; should already be validated */
+            fprintf(stderr, PROGNAME ":  invalid width\n");
+            writepng_cleanup(&wpng_info);
+            wpng_cleanup();
+            exit(5);
+        }
+        rowbytes_sz = (size_t)wpng_info.width;
+    }
     else if (wpng_info.pnmtype == 6)
-        rowbytes = wpng_info.width * 3;
+    {
+        if (wpng_info.width <= 0 || (size_t)wpng_info.width > (size_t)-1 / 3u) {
+            fprintf(stderr, PROGNAME ":  image rowbytes overflow\n");
+            writepng_cleanup(&wpng_info);
+            wpng_cleanup();
+            exit(5);
+        }
+        rowbytes_sz = (size_t)wpng_info.width * 3u;
+    }
     else /* if (wpng_info.pnmtype == 8) */
-        rowbytes = wpng_info.width * 4;
+    {
+        if (wpng_info.width <= 0 || (size_t)wpng_info.width > (size_t)-1 / 4u) {
+            fprintf(stderr, PROGNAME ":  image rowbytes overflow\n");
+            writepng_cleanup(&wpng_info);
+            wpng_cleanup();
+            exit(5);
+        }
+        rowbytes_sz = (size_t)wpng_info.width * 4u;
+    }
+
+    /* Preserve the original ulg rowbytes variable for downstream code,
+     * but only after ensuring the value fits. */
+    if (rowbytes_sz > (size_t)(ulg)-1) {
+        fprintf(stderr, PROGNAME ":  image rowbytes too large\n");
+        writepng_cleanup(&wpng_info);
+        wpng_cleanup();
+        exit(5);
+    }
+    rowbytes = (ulg)rowbytes_sz;
 
 
     /* read and write the image, either in its entirety (if writing interlaced
@@ -702,36 +739,47 @@ int main(int argc, char **argv)
 
     if (wpng_info.interlaced) {
         long i;
-        ulg bytes;
-        ulg image_bytes;
+        size_t bytes;
+        size_t image_bytes;
 
-        /* Guard against integer overflow */
-        if (wpng_info_height > ((size_t)(-1)/rowbytes ||
-            wpng_info_height > ((ulg)(-1)/rowbytes) {
+        /* SECURITY: Guard against integer overflow in rowbytes*height and allocations */
+        if (wpng_info.height <= 0 ||
+            (size_t)wpng_info.height > (size_t)-1 / rowbytes_sz)
+        {
             fprintf(stderr, PROGNAME ":  image_data buffer too large\n");
             writepng_cleanup(&wpng_info);
             wpng_cleanup();
             exit(5);
         }
 
-        image_bytes = rowbytes * wpng_info.height;
+        image_bytes = rowbytes_sz * (size_t)wpng_info.height;
+
+        if ((size_t)wpng_info.height > (size_t)-1 / sizeof(uch *)) {
+            fprintf(stderr, PROGNAME ":  row_pointers buffer too large\n");
+            writepng_cleanup(&wpng_info);
+            wpng_cleanup();
+            exit(5);
+        }
 
         wpng_info.image_data = (uch *)malloc(image_bytes);
-        wpng_info.row_pointers = (uch **)malloc(wpng_info.height*sizeof(uch *));
+        wpng_info.row_pointers = (uch **)malloc((size_t)wpng_info.height * sizeof(uch *));
         if (wpng_info.image_data == NULL || wpng_info.row_pointers == NULL) {
             fprintf(stderr, PROGNAME ":  insufficient memory for image data\n");
             writepng_cleanup(&wpng_info);
             wpng_cleanup();
             exit(5);
         }
+
         for (i = 0;  i < wpng_info.height;  ++i)
-            wpng_info.row_pointers[i] = wpng_info.image_data + i*rowbytes;
+            wpng_info.row_pointers[i] = wpng_info.image_data + (size_t)i * rowbytes_sz;
+
         bytes = fread(wpng_info.image_data, 1, image_bytes, wpng_info.infile);
         if (bytes != image_bytes) {
             fprintf(stderr, PROGNAME ":  expected %lu bytes, got %lu bytes\n",
-              image_bytes, bytes);
+              (unsigned long)image_bytes, (unsigned long)bytes);
             fprintf(stderr, "  (continuing anyway)\n");
         }
+
         if (writepng_encode_image(&wpng_info) != 0) {
             fprintf(stderr, PROGNAME
               ":  libpng problem (longjmp) while writing image data\n");
@@ -742,9 +790,9 @@ int main(int argc, char **argv)
 
     } else /* not interlaced:  write progressively (row by row) */ {
         long j;
-        ulg bytes;
+        size_t bytes;
 
-        wpng_info.image_data = (uch *)malloc(rowbytes);
+        wpng_info.image_data = (uch *)malloc(rowbytes_sz);
         if (wpng_info.image_data == NULL) {
             fprintf(stderr, PROGNAME ":  insufficient memory for row data\n");
             writepng_cleanup(&wpng_info);
@@ -753,11 +801,12 @@ int main(int argc, char **argv)
         }
         error = 0;
         for (j = wpng_info.height;  j > 0L;  --j) {
-            bytes = fread(wpng_info.image_data, 1, rowbytes, wpng_info.infile);
-            if (bytes != rowbytes) {
+            bytes = fread(wpng_info.image_data, 1, rowbytes_sz, wpng_info.infile);
+            if (bytes != rowbytes_sz) {
                 fprintf(stderr, PROGNAME
-                  ":  expected %lu bytes, got %lu bytes (row %ld)\n", rowbytes,
-                  bytes, wpng_info.height-j);
+                  ":  expected %lu bytes, got %lu bytes (row %ld)\n",
+                  (unsigned long)rowbytes_sz, (unsigned long)bytes,
+                  wpng_info.height-j);
                 ++error;
                 break;
             }
