@@ -3138,9 +3138,11 @@ png_image_read_direct_scaled(png_voidp argument)
        argument);
    png_imagep image = display->image;
    png_structrp png_ptr = image->opaque->png_ptr;
+   png_inforp info_ptr = image->opaque->info_ptr;
    png_bytep local_row = png_voidcast(png_bytep, display->local_row);
    png_bytep first_row = png_voidcast(png_bytep, display->first_row);
    ptrdiff_t row_bytes = display->row_bytes;
+   size_t copy_bytes = png_get_rowbytes(png_ptr, info_ptr);
    int passes;
 
    /* Handle interlacing. */
@@ -3170,7 +3172,7 @@ png_image_read_direct_scaled(png_voidp argument)
          png_read_row(png_ptr, local_row, NULL);
 
          /* Copy from local_row to user buffer. */
-         memcpy(output_row, local_row, (size_t)row_bytes);
+         memcpy(output_row, local_row, copy_bytes);
          output_row += row_bytes;
       }
    }
