@@ -1560,16 +1560,18 @@ png_image_write_init(png_imagep image)
 /* Arguments to png_image_write_main: */
 typedef struct
 {
-   /* Arguments: */
+   /* Arguments */
    png_imagep image;
    png_const_voidp buffer;
    png_int_32 row_stride;
    png_const_voidp colormap;
    int convert_to_8bit;
-   /* Local variables: */
+
+   /* Instance variables */
    png_const_voidp first_row;
-   ptrdiff_t row_bytes;
    png_voidp local_row;
+   ptrdiff_t row_step;
+
    /* Byte count for memory writing */
    png_bytep memory;
    png_alloc_size_t memory_bytes; /* not used for STDIO */
@@ -1678,7 +1680,7 @@ png_write_image_16bit(png_voidp argument)
       }
 
       png_write_row(png_ptr, png_voidcast(png_const_bytep, display->local_row));
-      input_row += display->row_bytes / 2;
+      input_row += display->row_step / 2;
    }
 
    return 1;
@@ -1804,7 +1806,7 @@ png_write_image_8bit(png_voidp argument)
 
          png_write_row(png_ptr, png_voidcast(png_const_bytep,
              display->local_row));
-         input_row += display->row_bytes / 2;
+         input_row += display->row_step / 2;
       } /* while y */
    }
 
@@ -1829,7 +1831,7 @@ png_write_image_8bit(png_voidp argument)
          }
 
          png_write_row(png_ptr, output_row);
-         input_row += display->row_bytes / 2;
+         input_row += display->row_step / 2;
       }
    }
 
@@ -2145,16 +2147,16 @@ png_image_write_main(png_voidp argument)
 
    {
       png_const_bytep row = png_voidcast(png_const_bytep, display->buffer);
-      ptrdiff_t row_bytes = display->row_stride;
+      ptrdiff_t row_step = display->row_stride;
 
       if (linear != 0)
-         row_bytes *= 2;
+         row_step *= 2;
 
-      if (row_bytes < 0)
-         row += (image->height-1) * (-row_bytes);
+      if (row_step < 0)
+         row += (image->height-1) * (-row_step);
 
       display->first_row = row;
-      display->row_bytes = row_bytes;
+      display->row_step = row_step;
    }
 
    /* Apply 'fast' options if the flag is set. */
@@ -2201,13 +2203,13 @@ png_image_write_main(png_voidp argument)
    else
    {
       png_const_bytep row = png_voidcast(png_const_bytep, display->first_row);
-      ptrdiff_t row_bytes = display->row_bytes;
+      ptrdiff_t row_step = display->row_step;
       png_uint_32 y = image->height;
 
       for (; y > 0; --y)
       {
          png_write_row(png_ptr, row);
-         row += row_bytes;
+         row += row_step;
       }
    }
 

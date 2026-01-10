@@ -3173,8 +3173,8 @@ png_image_read_direct_scaled(png_voidp argument)
          png_read_row(png_ptr, local_row, NULL);
 
          /* Copy from local_row to user buffer.
-          * Use row_bytes (i.e. the actual size in bytes of the row data size)
-          * for copying into output_row. Use row_step for advancing output_row,
+          * Use row_bytes (i.e. the actual size in bytes of the row data) for
+          * copying into output_row. Use row_step for advancing output_row,
           * to respect the caller's stride for padding or negative (bottom-up)
           * layouts.
           */
