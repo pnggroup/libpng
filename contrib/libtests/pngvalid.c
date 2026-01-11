@@ -6184,7 +6184,7 @@ image_pixel_add_alpha(image_pixel *this, const standard_display *display,
             this->have_tRNS = 0;
 
             /* Check the input, original, channel value here against the
-             * original tRNS gray chunk valie.
+             * original tRNS gray chunk value.
              */
             if (this->red == display->transparent.red)
                this->alphaf = 0;
@@ -7519,7 +7519,7 @@ static struct
    double green_coefficient;
    double blue_coefficient;
 
-   /* Set if the coeefficients have been overridden. */
+   /* Set if the coefficients have been overridden. */
    int coefficients_overridden;
 } data;
 
@@ -8993,7 +8993,7 @@ image_transform_test_counter(png_uint_32 counter, unsigned int max)
       /* For max 0 or 1 continue until the counter overflows: */
       counter >>= 1;
 
-      /* Continue if any entry hasn't reacked the max. */
+      /* Continue if any entry hasn't reached the max. */
       if (max > 1 && next->local_use < max)
          return 1;
       next = next->list;
@@ -9679,7 +9679,7 @@ gamma_component_validate(const char *name, const validate_info *vi,
        *  od: encoded result from libpng
        */
 
-      /* Now we have the numbers for real errors, both absolute values as as a
+      /* Now we have the numbers for real errors, both absolute values as a
        * percentage of the correct value (output):
        */
       error = fabs(input_sample-output);
@@ -11653,7 +11653,7 @@ main(int argc, char **argv)
 #  endif
 
    /* The following allows results to pass if they correspond to anything in the
-    * transformed range [input-.5,input+.5]; this is is required because of the
+    * transformed range [input-.5,input+.5]; this is required because of the
     * way libpng treats the 16_TO_8 flag when building the gamma tables in
     * releases up to 1.6.0.
     *

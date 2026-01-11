@@ -2792,7 +2792,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
     * If an alpha channel has been *added* then it must have the relevant opaque
     * value (255 or 65535).
     *
-    * The fist two the tests (in the order given above) (using the boolean
+    * The first two tests (in the order given above) (using the boolean
     * equivalence !a && !b == !(a || b))
     */
    if (!(((formata ^ formatb) & PNG_FORMAT_FLAG_LINEAR) |

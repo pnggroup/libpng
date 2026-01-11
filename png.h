@@ -2341,7 +2341,7 @@ PNG_EXPORT(162, int, png_get_text,
 #endif
 
 /* Note while png_set_text() will accept a structure whose text,
- * language, and  translated keywords are NULL pointers, the structure
+ * language, and translated keywords are NULL pointers, the structure
  * returned by png_get_text will always contain regular
  * zero-terminated C strings.  They might be empty strings but
  * they will never be NULL pointers.

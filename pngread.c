@@ -691,7 +691,7 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
       png_read_finish_IDAT(png_ptr);
 
 #ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
-   /* Report invalid palette index; added at libng-1.5.10 */
+   /* Report invalid palette index; added at libpng-1.5.10 */
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
        png_ptr->num_palette_max >= png_ptr->num_palette)
       png_benign_error(png_ptr, "Read palette index exceeding num_palette");
@@ -1256,7 +1256,7 @@ png_image_is_not_sRGB(png_const_structrp png_ptr)
     * png_struct::chromaticities always exists since the simplified API
     * requires rgb-to-gray.  The mDCV, cICP and cHRM chunks may all set it to
     * a non-sRGB value, so it needs to be checked but **only** if one of
-    * those chunks occured in the file.
+    * those chunks occurred in the file.
     */
    /* Highest priority: check to be safe. */
    if (png_has_chunk(png_ptr, cICP) || png_has_chunk(png_ptr, mDCV))
@@ -2876,7 +2876,7 @@ png_image_read_and_map(png_voidp argument)
             png_bytep outrow = first_row + y * row_step;
             png_const_bytep row_end = outrow + width;
 
-            /* Read read the libpng data into the temporary buffer. */
+            /* Read the libpng data into the temporary buffer. */
             png_read_row(png_ptr, inrow, NULL);
 
             /* Now process the row according to the processing option, note

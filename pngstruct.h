@@ -106,7 +106,7 @@ typedef enum
  * TODO: C23: convert these macros to C23 inlines (which are static).
  */
 #define png_chunk_flag_from_index(i) (0x80000000U >> (31 - (i)))
-   /* The flag coresponding to the given png_index enum value.  This is defined
+   /* The flag corresponding to the given png_index enum value.  This is defined
     * for png_unknown as well (until it reaches the value 32) but this should
     * not be relied on.
     */

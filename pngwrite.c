@@ -159,7 +159,7 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_const_inforp info_ptr)
     * them.
     *
     * PNG v3: Chunks mDCV and cLLI provide ancillary information for the
-    * interpretation of the colourspace chunkgs but do not require support for
+    * interpretation of the colourspace chunks but do not require support for
     * those chunks so are outside the "COLORSPACE" check but before the write of
     * the colourspace chunks themselves.
     */
