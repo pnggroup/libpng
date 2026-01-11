@@ -2012,7 +2012,7 @@ png_set_benign_errors(png_struct *png_ptr, int allowed)
 #endif /* BENIGN_ERRORS */
 
 #ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
-   /* Whether to report invalid palette index; added at libng-1.5.10.
+   /* Whether to report invalid palette index; added at libpng-1.5.10.
     * It is possible for an indexed (color-type==3) PNG file to contain
     * pixels with invalid (out-of-range) indexes if the PLTE chunk has
     * fewer entries than the image's bit-depth would allow. We recover

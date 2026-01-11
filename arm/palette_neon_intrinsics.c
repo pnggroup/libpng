@@ -43,7 +43,7 @@ png_riffle_palette_neon(png_byte *riffled_palette, const png_color *palette,
       riffled_palette[(i << 2) + 3] = trans_alpha[i];
 }
 
-/* Expands a palettized row into RGBA8. */
+/* Expands a palletized row into RGBA8. */
 static png_uint_32
 png_target_do_expand_palette_rgba8_neon(const png_uint_32 *riffled_palette,
     png_uint_32 row_width, const png_byte **ssp, png_byte **ddp)
@@ -85,7 +85,7 @@ png_target_do_expand_palette_rgba8_neon(const png_uint_32 *riffled_palette,
    return i;
 }
 
-/* Expands a palettized row into RGB8. */
+/* Expands a palletized row into RGB8. */
 static png_uint_32
 png_target_do_expand_palette_rgb8_neon(const png_color *paletteIn,
     png_uint_32 row_width, const png_byte **ssp, png_byte **ddp)

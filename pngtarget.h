@@ -29,7 +29,7 @@
  *    PNG_TARGET_CODE_IMPLEMENTATION
  *
  * To the quoted relative path name of a single C file to include to obtain the
- * implementation of the the target specific code.  For example:
+ * implementation of the target specific code.  For example:
  *
  *    "arm/arm_init.c"
  *    "intel/intel_init.c"

@@ -25,7 +25,7 @@
  *    png_target_impl
  *       string constant
  *       REQUIRED
- *       This must be a string naming the implemenation.
+ *       This must be a string naming the implementation.
  *
  *    png_target_free_data_impl
  *       static void png_target_free_data_impl(png_struct *)
