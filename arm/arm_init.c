@@ -99,7 +99,7 @@ png_target_do_expand_palette_neon(png_struct *png_ptr, png_row_info *row_info,
     *    the original code in pngrtran.c  That code is now here.
     *
     * 3) The original code takes pointers to the end of the input and the end of
-    *    the output; this is the way png_do_expand_palette works becuase it
+    *    the output; this is the way png_do_expand_palette works because it
     *    has to copy down from the end (otherwise it would overwrite the input
     *    data before it read it).  Note that the row buffer is aliased by
     *    these two pointers.

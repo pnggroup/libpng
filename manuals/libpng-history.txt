@@ -314,7 +314,7 @@ never got around to actually numbering the error messages. The function
 png_set_strip_error_numbers() was removed from the library by default.
 
 The png_zalloc() and png_zfree() functions are no longer exported.
-The png_zalloc() function no longer zeroes out the memory that it
+The png_zalloc() function no longer zeros out the memory that it
 allocates.  Applications that called png_zalloc(png_ptr, number, size)
 can call png_calloc(png_ptr, number*size) instead, and can call
 png_free() instead of png_zfree().
