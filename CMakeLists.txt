@@ -87,7 +87,7 @@ endif()
 option(PNG_TESTS "Build the libpng tests" ON)
 
 # Same as above, but for the third-party tools.
-# Although these tools are targetted at development environments only,
+# Although these tools are targeted at development environments only,
 # the users are allowed to override the option to build by default.
 if(ANDROID OR IOS)
   option(PNG_TOOLS "Build the libpng tools" OFF)
@@ -730,7 +730,7 @@ function(create_symlink DEST_FILE)
     message(FATAL_ERROR "create_symlink: Missing arguments: FILE or TARGET")
   endif()
   if(_SYM_FILE AND _SYM_TARGET)
-    message(FATAL_ERROR "create_symlink: Mutually-exlusive arguments:"
+    message(FATAL_ERROR "create_symlink: Mutually-exclusive arguments:"
                         "FILE (${_SYM_FILE}) and TARGET (${_SYM_TARGET})")
   endif()
 

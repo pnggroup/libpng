@@ -213,7 +213,7 @@ png_set_strip_alpha(png_struct *png_ptr)
  *
  * Terminology (assuming power law, "gamma", encodings):
  *    "screen" gamma: a power law imposed by the output device when digital
- *    samples are converted to visible light output.  The EOTF - volage to
+ *    samples are converted to visible light output.  The EOTF - voltage to
  *    luminance on output.
  *
  *    "file" gamma: a power law used to encode luminance levels from the input
@@ -1345,7 +1345,7 @@ png_resolve_file_gamma(const png_struct *png_ptr)
    if (file_gamma != 0)
       return file_gamma;
 
-   /* If png_reciprocal oveflows it returns 0 which indicates to the caller that
+   /* If png_reciprocal overflows, it returns 0, indicating to the caller that
     * there is no usable file gamma.  (The checks added to png_set_gamma and
     * png_set_alpha_mode should prevent a screen_gamma which would overflow.)
     */
@@ -4852,8 +4852,8 @@ png_do_read_transformations(png_struct *png_ptr, png_row_info *row_info)
       {
 #ifdef PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE
          /* Do not call 'png_do_expand_palette' if the SIMD implementation
-          * does it (note that this accomodates SIMD implementations which might
-          * only handle specific cases).
+          * does it. (Note that this accommodates SIMD implementations which
+          * might only handle specific cases.)
           */
          if (!png_target_do_expand_palette(png_ptr, row_info))
 #endif

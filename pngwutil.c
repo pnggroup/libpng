@@ -1763,7 +1763,7 @@ png_write_iTXt(png_struct *png_ptr, int compression, const char *key,
    }
 
    new_key[++key_len] = PNG_COMPRESSION_TYPE_BASE;
-   ++key_len; /* for the keywod separator */
+   ++key_len; /* for the keyword separator */
 
    /* We leave it to the application to meet PNG-1.0 requirements on the
     * contents of the text.  PNG-1.0 through PNG-1.2 discourage the use of

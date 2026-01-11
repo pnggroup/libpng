@@ -2260,7 +2260,7 @@ PNG_EXPORT(int, png_get_text,
 #endif
 
 /* Note while png_set_text() will accept a structure whose text,
- * language, and  translated keywords are NULL pointers, the structure
+ * language, and translated keywords are NULL pointers, the structure
  * returned by png_get_text will always contain regular
  * zero-terminated C strings.  They might be empty strings but
  * they will never be NULL pointers.
@@ -3358,7 +3358,7 @@ PNG_EXPORT(int, png_image_write_to_memory,
  *           For backward compatibility the original options are defined as
  *           the 'new' hardware option.  libpng can be compiled without
  *           hardware support (check PNG_TARGET_SPECIFIC_CODE_SUPPORTED and
- *           the documenation in pngtarget.h).
+ *           the documentation in pngtarget.h).
  *
  * SOFTWARE: sometimes software optimizations actually result in performance
  *           decrease on some architectures or systems, or with some sets of
