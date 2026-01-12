@@ -36,7 +36,10 @@ autoreconf -f -i
 make -j$(nproc) clean
 make -j$(nproc) libpng16.la
 
-for f in libpng_read_fuzzer libpng_colormap_fuzzer libpng_readapi_fuzzer libpng_transformations_fuzzer;
+for f in libpng_read_fuzzer \
+         libpng_colormap_fuzzer \
+         libpng_readapi_fuzzer \
+         libpng_transformations_fuzzer;
 do
 # build libpng_read_fuzzer.
 $CXX $CXXFLAGS -std=c++11 -I. \
