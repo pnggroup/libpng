@@ -47,6 +47,10 @@ $CXX $CXXFLAGS -std=c++11 -I. \
      -o $OUT/${f} \
      -lFuzzingEngine .libs/libpng16.a -lz
 
+# only libfuzzer can run the nalloc targets
+if test "x$FUZZING_ENGINE" == 'xlibfuzzer'
+then
+
 # wrapper script to duplicate target, run with env var NALLOC_FREQ=32
 # having a separate target with allocations failures
 cat << EOF > $OUT/${f}_nalloc
@@ -66,3 +70,6 @@ done
 
 cp $SRC/libpng/contrib/oss-fuzz/*.dict \
      $SRC/libpng/contrib/oss-fuzz/*.options $OUT/
+
+fi
+# end
