@@ -1,6 +1,6 @@
 /* pngwrite.c - general routines to write a PNG file
  *
- * Copyright (c) 2018-2025 Cosmin Truta
+ * Copyright (c) 2018-2026 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -1578,16 +1578,18 @@ png_image_write_init(png_image *image)
 /* Arguments to png_image_write_main: */
 typedef struct
 {
-   /* Arguments: */
+   /* Arguments */
    png_image *image;
    const void *buffer;
    png_int_32 row_stride;
    const void *colormap;
    int convert_to_8bit;
-   /* Local variables: */
+
+   /* Instance variables */
    const void *first_row;
-   ptrdiff_t row_bytes;
    void *local_row;
+   ptrdiff_t row_step;
+
    /* Byte count for memory writing */
    png_byte *memory;
    png_alloc_size_t memory_bytes; /* not used for STDIO */
@@ -1697,7 +1699,7 @@ png_write_image_16bit(void *argument)
 
       png_write_row(png_ptr,
           png_voidcast(const png_byte *, display->local_row));
-      input_row += (png_uint_16)display->row_bytes/(sizeof (png_uint_16));
+      input_row += display->row_step / 2;
    }
 
    return 1;
@@ -1823,7 +1825,7 @@ png_write_image_8bit(void *argument)
 
          png_write_row(png_ptr, png_voidcast(const png_byte *,
              display->local_row));
-         input_row += (png_uint_16)display->row_bytes/(sizeof (png_uint_16));
+         input_row += display->row_step / 2;
       } /* while y */
    }
 
@@ -1848,7 +1850,7 @@ png_write_image_8bit(void *argument)
          }
 
          png_write_row(png_ptr, output_row);
-         input_row += (png_uint_16)display->row_bytes/(sizeof (png_uint_16));
+         input_row += display->row_step / 2;
       }
    }
 
@@ -2164,16 +2166,16 @@ png_image_write_main(void *argument)
 
    {
       const png_byte *row = png_voidcast(const png_byte *, display->buffer);
-      ptrdiff_t row_bytes = display->row_stride;
+      ptrdiff_t row_step = display->row_stride;
 
       if (linear != 0)
-         row_bytes *= (sizeof (png_uint_16));
+         row_step *= 2;
 
-      if (row_bytes < 0)
-         row += (image->height-1) * (-row_bytes);
+      if (row_step < 0)
+         row += (image->height-1) * (-row_step);
 
       display->first_row = row;
-      display->row_bytes = row_bytes;
+      display->row_step = row_step;
    }
 
    /* Apply 'fast' options if the flag is set. */
@@ -2220,13 +2222,13 @@ png_image_write_main(void *argument)
    else
    {
       const png_byte *row = png_voidcast(const png_byte *, display->first_row);
-      ptrdiff_t row_bytes = display->row_bytes;
+      ptrdiff_t row_step = display->row_step;
       png_uint_32 y = image->height;
 
       for (; y > 0; --y)
       {
          png_write_row(png_ptr, row);
-         row += row_bytes;
+         row += row_step;
       }
    }
 
