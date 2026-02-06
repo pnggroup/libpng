@@ -1,6 +1,6 @@
 /* png.c - location for general purpose libpng functions
  *
- * Copyright (c) 2018-2025 Cosmin Truta
+ * Copyright (c) 2018-2026 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -795,7 +795,7 @@ png_get_copyright(const png_struct *png_ptr)
 #else
    return "\n"
       "libpng version 2.0.0.git\n"
-      "Copyright (c) 2018-2025 Cosmin Truta\n"
+      "Copyright (c) 2018-2026 Cosmin Truta\n"
       "Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson\n"
       "Copyright (c) 1996-1997 Andreas Dilger\n"
       "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n";
