@@ -5988,7 +5988,7 @@ Version 1.6.32rc01 [August 18, 2017]
 
 Version 1.6.32rc02 [August 22, 2017]
   Added contrib/oss-fuzz directory which contains files used by the oss-fuzz
-    project (https://github.com/google/oss-fuzz/tree/master/projects/libpng).
+    project <https://github.com/google/oss-fuzz/tree/master/projects/libpng>.
 
 Version 1.6.32 [August 24, 2017]
   No changes.
@@ -6323,7 +6323,7 @@ Version 1.6.53 [December 5, 2025]
 
 Version 1.6.54 [January 12, 2026]
   Fixed CVE-2026-22695 (medium severity):
-    Heap buffer over-read in `png_image_read_direct_scaled.
+    Heap buffer over-read in `png_image_read_direct_scaled`.
     (Reported and fixed by Petr Simecek.)
   Fixed CVE-2026-22801 (medium severity):
     Integer truncation causing heap buffer over-read in `png_image_write_*`.
@@ -6334,5 +6334,5 @@ Version 1.6.55 [TODO]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
-https://lists.sourceforge.net/lists/listinfo/png-mng-implement
+<https://lists.sourceforge.net/lists/listinfo/png-mng-implement>
 to subscribe.
