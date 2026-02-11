@@ -14,7 +14,7 @@
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
  *   libpng versions 0.97, January 1998, through 1.6.35, July 2018:
  *     Glenn Randers-Pehrson
- *   libpng versions 1.6.36, December 2018, through 1.6.54, January 2026:
+ *   libpng versions 1.6.36, December 2018, through 1.6.55, February 2026:
  *     Cosmin Truta
  *   See also "Contributing Authors", below.
  */
