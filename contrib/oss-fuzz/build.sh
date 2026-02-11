@@ -66,10 +66,10 @@ find $SRC/libpng -name "*.png" | \
      xargs zip $OUT/${f}_seed_corpus.zip
 
 cp $SRC/libpng/contrib/oss-fuzz/png.dict $OUT/${f}.dict
+fi
 done
 
 cp $SRC/libpng/contrib/oss-fuzz/*.dict \
      $SRC/libpng/contrib/oss-fuzz/*.options $OUT/
 
-fi
 # end
