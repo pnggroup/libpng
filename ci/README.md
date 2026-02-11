@@ -4,11 +4,11 @@ Scripts for the Continuous Integration of the PNG Reference Library
 Copyright Notice
 ----------------
 
-Copyright (c) 2019-2025 Cosmin Truta.
+Copyright (c) 2019-2026 Cosmin Truta.
 
 Use, modification and distribution are subject to the MIT License.
 Please see the accompanying file `LICENSE_MIT.txt` or visit
-https://opensource.org/license/mit
+<https://opensource.org/license/mit>
 
 File List
 ---------

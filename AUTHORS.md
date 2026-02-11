@@ -18,6 +18,7 @@ Authors, for copyright and licensing purposes.
  * Guy Eric Schalnat
  * James Yu
  * John Bowler
+ * Joshua Inscoe
  * Kevin Bracey
  * Lucas Chollet
  * Maarten Bent
