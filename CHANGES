@@ -6337,6 +6337,8 @@ Version 1.6.55 [February 9, 2026]
   Resolved an oss-fuzz build issue involving nalloc.
     (Contributed by Philippe Antoine.)
 
+Version 1.6.56 [TODO]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
 <https://lists.sourceforge.net/lists/listinfo/png-mng-implement>
