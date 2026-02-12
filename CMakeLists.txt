@@ -650,6 +650,13 @@ if(PNG_TESTS AND PNG_SHARED)
     endforeach()
   endforeach()
 
+  # Regression test:
+  # Use stride_extra > 32767 to trigger row_bytes > 65535 for linear images.
+  png_add_test(NAME pngstest-large-stride
+               COMMAND pngstest
+               OPTIONS --stride-extra 33000 --tmpfile "large-stride-" --log
+               FILES "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-alpha-16-linear.png")
+
   add_executable(pngunknown ${pngunknown_sources})
   target_link_libraries(pngunknown
                         PRIVATE png_shared)
