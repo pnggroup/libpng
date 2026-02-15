@@ -536,10 +536,19 @@ BOOL BuildPngList (PTSTR pstrPathName, TCHAR **ppFileList, int *pFileCount,
     /* extract foldername, filename and search-name */
 
     strcpy (szImgPathName, pstrPathName);
-    strcpy (szImgFileName, strrchr (pstrPathName, '\\') + 1);
+    
+    char *pLastSlash = strrchr (pstrPathName, '\\');
+    if (pLastSlash != NULL)
+        strcpy (szImgFileName, pLastSlash + 1);
+    else
+        strcpy (szImgFileName, pstrPathName);
 
     strcpy (szImgFindName, szImgPathName);
-    *(strrchr (szImgFindName, '\\') + 1) = '\0';
+    pLastSlash = strrchr (szImgFindName, '\\');
+    if (pLastSlash != NULL)
+        *(pLastSlash + 1) = '\0';
+    else
+        szImgFindName[0] = '\0';
     strcat (szImgFindName, "*.png");
 
     /* first cycle: count number of files in directory for memory allocation */
@@ -559,6 +568,8 @@ BOOL BuildPngList (PTSTR pstrPathName, TCHAR **ppFileList, int *pFileCount,
     /* allocation memory for file-list */
 
     *ppFileList = (TCHAR *) malloc (*pFileCount * MAX_PATH);
+    if (*ppFileList == NULL)
+        return FALSE;
 
     /* second cycle: read directory and store filenames in file-list */
 
@@ -570,7 +581,11 @@ BOOL BuildPngList (PTSTR pstrPathName, TCHAR **ppFileList, int *pFileCount,
     while (bOk)
     {
         strcpy (*ppFileList + ii, szImgPathName);
-        strcpy (strrchr(*ppFileList + ii, '\\') + 1, finddata.cFileName);
+        char *pFileSlash = strrchr(*ppFileList + ii, '\\');
+        if (pFileSlash != NULL)
+            strcpy (pFileSlash + 1, finddata.cFileName);
+        else
+            strcpy (*ppFileList + ii, finddata.cFileName);
 
         if (strcmp(pstrPathName, *ppFileList + ii) == 0)
             *pFileIndex = i;
@@ -685,7 +700,11 @@ BOOL LoadImageFile (HWND hwnd, PTSTR pstrPathName,
 
     if (*ppbImage != NULL)
     {
-        sprintf (szTmp, "VisualPng - %s", strrchr(pstrPathName, '\\') + 1);
+        TCHAR *pFileName = strrchr(pstrPathName, '\\');
+        if (pFileName != NULL)
+            sprintf (szTmp, "VisualPng - %s", pFileName + 1);
+        else
+            sprintf (szTmp, "VisualPng - %s", pstrPathName);
         SetWindowText (hwnd, szTmp);
     }
     else
@@ -727,8 +746,9 @@ BOOL DisplayImage (HWND hwnd, BYTE **ppDib,
     }
 
     if (cyWinSize > ((size_t)(-1))/wDIRowBytes) {
-    {
-        MessageBox (hwnd, TEXT ("Visual PNG: image is too big");
+        MessageBox (hwnd, TEXT ("Visual PNG: image is too big"),
+            szProgName, MB_ICONEXCLAMATION | MB_OK);
+        return FALSE;
     }
     if (!(pDib = (BYTE *) malloc (sizeof(BITMAPINFOHEADER) +
         wDIRowBytes * cyWinSize)))
