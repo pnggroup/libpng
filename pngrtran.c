@@ -476,6 +476,9 @@ png_set_quantize(png_struct *png_ptr, png_color *palette,
    if (png_rtran_ok(png_ptr, 0) == 0)
       return;
 
+   if (palette == NULL)
+      return;
+
    png_ptr->transformations |= PNG_QUANTIZE;
 
    if (full_quantize == 0)

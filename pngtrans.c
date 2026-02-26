@@ -84,7 +84,7 @@ png_set_shift(png_struct *png_ptr, const png_color_8 *true_bits)
 {
    png_debug(1, "in png_set_shift");
 
-   if (png_ptr == NULL)
+   if (png_ptr == NULL || true_bits == NULL)
       return;
 
    png_ptr->transformations |= PNG_SHIFT;
