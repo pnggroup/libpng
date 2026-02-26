@@ -2683,7 +2683,7 @@ png_image_read_colormap(void *argument)
                   {
                      r = back_r;
                      g = back_g;
-                     b = back_g;
+                     b = back_b;
                   }
 
                   /* Compare the newly-created color-map entry with the one the
