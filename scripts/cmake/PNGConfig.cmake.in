@@ -1,0 +1,62 @@
+# PNGConfig.cmake
+# CMake config file compatible with the FindPNG module.
+
+# Copyright (c) 2024 Cosmin Truta
+# Written by Benjamin Buch, 2024
+#
+# Use, modification and distribution are subject to
+# the same licensing terms and conditions as libpng.
+# Please see the copyright notice in png.h or visit
+# http://libpng.org/pub/png/src/libpng-LICENSE.txt
+#
+# SPDX-License-Identifier: libpng-2.0
+
+include(CMakeFindDependencyMacro)
+
+if(@PNG_SHARED@)
+  list(APPEND _PNG_supported_components "shared")
+endif()
+
+if(@PNG_STATIC@)
+  list(APPEND _PNG_supported_components "static")
+endif()
+
+if(@ZLIB_CONFIG@)
+  if(PNG_FIND_COMPONENTS)
+    foreach(_comp ${PNG_FIND_COMPONENTS})
+        if(NOT _comp IN_LIST _PNG_supported_components)
+          set(PNG_FOUND False)
+          set(PNG_NOT_FOUND_MESSAGE "Unsupported component: ${_comp} - Only ${_PNG_supported_components} are available")
+        endif()
+    endforeach()
+
+    find_dependency(ZLIB CONFIG COMPONENTS ${PNG_FIND_COMPONENTS})
+  else()
+    find_dependency(ZLIB CONFIG)
+  endif()
+else()
+  find_dependency(ZLIB REQUIRED)
+endif()
+
+if(NOT TARGET ZLIB::ZLIBSTATIC)
+  add_library(ZLIB::ZLIBSTATIC ALIAS ZLIB::ZLIB)
+endif(NOT TARGET ZLIB::ZLIBSTATIC)
+
+include("${CMAKE_CURRENT_LIST_DIR}/PNGTargets.cmake")
+
+foreach(_comp ${PNG_FIND_COMPONENTS})
+  if(NOT TARGET png::png_${_comp})
+    set(PNG_FOUND False)
+    set(PNG_NOT_FOUND_MESSAGE "${_comp} was not found - Only ${_PNG_supported_components} are available")
+  endif()
+endforeach
+
+if(NOT TARGET PNG::PNG)
+  if(TARGET PNG::png_shared)
+    add_library(PNG::PNG INTERFACE IMPORTED)
+    target_link_libraries(PNG::PNG INTERFACE PNG::png_shared)
+  elseif(TARGET PNG::png_static)
+    add_library(PNG::PNG INTERFACE IMPORTED)
+    target_link_libraries(PNG::PNG INTERFACE PNG::png_static)
+  endif()
+endif()
