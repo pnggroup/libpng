@@ -1629,7 +1629,7 @@ png_handle_sPLT(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
    dl = (png_uint_32)(data_length / (unsigned int)entry_size);
    max_dl = PNG_SIZE_MAX / (sizeof (png_sPLT_entry));
 
-   if (dl > max_dl)
+   if (dl > 0x7fffffffUL || dl > max_dl)
    {
       png_warning(png_ptr, "sPLT chunk too long");
       return handled_error;
