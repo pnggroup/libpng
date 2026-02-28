@@ -87,6 +87,35 @@ png_set_shift(png_structrp png_ptr, png_const_color_8p true_bits)
    if (png_ptr == NULL || true_bits == NULL)
       return;
 
+   /* Check the shift values before passing them on to png_do_shift. */
+   {
+      png_byte bit_depth = png_ptr->bit_depth;
+      int invalid = 0;
+
+      if ((png_ptr->color_type & PNG_COLOR_MASK_COLOR) != 0)
+      {
+         if (true_bits->red == 0 || true_bits->red > bit_depth ||
+             true_bits->green == 0 || true_bits->green > bit_depth ||
+             true_bits->blue == 0 || true_bits->blue > bit_depth)
+            invalid = 1;
+      }
+      else
+      {
+         if (true_bits->gray == 0 || true_bits->gray > bit_depth)
+            invalid = 1;
+      }
+
+      if ((png_ptr->color_type & PNG_COLOR_MASK_ALPHA) != 0 &&
+          (true_bits->alpha == 0 || true_bits->alpha > bit_depth))
+         invalid = 1;
+
+      if (invalid)
+      {
+         png_app_error(png_ptr, "png_set_shift: invalid shift values");
+         return;
+      }
+   }
+
    png_ptr->transformations |= PNG_SHIFT;
    png_ptr->shift = *true_bits;
 }
