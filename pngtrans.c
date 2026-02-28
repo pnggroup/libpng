@@ -87,6 +87,31 @@ png_set_shift(png_struct *png_ptr, const png_color_8 *true_bits)
    if (png_ptr == NULL || true_bits == NULL)
       return;
 
+   if ((png_ptr->color_type & PNG_COLOR_MASK_COLOR) != 0)
+   {
+      if (true_bits->red == 0 || true_bits->green == 0 ||
+          true_bits->blue == 0)
+      {
+         png_app_error(png_ptr, "png_set_shift: invalid shift value");
+         return;
+      }
+   }
+   else
+   {
+      if (true_bits->gray == 0)
+      {
+         png_app_error(png_ptr, "png_set_shift: invalid shift value");
+         return;
+      }
+   }
+
+   if ((png_ptr->color_type & PNG_COLOR_MASK_ALPHA) != 0 &&
+       true_bits->alpha == 0)
+   {
+      png_app_error(png_ptr, "png_set_shift: invalid shift value");
+      return;
+   }
+
    png_ptr->transformations |= PNG_SHIFT;
    png_ptr->shift = *true_bits;
 }
