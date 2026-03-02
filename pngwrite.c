@@ -528,7 +528,23 @@ png_convert_from_struct_tm(png_time *ptime, const struct tm * ttime)
 }
 
 void
-png_convert_from_time_t(png_time *ptime, time_t ttime)
+png_ttime_validate(png_struct *png_ptr, time_t ttime)
+{
+   /* Check if ttime is valid. Set lower bound to NULL and upper
+    * bound to signed 64-bit
+    */
+   if (ttime > 0x7FFFFFFFL || ttime == (time_t)-1)
+   {
+      if (ttime < 0 || (ttime >> 31)-1)
+      {
+         /* Raise error if ttime is invalid */
+         png_error(png_ptr, "ttime is invalid");
+      }
+   }
+}
+
+void
+png_convert_from_time_t(png_struct *png_ptr, png_time *ptime, time_t ttime)
 {
    struct tm *tbuf;
 
@@ -537,9 +553,10 @@ png_convert_from_time_t(png_time *ptime, time_t ttime)
    tbuf = gmtime(&ttime);
    if (tbuf == NULL)
    {
-      /* TODO: add a safe function which takes a png_ptr argument and raises
-       * a png_error if the ttime argument is invalid and the call to gmtime
-       * fails as a consequence.
+      png_ttime_validate(png_ptr, ttime);
+
+      /* Fallback if png_ttime_validate does not raise an error for some
+       * reason
        */
       memset(ptime, 0, sizeof(*ptime));
       return;
