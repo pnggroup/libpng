@@ -40,13 +40,10 @@ static void test_png_read_png_api(const uint8_t *data, size_t size) {
     struct png_mem_buffer buffer = {data, size, 0};
     png_set_read_fn(png_ptr, &buffer, png_read_from_buffer);
 
-    /* Set up transformations before reading */
-    png_set_scale_16(png_ptr);
-    png_set_packing(png_ptr);
-    png_set_expand(png_ptr);
-
-    /* Use png_read_png which should trigger OSS_FUZZ_png_read_png path */
-    png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
+    /* Use png_read_png with transform flags */
+    png_read_png(png_ptr, info_ptr,
+                 PNG_TRANSFORM_SCALE_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND,
+                 NULL);
 
     png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 }
