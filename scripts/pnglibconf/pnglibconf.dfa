@@ -614,11 +614,6 @@ option COLORSPACE disabled
 
 setting sRGB_PROFILE_CHECKS default 2
 
-# Buggy compilers (e.g., gcc 2.7.2.2) need PNG_NO_POINTER_INDEXING
-# See png[wr]util.c, normally this should always be *on*
-
-option POINTER_INDEXING
-
 # Other defines for things like memory and the like can go here.
 
 # BUILD TIME SETTINGS
