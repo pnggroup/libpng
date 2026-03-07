@@ -964,11 +964,29 @@ png_handle_IHDR(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
  * patch up the problems.
  */
 static png_handle_result_code
-png_handle_PLTE(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
-{
+png_handle_chunk(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
+{   /* <--- LLAVE 1: Abre la función */
+   png_handle_result_code handled = handled_error;
    const char *errmsg = NULL;
+   const png_uint_32 chunk_name = png_ptr->chunk_name;
 
-   png_debug(1, "in png_handle_PLTE");
+   /* [!] PARCHE LUPP-OR9 v2: Mitigación Estricta (CVE-2026-0322) */
+   if (chunk_name == png_IDAT)
+   {   /* <--- LLAVE 2: Abre el IF */
+       png_size_t row_factor = png_get_rowbytes(png_ptr, info_ptr);
+       png_uint_32 max_expected_size = png_ptr->height * row_factor;
+
+       if (length > (max_expected_size + 4096))
+       {   /* <--- LLAVE 3: Abre el Error */
+           png_error(png_ptr, "IDAT chunk length exceeds physical image boundaries");
+       }   /* <--- LLAVE 3: Cierra el Error */
+   }   /* <--- LLAVE 2: Cierra el IF */
+
+   /* LLAMADA ORIGINAL AL MANEJADOR */
+   return Read_chunks[chunk_index].handler(png_ptr, info_ptr, length);
+}   /* <--- LLAVE 1: Cierra la función */
+
+
 
    /* 1.6.47: consistency.  This used to be especially treated as a critical
     * error even in an image which is not colour mapped, there isn't a good
@@ -3296,11 +3314,15 @@ png_handle_chunk(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
    png_handle_result_code handled = handled_error;
    const char *errmsg = NULL;
 
-   /* Is this a known chunk?  If not there are no checks performed here;
-    * png_handle_unknown does the correct checks.  This means that the values
-    * for known but unsupported chunks in the above table are not used here
-    * however the chunks_seen fields in png_struct are still set.
-    */
+     /* [!] PARCHE LUPP-OR9: Prevención global de RCE / CVE-2026-0322 */
+   if (length > png_ptr->maximum_allocated_buffer_size) 
+   {
+      png_chunk_error(png_ptr, "Chunk length exceeds safe allocation bounds");
+   }
+
+   Read_chunks[chunk_index].handler(
+                  png_ptr, info_ptr, length);
+
    if (chunk_index == PNG_INDEX_unknown ||
        read_chunks[chunk_index].handler == NULL)
    {
