@@ -40,9 +40,7 @@ static void test_png_read_png_api(const uint8_t *data, size_t size) {
     struct png_mem_buffer buffer = {data, size, 0};
     png_set_read_fn(png_ptr, &buffer, png_read_from_buffer);
 
-    /* Use png_read_png with transform flags (libpng-manual.txt lines 1170-1171:
-       "You must use png_transforms and not call any png_set_transform()
-       functions when you use png_read_png().") */
+    /* Use png_read_png with transform flags */
     png_read_png(png_ptr, info_ptr,
                  PNG_TRANSFORM_SCALE_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND,
                  NULL);
