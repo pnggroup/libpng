@@ -32,7 +32,15 @@ static void test_png_transformations(const uint8_t *data, size_t size) {
         return;
     }
 
+    /* Declare heap pointers before setjmp so they can be freed on longjmp.
+       Must be volatile per C standard §7.13.2.1: non-volatile locals modified
+       between setjmp and longjmp have indeterminate values after longjmp. */
+    volatile png_bytep row = NULL;
+    volatile png_colorp palette = NULL;
+
     if (setjmp(png_jmpbuf(png_ptr))) {
+        free((void*)row);
+        free((void*)palette);
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         return;
     }
@@ -60,14 +68,15 @@ static void test_png_transformations(const uint8_t *data, size_t size) {
 
     /* Target 2: Color quantization (triggers png_do_quantize) */
     if (color_type == PNG_COLOR_TYPE_RGB || color_type == PNG_COLOR_TYPE_RGB_ALPHA) {
-        png_colorp palette = (png_colorp)malloc(256 * sizeof(png_color));
+        palette = (png_colorp)malloc(256 * sizeof(png_color));
         if (palette) {
             int i;
             for (i = 0; i < 256; i++) {
                 palette[i].red = palette[i].green = palette[i].blue = (png_byte)i;
             }
             png_set_quantize(png_ptr, palette, 256, 256, NULL, 0);
-            free(palette);
+            free((void*)palette);
+            palette = NULL;
         }
     }
 
@@ -90,15 +99,15 @@ static void test_png_transformations(const uint8_t *data, size_t size) {
 
     /* Read image data to execute transformations */
     size_t rowbytes = png_get_rowbytes(png_ptr, info_ptr);
-    png_bytep row = (png_bytep)malloc(rowbytes);
+    row = (png_bytep)malloc(rowbytes);
     if (row) {
         int y;
         for (y = 0; y < height && y < 100; y++) { /* Limit rows for performance */
             png_read_row(png_ptr, row, NULL);
         }
-        free(row);
     }
 
+    free((void*)row);
     png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 }
 
@@ -184,13 +193,10 @@ static void test_png_read_png_api(const uint8_t *data, size_t size) {
     struct png_mem_buffer buffer = {data, size, 0};
     png_set_read_fn(png_ptr, &buffer, png_read_from_buffer);
 
-    /* Set up transformations before reading */
-    png_set_scale_16(png_ptr);
-    png_set_packing(png_ptr);
-    png_set_expand(png_ptr);
-
-    /* Use png_read_png which should trigger OSS_FUZZ_png_read_png path */
-    png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
+    /* Use png_read_png with transform flags */
+    png_read_png(png_ptr, info_ptr,
+                 PNG_TRANSFORM_SCALE_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND,
+                 NULL);
 
     png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 }
