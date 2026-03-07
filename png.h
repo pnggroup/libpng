@@ -997,9 +997,13 @@ PNG_REMOVED(const char *, png_convert_to_rfc1123,
 PNG_EXPORT(void, png_convert_from_struct_tm,
    (png_time *ptime, const struct tm * ttime));
 
+/* Safety function to check if ttime is valid */
+PNG_EXPORT(void, png_ttime_validate,
+   (png_struct *png_ptr, time_t ttime));
+
 /* Convert from time_t to png_time.  Uses gmtime() */
 PNG_EXPORT(void, png_convert_from_time_t,
-   (png_time *ptime, time_t ttime));
+   (png_struct *png_ptr, png_time *ptime, time_t ttime));
 #endif /* CONVERT_tIME */
 
 #ifdef PNG_READ_EXPAND_SUPPORTED

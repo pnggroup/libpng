@@ -172,7 +172,7 @@ int writepng_init(mainprog_info *mainprog_ptr)
     if (mainprog_ptr->have_time) {
         png_time  modtime;
 
-        png_convert_from_time_t(&modtime, mainprog_ptr->modtime);
+        png_convert_from_time_t(png_ptr, &modtime, mainprog_ptr->modtime);
         png_set_tIME(png_ptr, info_ptr, &modtime);
     }
 
