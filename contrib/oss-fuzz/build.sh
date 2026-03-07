@@ -41,32 +41,27 @@ for f in libpng_read_fuzzer \
          libpng_readapi_fuzzer \
          libpng_transformations_fuzzer;
 do
-# build libpng_read_fuzzer.
-$CXX $CXXFLAGS -std=c++11 -I. \
-     $SRC/libpng/contrib/oss-fuzz/${f}.cc \
-     -o $OUT/${f} \
-     -lFuzzingEngine .libs/libpng16.a -lz
+    # build libpng_read_fuzzer.
+    $CXX $CXXFLAGS -std=c++11 -I. \
+         $SRC/libpng/contrib/oss-fuzz/${f}.cc \
+         -o $OUT/${f} \
+         -lFuzzingEngine .libs/libpng16.a -lz
 
-# only libfuzzer can run the nalloc targets
-if test "x$FUZZING_ENGINE" == 'xlibfuzzer'
-then
+    # only libfuzzer can run the nalloc targets
+    if test "x$FUZZING_ENGINE" == 'xlibfuzzer'
+    then
 
-# wrapper script to duplicate target, run with env var NALLOC_FREQ=32
-# having a separate target with allocations failures
-cat << EOF > $OUT/${f}_nalloc
-#!/bin/sh
-# LLVMFuzzerTestOneInput for fuzzer detection.
-this_dir=\$(dirname "\$0")
-NALLOC_FREQ=32 \$this_dir/${f} \$@
-EOF
-chmod +x $OUT/${f}_nalloc
+        # Duplicate fuzzer with '_nalloc' suffix
+        cp -p $OUT/${f} $OUT/${f}_nalloc
 
-# add seed corpus.
-find $SRC/libpng -name "*.png" | \
-     xargs zip $OUT/${f}_seed_corpus.zip
+        # add seed corpus.
+        find $SRC/libpng -name "*.png" | \
+            xargs zip $OUT/${f}_seed_corpus.zip
+        find $SRC/libpng -name "*.png" | \
+            xargs zip $OUT/${f}_nalloc_seed_corpus.zip
 
-cp $SRC/libpng/contrib/oss-fuzz/png.dict $OUT/${f}.dict
-fi
+        cp $SRC/libpng/contrib/oss-fuzz/png.dict $OUT/${f}.dict
+    fi
 done
 
 cp $SRC/libpng/contrib/oss-fuzz/*.dict \

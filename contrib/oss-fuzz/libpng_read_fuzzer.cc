@@ -18,6 +18,7 @@
 #include <string.h>
 
 #include <vector>
+#include <string>
 
 #define PNG_INTERNAL
 #include "png.h"
@@ -95,6 +96,30 @@ void default_free(png_structp, png_voidp ptr) {
 }
 
 static const int kPngHeaderSize = 8;
+
+// Test string for suffix
+bool endsWith(const std::string& str, const std::string& suffix) {
+  if (str.length() >= suffix.length()) {
+    return str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0;
+  } else {
+    return false;
+  }
+}
+
+// A custom fuzzer initialization function
+extern "C" int LLVMFuzzerInitialize(int *argcp,char ***argvp) {
+  int argc = *argcp;
+  std::string exe_path = (*argvp)[0];
+  std::string nalloc_suffix("_nalloc");
+
+  if (endsWith(exe_path, nalloc_suffix))
+    {
+      setenv("NALLOC_FREQ","32",1);
+    }
+  nalloc_init(nullptr);
+
+  return 0;
+}
 
 // Entry point for LibFuzzer.
 // Roughly follows the libpng book example:

@@ -4,6 +4,13 @@
 #include <setjmp.h>
 #include <png.h>
 
+
+// A custom fuzzer initialization function
+extern "C" int LLVMFuzzerInitialize(int *argcp,char ***argvp) {
+
+  return 0;
+}
+
 /* Memory buffer structure for PNG reading */
 struct png_mem_buffer {
     const uint8_t *data;

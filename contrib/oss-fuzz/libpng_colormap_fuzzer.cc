@@ -4,6 +4,12 @@
 #include <setjmp.h>
 #include <png.h>
 
+// A custom fuzzer initialization function
+extern "C" int LLVMFuzzerInitialize(int *argcp,char ***argvp) {
+
+  return 0;
+}
+
 /* Test png_image API and colormap functions */
 static void test_png_image_colormap(const uint8_t *data, size_t size) {
     png_image image;
