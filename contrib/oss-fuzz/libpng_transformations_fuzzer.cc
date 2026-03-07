@@ -36,9 +36,11 @@ static void test_png_transformations(const uint8_t *data, size_t size) {
        Must be volatile per C standard §7.13.2.1: non-volatile locals modified
        between setjmp and longjmp have indeterminate values after longjmp. */
     volatile png_bytep row = NULL;
+    volatile png_colorp palette = NULL;
 
     if (setjmp(png_jmpbuf(png_ptr))) {
         free((void*)row);
+        free((void*)palette);
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         return;
     }
@@ -66,14 +68,15 @@ static void test_png_transformations(const uint8_t *data, size_t size) {
 
     /* Target 2: Color quantization (triggers png_do_quantize) */
     if (color_type == PNG_COLOR_TYPE_RGB || color_type == PNG_COLOR_TYPE_RGB_ALPHA) {
-        png_colorp palette = (png_colorp)malloc(256 * sizeof(png_color));
+        palette = (png_colorp)malloc(256 * sizeof(png_color));
         if (palette) {
             int i;
             for (i = 0; i < 256; i++) {
                 palette[i].red = palette[i].green = palette[i].blue = (png_byte)i;
             }
             png_set_quantize(png_ptr, palette, 256, 256, NULL, 0);
-            free(palette);
+            free((void*)palette);
+            palette = NULL;
         }
     }
 
@@ -105,7 +108,6 @@ static void test_png_transformations(const uint8_t *data, size_t size) {
     }
 
     free((void*)row);
-    row = NULL;
     png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 }
 
@@ -191,9 +193,7 @@ static void test_png_read_png_api(const uint8_t *data, size_t size) {
     struct png_mem_buffer buffer = {data, size, 0};
     png_set_read_fn(png_ptr, &buffer, png_read_from_buffer);
 
-    /* Use png_read_png with transform flags (libpng-manual.txt lines 1170-1171:
-       "You must use png_transforms and not call any png_set_transform()
-       functions when you use png_read_png().") */
+    /* Use png_read_png with transform flags */
     png_read_png(png_ptr, info_ptr,
                  PNG_TRANSFORM_SCALE_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND,
                  NULL);
