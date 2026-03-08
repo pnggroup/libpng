@@ -51,6 +51,8 @@ $CXX $CXXFLAGS -std=c++11 -I. \
 if test "x$FUZZING_ENGINE" == 'xlibfuzzer'
 then
 
+if grep -q "nalloc_init" $SRC/libpng/contrib/oss-fuzz/${f}.cc
+then
 # wrapper script to duplicate target, run with env var NALLOC_FREQ=32
 # having a separate target with allocations failures
 cat << EOF > $OUT/${f}@nalloc
@@ -60,13 +62,14 @@ this_dir=\$(dirname "\$0")
 NALLOC_FREQ=32 \$this_dir/${f} \$@
 EOF
 chmod +x $OUT/${f}@nalloc
+fi
 
 # add seed corpus.
 find $SRC/libpng -name "*.png" | \
      xargs zip $OUT/${f}_seed_corpus.zip
 
-cp $SRC/libpng/contrib/oss-fuzz/png.dict $OUT/${f}.dict
 fi
+cp $SRC/libpng/contrib/oss-fuzz/png.dict $OUT/${f}.dict
 done
 
 cp $SRC/libpng/contrib/oss-fuzz/*.dict \
