@@ -54,7 +54,7 @@ then
 # wrapper script to duplicate target, run with env var NALLOC_FREQ=32
 # having a separate target with allocations failures
 cat << EOF > $OUT/${f}_nalloc
-#!/bin/sh
+#!/bin/bash
 # LLVMFuzzerTestOneInput for fuzzer detection.
 this_dir=\$(dirname "\$0")
 NALLOC_FREQ=32 \$this_dir/${f} \$@
