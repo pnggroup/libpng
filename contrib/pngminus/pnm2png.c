@@ -357,12 +357,19 @@ BOOL do_pnm2png (png_struct *png_ptr, png_info *info_ptr,
   if (packed_bitmap)
   {
     /* row data is as many bytes as can fit width x channels x bit_depth */
-    row_bytes = (width * channels * bit_depth + 7) / 8;
+    png_uint_32 pixels = (png_uint_32) (channels * bit_depth);
+    if (pixels == 0 || width > (0xFFFFFFFFU - 7) / pixels)
+      return FALSE; /* overflow */
+    row_bytes = (width * pixels + 7) / 8;
   }
   else
   {
     /* row_bytes is the width x number of channels x (bit-depth / 8) */
-    row_bytes = width * channels * ((bit_depth <= 8) ? 1 : 2);
+    png_uint_32 bytes_per_sample = (bit_depth <= 8) ? 1 : 2;
+    png_uint_32 pixel_bytes = (png_uint_32) channels * bytes_per_sample;
+    if (pixel_bytes == 0 || width > 0xFFFFFFFFU / pixel_bytes)
+      return FALSE; /* overflow */
+    row_bytes = width * pixel_bytes;
   }
 
   if ((row_bytes == 0) ||
