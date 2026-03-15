@@ -1155,28 +1155,35 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
 
    if (trans_alpha != NULL)
    {
-       /* It may not actually be necessary to set png_ptr->trans_alpha here;
-        * we do it for backward compatibility with the way the png_handle_tRNS
-        * function used to do the allocation.
-        *
-        * 1.6.0: The above statement is incorrect; png_handle_tRNS effectively
-        * relies on png_set_tRNS storing the information in png_struct
-        * (otherwise it won't be there for the code in pngrtran.c).
-        */
-
        png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
 
        if (num_trans > 0 && num_trans <= PNG_MAX_PALETTE_LENGTH)
        {
-         /* Changed from num_trans to PNG_MAX_PALETTE_LENGTH in version 1.2.1 */
+          /* Allocate info_ptr's copy of the transparency data. */
           info_ptr->trans_alpha = png_voidcast(png_bytep,
               png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH));
           memcpy(info_ptr->trans_alpha, trans_alpha, (size_t)num_trans);
-
           info_ptr->free_me |= PNG_FREE_TRNS;
           info_ptr->valid |= PNG_INFO_tRNS;
+
+          /* Allocate an independent copy for png_struct, so that the
+           * lifetime of png_ptr->trans_alpha is decoupled from the
+           * lifetime of info_ptr->trans_alpha.  Previously these two
+           * pointers were aliased, which caused a use-after-free if
+           * png_free_data freed info_ptr->trans_alpha while
+           * png_ptr->trans_alpha was still in use by the row transform
+           * functions (e.g. png_do_expand_palette).
+           */
+          png_free(png_ptr, png_ptr->trans_alpha);
+          png_ptr->trans_alpha = png_voidcast(png_bytep,
+              png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH));
+          memcpy(png_ptr->trans_alpha, trans_alpha, (size_t)num_trans);
        }
-       png_ptr->trans_alpha = info_ptr->trans_alpha;
+       else
+       {
+          png_free(png_ptr, png_ptr->trans_alpha);
+          png_ptr->trans_alpha = NULL;
+       }
    }
 
    if (trans_color != NULL)

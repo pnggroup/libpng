@@ -1772,10 +1772,6 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return handled_error;
    }
 
-   /* TODO: this is a horrible side effect in the palette case because the
-    * png_struct ends up with a pointer to the tRNS buffer owned by the
-    * png_info.  Fix this.
-    */
    png_set_tRNS(png_ptr, info_ptr, readbuf, png_ptr->num_trans,
        &(png_ptr->trans_color));
    return handled_ok;

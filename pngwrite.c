@@ -1010,6 +1010,12 @@ png_write_destroy(png_structrp png_ptr)
    png_ptr->chunk_list = NULL;
 #endif
 
+#if defined(PNG_tRNS_SUPPORTED)
+   /* Free the independent copy of trans_alpha owned by png_struct. */
+   png_free(png_ptr, png_ptr->trans_alpha);
+   png_ptr->trans_alpha = NULL;
+#endif
+
    /* The error handling and memory handling information is left intact at this
     * point: the jmp_buf may still have to be freed.  See png_destroy_png_struct
     * for how this happens.
