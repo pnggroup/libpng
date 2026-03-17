@@ -1159,9 +1159,13 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
 
        if (num_trans > 0 && num_trans <= PNG_MAX_PALETTE_LENGTH)
        {
-          /* Allocate info_ptr's copy of the transparency data. */
+          /* Allocate info_ptr's copy of the transparency data.
+           * Initialize all entries to fully opaque (0xff), then overwrite
+           * the first num_trans entries with the actual values.
+           */
           info_ptr->trans_alpha = png_voidcast(png_bytep,
               png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH));
+          memset(info_ptr->trans_alpha, 0xff, PNG_MAX_PALETTE_LENGTH);
           memcpy(info_ptr->trans_alpha, trans_alpha, (size_t)num_trans);
           info_ptr->free_me |= PNG_FREE_TRNS;
           info_ptr->valid |= PNG_INFO_tRNS;
@@ -1177,6 +1181,7 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
           png_free(png_ptr, png_ptr->trans_alpha);
           png_ptr->trans_alpha = png_voidcast(png_bytep,
               png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH));
+          memset(png_ptr->trans_alpha, 0xff, PNG_MAX_PALETTE_LENGTH);
           memcpy(png_ptr->trans_alpha, trans_alpha, (size_t)num_trans);
        }
        else
