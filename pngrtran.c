@@ -814,7 +814,13 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
    }
    if (png_ptr->palette == NULL)
    {
-      png_ptr->palette = palette;
+      /* Allocate an owned copy rather than aliasing the caller's pointer,
+       * so that png_read_destroy can free png_ptr->palette unconditionally.
+       */
+      png_ptr->palette = png_voidcast(png_colorp, png_calloc(png_ptr,
+          PNG_MAX_PALETTE_LENGTH * (sizeof (png_color))));
+      memcpy(png_ptr->palette, palette, (unsigned int)num_palette *
+          (sizeof (png_color)));
    }
    png_ptr->num_palette = (png_uint_16)num_palette;
 

@@ -1016,6 +1016,10 @@ png_write_destroy(png_structrp png_ptr)
    png_ptr->trans_alpha = NULL;
 #endif
 
+   /* Free the independent copy of the palette owned by png_struct. */
+   png_free(png_ptr, png_ptr->palette);
+   png_ptr->palette = NULL;
+
    /* The error handling and memory handling information is left intact at this
     * point: the jmp_buf may still have to be freed.  See png_destroy_png_struct
     * for how this happens.

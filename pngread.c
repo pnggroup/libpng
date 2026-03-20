@@ -779,12 +779,11 @@ png_read_destroy(png_structrp png_ptr)
    png_ptr->quantize_index = NULL;
 #endif
 
-   if ((png_ptr->free_me & PNG_FREE_PLTE) != 0)
-   {
-      png_zfree(png_ptr, png_ptr->palette);
-      png_ptr->palette = NULL;
-   }
-   png_ptr->free_me &= ~PNG_FREE_PLTE;
+   /* png_ptr->palette is always independently allocated (not aliased
+    * with info_ptr->palette), so free it unconditionally.
+    */
+   png_free(png_ptr, png_ptr->palette);
+   png_ptr->palette = NULL;
 
 #if defined(PNG_tRNS_SUPPORTED) || \
     defined(PNG_READ_EXPAND_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
