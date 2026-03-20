@@ -2070,6 +2070,21 @@ png_read_transform_info(png_structrp png_ptr, png_inforp info_ptr)
 {
    png_debug(1, "in png_read_transform_info");
 
+   if (png_ptr->transformations != 0)
+   {
+      if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
+          info_ptr->palette != NULL && png_ptr->palette != NULL)
+      {
+         /* Sync info_ptr->palette with png_ptr->palette.
+          * The function png_init_read_transformations may have modified
+          * png_ptr->palette in place (e.g. for gamma correction or for
+          * background compositing).
+          */
+         memcpy(info_ptr->palette, png_ptr->palette,
+             PNG_MAX_PALETTE_LENGTH * (sizeof (png_color)));
+      }
+   }
+
 #ifdef PNG_READ_EXPAND_SUPPORTED
    if ((png_ptr->transformations & PNG_EXPAND) != 0)
    {
