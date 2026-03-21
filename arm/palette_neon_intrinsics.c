@@ -1,6 +1,6 @@
 /* palette_neon_intrinsics.c - NEON optimised palette expansion functions
  *
- * Copyright (c) 2018-2019 Cosmin Truta
+ * Copyright (c) 2018-2026 Cosmin Truta
  * Copyright (c) 2017-2018 Arm Holdings. All rights reserved.
  * Written by Richard Townsend <Richard.Townsend@arm.com>, February 2017.
  *
@@ -79,7 +79,7 @@ png_do_expand_palette_rgba8_neon(png_structrp png_ptr, png_row_infop row_info,
     */
    *ddp = *ddp - ((pixels_per_chunk * sizeof(png_uint_32)) - 1);
 
-   for (i = 0; i < row_width; i += pixels_per_chunk)
+   for (i = 0; i + pixels_per_chunk <= row_width; i += pixels_per_chunk)
    {
       uint32x4_t cur;
       png_bytep sp = *ssp - i, dp = *ddp - (i << 2);
@@ -89,13 +89,12 @@ png_do_expand_palette_rgba8_neon(png_structrp png_ptr, png_row_infop row_info,
       cur = vld1q_lane_u32(riffled_palette + *(sp - 0), cur, 3);
       vst1q_u32((void *)dp, cur);
    }
-   if (i != row_width)
-   {
-      /* Remove the amount that wasn't processed. */
-      i -= pixels_per_chunk;
-   }
 
-   /* Decrement output pointers. */
+   /* Undo the pre-adjustment of *ddp before the pointer handoff,
+    * so the scalar fallback in pngrtran.c receives a dp that points
+    * to the correct position.
+    */
+   *ddp = *ddp + (pixels_per_chunk * 4 - 1);
    *ssp = *ssp - i;
    *ddp = *ddp - (i << 2);
    return i;
@@ -120,7 +119,7 @@ png_do_expand_palette_rgb8_neon(png_structrp png_ptr, png_row_infop row_info,
    /* Seeking this back by 8 pixels x 3 bytes. */
    *ddp = *ddp - ((pixels_per_chunk * sizeof(png_color)) - 1);
 
-   for (i = 0; i < row_width; i += pixels_per_chunk)
+   for (i = 0; i + pixels_per_chunk <= row_width; i += pixels_per_chunk)
    {
       uint8x8x3_t cur;
       png_bytep sp = *ssp - i, dp = *ddp - ((i << 1) + i);
@@ -135,13 +134,11 @@ png_do_expand_palette_rgb8_neon(png_structrp png_ptr, png_row_infop row_info,
       vst3_u8((void *)dp, cur);
    }
 
-   if (i != row_width)
-   {
-      /* Remove the amount that wasn't processed. */
-      i -= pixels_per_chunk;
-   }
-
-   /* Decrement output pointers. */
+   /* Undo the pre-adjustment of *ddp before the pointer handoff,
+    * so the scalar fallback in pngrtran.c receives a dp that points
+    * to the correct position.
+    */
+   *ddp = *ddp + (pixels_per_chunk * 3 - 1);
    *ssp = *ssp - i;
    *ddp = *ddp - ((i << 1) + i);
    return i;
