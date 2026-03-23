@@ -849,6 +849,16 @@ png_set_user_transform_info(png_struct *png_ptr, void *user_transform_ptr,
 #endif
 
    png_ptr->user_transform_ptr = user_transform_ptr;
+
+   if (user_transform_depth <= 0 || user_transform_depth > 255 ||
+       user_transform_channels <= 0 || user_transform_channels > 255 ||
+       user_transform_depth * user_transform_channels > 255)
+   {
+      png_app_error(png_ptr,
+          "user_transform_depth * user_transform_channels exceeds 255");
+      return;
+   }
+
    png_ptr->user_transform_depth = (png_byte)user_transform_depth;
    png_ptr->user_transform_channels = (png_byte)user_transform_channels;
 }
