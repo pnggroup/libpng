@@ -96,6 +96,8 @@ TESTS =\
    tests/pngstest-sRGB\
    tests/pngstest-sRGB-alpha\
    tests/pngstest-large-stride\
+   tests/pngstest-negative-stride\
+   tests/pngstest-negative-stride-extra\
    tests/pngunknown-IDAT\
    tests/pngunknown-discard\
    tests/pngunknown-if-safe\

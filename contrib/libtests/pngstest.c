@@ -323,18 +323,19 @@ compare_16bit(int v1, int v2, int error_limit, int multiple_algorithms)
 }
 #endif /* unused */
 
-#define USE_FILE 1       /* else memory */
-#define USE_STDIO 2      /* else use file name */
-#define STRICT 4         /* fail on warnings too */
+#define USE_FILE 1           /* else memory */
+#define USE_STDIO 2          /* else use file name */
+#define STRICT 4             /* fail on warnings too */
 #define VERBOSE 8
-#define KEEP_TMPFILES 16 /* else delete temporary files */
+#define KEEP_TMPFILES 16     /* else delete temporary files */
 #define KEEP_GOING 32
 #define ACCUMULATE 64
 #define FAST_WRITE 128
 #define sRGB_16BIT 256
-#define NO_RESEED  512   /* do not reseed on each new file */
-#define GBG_ERROR 1024   /* do not ignore the gamma+background_rgb_to_gray
-                          * libpng warning. */
+#define NO_RESEED 512        /* do not reseed on each new file */
+#define GBG_ERROR 1024       /* do not ignore the gamma+background_rgb_to_gray
+                              * warning. */
+#define NEGATIVE_STRIDE 2048 /* negate row stride for bottom-up layout */
 
 static void
 print_opts(png_uint_32 opts)
@@ -363,6 +364,8 @@ print_opts(png_uint_32 opts)
    if (opts & GBG_ERROR)
       printf(" --fault-gbg-warning");
 #endif
+   if (opts & NEGATIVE_STRIDE)
+      printf(" --negative-stride");
 }
 
 #define FORMAT_NO_CHANGE 0x80000000 /* additional flag */
@@ -3042,6 +3045,9 @@ read_file(Image *image, png_uint_32 format, png_const_colorp background)
       image->stride = PNG_IMAGE_ROW_STRIDE(image->image) + image->stride_extra;
       allocbuffer(image);
 
+      if (image->opts & NEGATIVE_STRIDE)
+         image->stride = -image->stride;
+
       result = png_image_finish_read(&image->image, background,
          image->buffer+16, (png_int_32)image->stride, image->colormap);
 
@@ -3579,6 +3585,8 @@ main(int argc, char **argv)
          opts |= NO_RESEED;
       else if (strcmp(arg, "--fault-gbg-warning") == 0)
          opts |= GBG_ERROR;
+      else if (strcmp(arg, "--negative-stride") == 0)
+         opts |= NEGATIVE_STRIDE;
       else if (strcmp(arg, "--stride-extra") == 0)
       {
          if (c+1 < argc)
