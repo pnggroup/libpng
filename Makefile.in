@@ -16,7 +16,7 @@
 
 # Makefile.am, the source file for Makefile.in (and hence Makefile), is
 #
-# Copyright (c) 2018-2025 Cosmin Truta
+# Copyright (c) 2018-2026 Cosmin Truta
 # Copyright (c) 2004-2016 Glenn Randers-Pehrson
 #
 # This code is released under the libpng license.
@@ -811,21 +811,40 @@ BUILT_SOURCES = pnglibconf.h
 # set of parameters:
 @ENABLE_TESTS_TRUE@TESTS = \
 @ENABLE_TESTS_TRUE@   tests/pngtest-all\
-@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
-@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-16-to-8\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-alpha-mode\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-background\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-expand16-alpha-mode\
 @ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-expand16-background\
-@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-expand16-transform tests/pngvalid-gamma-sbit\
-@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-threshold tests/pngvalid-gamma-transform\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-expand16-transform\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-sbit\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-threshold\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-transform\
 @ENABLE_TESTS_TRUE@   tests/pngvalid-progressive-size\
 @ENABLE_TESTS_TRUE@   tests/pngvalid-progressive-interlace-standard\
 @ENABLE_TESTS_TRUE@   tests/pngvalid-transform\
-@ENABLE_TESTS_TRUE@   tests/pngvalid-progressive-standard tests/pngvalid-standard\
-@ENABLE_TESTS_TRUE@   tests/pngstest-1.8 tests/pngstest-1.8-alpha tests/pngstest-linear\
-@ENABLE_TESTS_TRUE@   tests/pngstest-linear-alpha tests/pngstest-none tests/pngstest-none-alpha\
-@ENABLE_TESTS_TRUE@   tests/pngstest-sRGB tests/pngstest-sRGB-alpha tests/pngunknown-IDAT\
-@ENABLE_TESTS_TRUE@   tests/pngunknown-discard tests/pngunknown-if-safe tests/pngunknown-sAPI\
-@ENABLE_TESTS_TRUE@   tests/pngunknown-sTER tests/pngunknown-save tests/pngunknown-vpAg\
-@ENABLE_TESTS_TRUE@   tests/pngimage-quick tests/pngimage-full
+@ENABLE_TESTS_TRUE@   tests/pngvalid-progressive-standard\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-standard\
+@ENABLE_TESTS_TRUE@   tests/pngstest-1.8\
+@ENABLE_TESTS_TRUE@   tests/pngstest-1.8-alpha\
+@ENABLE_TESTS_TRUE@   tests/pngstest-linear\
+@ENABLE_TESTS_TRUE@   tests/pngstest-linear-alpha\
+@ENABLE_TESTS_TRUE@   tests/pngstest-none\
+@ENABLE_TESTS_TRUE@   tests/pngstest-none-alpha\
+@ENABLE_TESTS_TRUE@   tests/pngstest-sRGB\
+@ENABLE_TESTS_TRUE@   tests/pngstest-sRGB-alpha\
+@ENABLE_TESTS_TRUE@   tests/pngstest-large-stride\
+@ENABLE_TESTS_TRUE@   tests/pngstest-negative-stride\
+@ENABLE_TESTS_TRUE@   tests/pngstest-negative-stride-extra\
+@ENABLE_TESTS_TRUE@   tests/pngunknown-IDAT\
+@ENABLE_TESTS_TRUE@   tests/pngunknown-discard\
+@ENABLE_TESTS_TRUE@   tests/pngunknown-if-safe\
+@ENABLE_TESTS_TRUE@   tests/pngunknown-sAPI\
+@ENABLE_TESTS_TRUE@   tests/pngunknown-sTER\
+@ENABLE_TESTS_TRUE@   tests/pngunknown-save\
+@ENABLE_TESTS_TRUE@   tests/pngunknown-vpAg\
+@ENABLE_TESTS_TRUE@   tests/pngimage-quick\
+@ENABLE_TESTS_TRUE@   tests/pngimage-full
 
 
 # man pages
@@ -1888,6 +1907,27 @@ tests/pngstest-sRGB.log: tests/pngstest-sRGB
 tests/pngstest-sRGB-alpha.log: tests/pngstest-sRGB-alpha
 	@p='tests/pngstest-sRGB-alpha'; \
 	b='tests/pngstest-sRGB-alpha'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+tests/pngstest-large-stride.log: tests/pngstest-large-stride
+	@p='tests/pngstest-large-stride'; \
+	b='tests/pngstest-large-stride'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+tests/pngstest-negative-stride.log: tests/pngstest-negative-stride
+	@p='tests/pngstest-negative-stride'; \
+	b='tests/pngstest-negative-stride'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+tests/pngstest-negative-stride-extra.log: tests/pngstest-negative-stride-extra
+	@p='tests/pngstest-negative-stride-extra'; \
+	b='tests/pngstest-negative-stride-extra'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
