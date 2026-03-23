@@ -2667,7 +2667,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
        * of the loop until the end; this validates the color-mapped data to
        * ensure all pixels are valid color-map indexes.
        */
-      for (y=0, match=1; y<height && match; ++y, ppa += stridea, ppb += strideb)
+      for (y=0, match=1; y<height && match; ++y)
       {
          png_uint_32 x;
 
@@ -2685,6 +2685,19 @@ compare_two_images(Image *a, Image *b, int via_linear,
             in_use[aval] = 1;
             if (aval > amax)
                amax = aval;
+         }
+
+         /* Increment with care!
+          * With negative strides, an unguarded final increment would produce
+          * a pointer before the allocated object, which is undefined behavior.
+          * Standard C allows one-after-end pointers, not one-before-beginning
+          * pointers, and this restriction stands regardless of whether the
+          * pointers are dereferenced or not.
+          */
+         if (y+1 < height)
+         {
+            ppa += stridea;
+            ppb += strideb;
          }
       }
 
@@ -2862,7 +2875,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
       btoa[3] = btoa[2] = btoa[1] = btoa[0] = 4; /* 4 == not present */
    }
 
-   for (y=0; y<height; ++y, rowa += stridea, rowb += strideb)
+   for (y=0; y<height; ++y)
    {
       png_const_bytep ppa, ppb;
       png_uint_32 x;
@@ -2943,6 +2956,16 @@ compare_two_images(Image *a, Image *b, int via_linear,
           */
          if (!cmppixel(&tr, psa, psb, x, y) && (a->opts & KEEP_GOING) == 0)
             return 0; /* error case */
+      }
+
+      /* Increment with care!
+       * (See the previous comment about preventing negative strides from
+       * causing undefined behavior.)
+       */
+      if (y+1 < height)
+      {
+         rowa += stridea;
+         rowb += strideb;
       }
    }
 
