@@ -48,12 +48,12 @@ png_riffle_palette_neon(png_structrp png_ptr)
       w.val[0] = v.val[0];
       w.val[1] = v.val[1];
       w.val[2] = v.val[2];
-      vst4q_u8(riffled_palette + (i << 2), w);
+      vst4q_u8(riffled_palette + i * 4, w);
    }
 
    /* Fix up the missing transparency values. */
    for (i = 0; i < num_trans; i++)
-      riffled_palette[(i << 2) + 3] = trans_alpha[i];
+      riffled_palette[i * 4 + 3] = trans_alpha[i];
 }
 
 /* Expands a palettized row into RGBA8. */
@@ -77,12 +77,12 @@ png_do_expand_palette_rgba8_neon(png_structrp png_ptr, png_row_infop row_info,
     * The NEON part writes forward from a given position, so we have
     * to seek this back by 4 pixels x 4 bytes.
     */
-   *ddp = *ddp - ((pixels_per_chunk * sizeof(png_uint_32)) - 1);
+   *ddp = *ddp - (pixels_per_chunk * 4 - 1);
 
    for (i = 0; i + pixels_per_chunk <= row_width; i += pixels_per_chunk)
    {
       uint32x4_t cur;
-      png_bytep sp = *ssp - i, dp = *ddp - (i << 2);
+      png_bytep sp = *ssp - i, dp = *ddp - i * 4;
       cur = vld1q_dup_u32 (riffled_palette + *(sp - 3));
       cur = vld1q_lane_u32(riffled_palette + *(sp - 2), cur, 1);
       cur = vld1q_lane_u32(riffled_palette + *(sp - 1), cur, 2);
@@ -96,7 +96,7 @@ png_do_expand_palette_rgba8_neon(png_structrp png_ptr, png_row_infop row_info,
     */
    *ddp = *ddp + (pixels_per_chunk * 4 - 1);
    *ssp = *ssp - i;
-   *ddp = *ddp - (i << 2);
+   *ddp = *ddp - i * 4;
    return i;
 }
 
@@ -117,20 +117,20 @@ png_do_expand_palette_rgb8_neon(png_structrp png_ptr, png_row_infop row_info,
       return 0;
 
    /* Seeking this back by 8 pixels x 3 bytes. */
-   *ddp = *ddp - ((pixels_per_chunk * sizeof(png_color)) - 1);
+   *ddp = *ddp - (pixels_per_chunk * 3 - 1);
 
    for (i = 0; i + pixels_per_chunk <= row_width; i += pixels_per_chunk)
    {
       uint8x8x3_t cur;
-      png_bytep sp = *ssp - i, dp = *ddp - ((i << 1) + i);
-      cur = vld3_dup_u8(palette + sizeof(png_color) * (*(sp - 7)));
-      cur = vld3_lane_u8(palette + sizeof(png_color) * (*(sp - 6)), cur, 1);
-      cur = vld3_lane_u8(palette + sizeof(png_color) * (*(sp - 5)), cur, 2);
-      cur = vld3_lane_u8(palette + sizeof(png_color) * (*(sp - 4)), cur, 3);
-      cur = vld3_lane_u8(palette + sizeof(png_color) * (*(sp - 3)), cur, 4);
-      cur = vld3_lane_u8(palette + sizeof(png_color) * (*(sp - 2)), cur, 5);
-      cur = vld3_lane_u8(palette + sizeof(png_color) * (*(sp - 1)), cur, 6);
-      cur = vld3_lane_u8(palette + sizeof(png_color) * (*(sp - 0)), cur, 7);
+      png_bytep sp = *ssp - i, dp = *ddp - i * 3;
+      cur = vld3_dup_u8(palette + *(sp - 7) * 3);
+      cur = vld3_lane_u8(palette + *(sp - 6) * 3, cur, 1);
+      cur = vld3_lane_u8(palette + *(sp - 5) * 3, cur, 2);
+      cur = vld3_lane_u8(palette + *(sp - 4) * 3, cur, 3);
+      cur = vld3_lane_u8(palette + *(sp - 3) * 3, cur, 4);
+      cur = vld3_lane_u8(palette + *(sp - 2) * 3, cur, 5);
+      cur = vld3_lane_u8(palette + *(sp - 1) * 3, cur, 6);
+      cur = vld3_lane_u8(palette + *(sp - 0) * 3, cur, 7);
       vst3_u8((void *)dp, cur);
    }
 
@@ -140,7 +140,7 @@ png_do_expand_palette_rgb8_neon(png_structrp png_ptr, png_row_infop row_info,
     */
    *ddp = *ddp + (pixels_per_chunk * 3 - 1);
    *ssp = *ssp - i;
-   *ddp = *ddp - ((i << 1) + i);
+   *ddp = *ddp - i * 3;
    return i;
 }
 
