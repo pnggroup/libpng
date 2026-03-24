@@ -2030,7 +2030,7 @@ png_image_write_main(void *argument)
    {
       unsigned int channels = PNG_IMAGE_PIXEL_CHANNELS(image->format);
 
-      if (image->width <= 0x7fffffffU/channels) /* no overflow */
+      if (image->width <= 0x7fffffffU/channels && image->width != 0) /* no overflow */
       {
          png_uint_32 check;
          png_uint_32 png_row_stride = image->width * channels;
