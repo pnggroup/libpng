@@ -727,6 +727,11 @@ png_get_iCCP(const png_struct *png_ptr, png_info *info_ptr,
    {
       *name = info_ptr->iccp_name;
       *profile = info_ptr->iccp_profile;
+      if (info_ptr->iccp_proflen < 128)
+      {
+         png_warning(png_ptr, "Invalid iCCP profile length (too small)");
+         return 0;
+      }
       *proflen = png_get_uint_32(info_ptr->iccp_profile);
       /* This is somewhat irrelevant since the profile data returned has
        * actually been uncompressed.

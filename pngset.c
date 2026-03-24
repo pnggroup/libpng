@@ -873,6 +873,13 @@ png_set_iCCP(const png_struct *png_ptr, png_info *info_ptr,
    if (compression_type != PNG_COMPRESSION_TYPE_BASE)
       png_app_error(png_ptr, "Invalid iCCP compression method");
 
+   // A valid ICC profile header must be exactly 128 bytes long.
+   if (proflen < 128)
+   {
+      png_app_error(png_ptr, "Invalid iCCP profile length (too small)");
+      return;
+   }
+
    length = strlen(name)+1;
    new_iccp_name = png_voidcast(char *, png_malloc_warn(png_ptr, length));
 
