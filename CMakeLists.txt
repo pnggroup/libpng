@@ -772,6 +772,8 @@ if(PNG_TESTS AND PNG_SHARED)
 
   set(PNGTEST_PNG "${CMAKE_CURRENT_SOURCE_DIR}/pngtest.png")
 
+  # pngtest tests:
+  # Basic read/write roundtrip using the sequential API.
   add_executable(pngtest ${pngtest_sources})
   target_link_libraries(pngtest
                         PRIVATE png_shared)
@@ -784,6 +786,9 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngtest
                FILES "${TEST_PNG3_PNGS}")
 
+  # pngvalid tests:
+  # Internal validation of standard and progressive reading,
+  # transforms, and gamma handling.
   add_executable(pngvalid ${pngvalid_sources})
   target_link_libraries(pngvalid
                         PRIVATE png_shared)
@@ -831,6 +836,9 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngvalid
                OPTIONS --transform)
 
+  # pngstest tests:
+  # Format conversions through the simplified API,
+  # by gamma type and alpha type.
   add_executable(pngstest ${pngstest_sources})
   target_link_libraries(pngstest
                         PRIVATE png_shared)
@@ -927,6 +935,8 @@ if(PNG_TESTS AND PNG_SHARED)
                      "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-alpha-8-sRGB.png"
                      "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-alpha-16-linear.png")
 
+  # pngunknown tests:
+  # Unknown chunk handling under various read policies.
   add_executable(pngunknown ${pngunknown_sources})
   target_link_libraries(pngunknown
                         PRIVATE png_shared)
@@ -961,6 +971,8 @@ if(PNG_TESTS AND PNG_SHARED)
                OPTIONS --strict vpAg=if-safe
                FILES "${PNGTEST_PNG}")
 
+  # pngimage tests:
+  # Image read validation against the pngsuite corpus.
   add_executable(pngimage ${pngimage_sources})
   target_link_libraries(pngimage
                         PRIVATE png_shared)
