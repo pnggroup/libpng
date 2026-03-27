@@ -535,6 +535,8 @@ if(PNG_TESTS AND PNG_SHARED)
 
   set(PNGTEST_PNG "${CMAKE_CURRENT_SOURCE_DIR}/pngtest.png")
 
+  # pngtest tests:
+  # Basic read/write roundtrip using the sequential API.
   add_executable(pngtest ${pngtest_sources})
   target_link_libraries(pngtest
                         PRIVATE png_shared)
@@ -547,6 +549,9 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngtest
                FILES "${TEST_PNG3_PNGS}")
 
+  # pngvalid tests:
+  # Internal validation of standard and progressive reading,
+  # transforms, and gamma handling.
   add_executable(pngvalid ${pngvalid_sources})
   target_link_libraries(pngvalid
                         PRIVATE png_shared)
@@ -594,6 +599,9 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngvalid
                OPTIONS --transform)
 
+  # pngstest tests:
+  # Format conversions through the simplified API,
+  # by gamma type and alpha type.
   add_executable(pngstest ${pngstest_sources})
   target_link_libraries(pngstest
                         PRIVATE png_shared)
@@ -650,13 +658,48 @@ if(PNG_TESTS AND PNG_SHARED)
     endforeach()
   endforeach()
 
-  # Regression test:
+  # Large-stride test:
   # Use stride_extra > 32767 to trigger row_bytes > 65535 for linear images.
   png_add_test(NAME pngstest-large-stride
                COMMAND pngstest
                OPTIONS --stride-extra 33000 --tmpfile "large-stride-" --log
                FILES "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-alpha-16-linear.png")
 
+  # Negative-stride test:
+  # Bottom-up layout through all read/write paths.
+  png_add_test(NAME pngstest-negative-stride
+               COMMAND pngstest
+               OPTIONS --negative-stride --tmpfile "negative-stride-" --log
+               FILES "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/gray-1.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/gray-16-linear.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-8-linear.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-16-linear.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/palette-8-tRNS.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/gray-alpha-8-linear.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/gray-alpha-16-linear.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-alpha-8-1.8.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-alpha-8-sRGB.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-alpha-16-linear.png")
+
+  # Negative-stride-extra test:
+  # Bottom-up layout with non-aligned padding.
+  png_add_test(NAME pngstest-negative-stride-extra
+               COMMAND pngstest
+               OPTIONS --negative-stride --stride-extra 7
+                       --tmpfile "negative-stride-extra-" --log
+               FILES "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/gray-1.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/gray-16-linear.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-8-linear.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-16-linear.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/palette-8-tRNS.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/gray-alpha-8-linear.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/gray-alpha-16-linear.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-alpha-8-1.8.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-alpha-8-sRGB.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-alpha-16-linear.png")
+
+  # pngunknown tests:
+  # Unknown chunk handling under various read policies.
   add_executable(pngunknown ${pngunknown_sources})
   target_link_libraries(pngunknown
                         PRIVATE png_shared)
@@ -691,6 +734,8 @@ if(PNG_TESTS AND PNG_SHARED)
                OPTIONS --strict vpAg=if-safe
                FILES "${PNGTEST_PNG}")
 
+  # pngimage tests:
+  # Image read validation against the pngsuite corpus.
   add_executable(pngimage ${pngimage_sources})
   target_link_libraries(pngimage
                         PRIVATE png_shared)

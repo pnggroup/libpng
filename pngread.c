@@ -867,21 +867,19 @@ png_read_destroy(png_struct *png_ptr)
    png_ptr->quantize_index = NULL;
 #endif
 
-   if ((png_ptr->free_me & PNG_FREE_PLTE) != 0)
-   {
-      png_zfree(png_ptr, png_ptr->palette);
-      png_ptr->palette = NULL;
-   }
-   png_ptr->free_me &= ~PNG_FREE_PLTE;
+   /* png_ptr->palette is always independently allocated (not aliased
+    * with info_ptr->palette), so free it unconditionally.
+    */
+   png_free(png_ptr, png_ptr->palette);
+   png_ptr->palette = NULL;
 
 #if defined(PNG_tRNS_SUPPORTED) || \
     defined(PNG_READ_EXPAND_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-   if ((png_ptr->free_me & PNG_FREE_TRNS) != 0)
-   {
-      png_free(png_ptr, png_ptr->trans_alpha);
-      png_ptr->trans_alpha = NULL;
-   }
-   png_ptr->free_me &= ~PNG_FREE_TRNS;
+   /* png_ptr->trans_alpha is always independently allocated (not aliased
+    * with info_ptr->trans_alpha), so free it unconditionally.
+    */
+   png_free(png_ptr, png_ptr->trans_alpha);
+   png_ptr->trans_alpha = NULL;
 #endif
 
    inflateEnd(&png_ptr->zstream);
@@ -4200,7 +4198,7 @@ png_image_finish_read(png_image *image, const png_color *background,
             row_stride = (png_int_32)/*SAFE*/png_row_stride;
 
          if (row_stride < 0)
-            check = (png_uint_32)(-row_stride);
+            check = -(png_uint_32)row_stride;
 
          else
             check = (png_uint_32)row_stride;

@@ -795,7 +795,13 @@ png_set_quantize(png_struct *png_ptr, png_color *palette,
    }
    if (png_ptr->palette == NULL)
    {
-      png_ptr->palette = palette;
+      /* Allocate an owned copy rather than aliasing the caller's pointer,
+       * so that png_read_destroy can free png_ptr->palette unconditionally.
+       */
+      png_ptr->palette = png_voidcast(png_colorp, png_calloc(png_ptr,
+          PNG_MAX_PALETTE_LENGTH * (sizeof (png_color))));
+      memcpy(png_ptr->palette, palette, (unsigned int)num_palette *
+          (sizeof (png_color)));
    }
    png_ptr->num_palette = (png_uint_16)num_palette;
 
@@ -2045,6 +2051,21 @@ void /* PRIVATE */
 png_read_transform_info(png_struct *png_ptr, png_info *info_ptr)
 {
    png_debug(1, "in png_read_transform_info");
+
+   if (png_ptr->transformations != 0)
+   {
+      if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
+          info_ptr->palette != NULL && png_ptr->palette != NULL)
+      {
+         /* Sync info_ptr->palette with png_ptr->palette.
+          * The function png_init_read_transformations may have modified
+          * png_ptr->palette in place (e.g. for gamma correction or for
+          * background compositing).
+          */
+         memcpy(info_ptr->palette, png_ptr->palette,
+             PNG_MAX_PALETTE_LENGTH * (sizeof (png_color)));
+      }
+   }
 
 #ifdef PNG_READ_EXPAND_SUPPORTED
    if ((png_ptr->transformations & PNG_EXPAND) != 0)

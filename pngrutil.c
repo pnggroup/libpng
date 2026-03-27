@@ -1039,19 +1039,6 @@ png_handle_PLTE(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
       /* A valid PLTE chunk has been read */
       png_ptr->mode |= PNG_HAVE_PLTE;
 
-      /* TODO: png_set_PLTE has the side effect of setting png_ptr->palette to
-       * its own copy of the palette.  This has the side effect that when
-       * png_start_row is called (this happens after any call to
-       * png_read_update_info) the info_ptr palette gets changed.  This is
-       * extremely unexpected and confusing.
-       *
-       * REVIEW: there have been consistent bugs in the past about gamma and
-       * similar transforms to colour mapped images being useless because the
-       * modified palette cannot be accessed because of the above.
-       *
-       * CONSIDER: Fix this by not sharing the palette in this way.  But does
-       * this completely fix the problem?
-       */
       png_set_PLTE(png_ptr, info_ptr, palette, num);
       return handled_ok;
    }
@@ -1758,10 +1745,6 @@ png_handle_tRNS(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
       return handled_error;
    }
 
-   /* TODO: this is a horrible side effect in the palette case because the
-    * png_struct ends up with a pointer to the tRNS buffer owned by the
-    * png_info.  Fix this.
-    */
    png_set_tRNS(png_ptr, info_ptr, readbuf, png_ptr->num_trans,
        &(png_ptr->trans_color));
    return handled_ok;

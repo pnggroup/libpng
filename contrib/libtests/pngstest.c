@@ -323,18 +323,19 @@ compare_16bit(int v1, int v2, int error_limit, int multiple_algorithms)
 }
 #endif /* unused */
 
-#define USE_FILE 1       /* else memory */
-#define USE_STDIO 2      /* else use file name */
-#define STRICT 4         /* fail on warnings too */
+#define USE_FILE 1           /* else memory */
+#define USE_STDIO 2          /* else use file name */
+#define STRICT 4             /* fail on warnings too */
 #define VERBOSE 8
-#define KEEP_TMPFILES 16 /* else delete temporary files */
+#define KEEP_TMPFILES 16     /* else delete temporary files */
 #define KEEP_GOING 32
 #define ACCUMULATE 64
 #define FAST_WRITE 128
 #define sRGB_16BIT 256
-#define NO_RESEED  512   /* do not reseed on each new file */
-#define GBG_ERROR 1024   /* do not ignore the gamma+background_rgb_to_gray
-                          * libpng warning. */
+#define NO_RESEED 512        /* do not reseed on each new file */
+#define GBG_ERROR 1024       /* do not ignore the gamma+background_rgb_to_gray
+                              * warning. */
+#define NEGATIVE_STRIDE 2048 /* negate row stride for bottom-up layout */
 
 static void
 print_opts(png_uint_32 opts)
@@ -361,6 +362,8 @@ print_opts(png_uint_32 opts)
       printf(" --noreseed");
    if (opts & GBG_ERROR)
       printf(" --fault-gbg-warning");
+   if (opts & NEGATIVE_STRIDE)
+      printf(" --negative-stride");
 }
 
 #define FORMAT_NO_CHANGE 0x80000000 /* additional flag */
@@ -2662,7 +2665,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
        * of the loop until the end; this validates the color-mapped data to
        * ensure all pixels are valid color-map indexes.
        */
-      for (y=0, match=1; y<height && match; ++y, ppa += stridea, ppb += strideb)
+      for (y=0, match=1; y<height && match; ++y)
       {
          png_uint_32 x;
 
@@ -2680,6 +2683,19 @@ compare_two_images(Image *a, Image *b, int via_linear,
             in_use[aval] = 1;
             if (aval > amax)
                amax = aval;
+         }
+
+         /* Increment with care!
+          * With negative strides, an unguarded final increment would produce
+          * a pointer before the allocated object, which is undefined behavior.
+          * Standard C allows one-after-end pointers, not one-before-beginning
+          * pointers, and this restriction stands regardless of whether the
+          * pointers are dereferenced or not.
+          */
+         if (y+1 < height)
+         {
+            ppa += stridea;
+            ppb += strideb;
          }
       }
 
@@ -2857,7 +2873,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
       btoa[3] = btoa[2] = btoa[1] = btoa[0] = 4; /* 4 == not present */
    }
 
-   for (y=0; y<height; ++y, rowa += stridea, rowb += strideb)
+   for (y=0; y<height; ++y)
    {
       const png_byte *ppa, *ppb;
       png_uint_32 x;
@@ -2938,6 +2954,16 @@ compare_two_images(Image *a, Image *b, int via_linear,
           */
          if (!cmppixel(&tr, psa, psb, x, y) && (a->opts & KEEP_GOING) == 0)
             return 0; /* error case */
+      }
+
+      /* Increment with care!
+       * (See the previous comment about preventing negative strides from
+       * causing undefined behavior.)
+       */
+      if (y+1 < height)
+      {
+         rowa += stridea;
+         rowb += strideb;
       }
    }
 
@@ -3039,6 +3065,9 @@ read_file(Image *image, png_uint_32 format, const png_color *background)
 
       image->stride = PNG_IMAGE_ROW_STRIDE(image->image) + image->stride_extra;
       allocbuffer(image);
+
+      if (image->opts & NEGATIVE_STRIDE)
+         image->stride = -image->stride;
 
       result = png_image_finish_read(&image->image, background,
          image->buffer+16, (png_int_32)image->stride, image->colormap);
@@ -3577,6 +3606,8 @@ main(int argc, char **argv)
          opts |= NO_RESEED;
       else if (strcmp(arg, "--fault-gbg-warning") == 0)
          opts |= GBG_ERROR;
+      else if (strcmp(arg, "--negative-stride") == 0)
+         opts |= NEGATIVE_STRIDE;
       else if (strcmp(arg, "--stride-extra") == 0)
       {
          if (c+1 < argc)
