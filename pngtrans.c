@@ -1,6 +1,6 @@
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Copyright (c) 2018-2025 Cosmin Truta
+ * Copyright (c) 2018-2026 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -84,8 +84,37 @@ png_set_shift(png_struct *png_ptr, const png_color_8 *true_bits)
 {
    png_debug(1, "in png_set_shift");
 
-   if (png_ptr == NULL)
+   if (png_ptr == NULL || true_bits == NULL)
       return;
+
+   /* Check the shift values before passing them on to png_do_shift. */
+   {
+      png_byte bit_depth = png_ptr->bit_depth;
+      int invalid = 0;
+
+      if ((png_ptr->color_type & PNG_COLOR_MASK_COLOR) != 0)
+      {
+         if (true_bits->red == 0 || true_bits->red > bit_depth ||
+             true_bits->green == 0 || true_bits->green > bit_depth ||
+             true_bits->blue == 0 || true_bits->blue > bit_depth)
+            invalid = 1;
+      }
+      else
+      {
+         if (true_bits->gray == 0 || true_bits->gray > bit_depth)
+            invalid = 1;
+      }
+
+      if ((png_ptr->color_type & PNG_COLOR_MASK_ALPHA) != 0 &&
+          (true_bits->alpha == 0 || true_bits->alpha > bit_depth))
+         invalid = 1;
+
+      if (invalid)
+      {
+         png_app_error(png_ptr, "png_set_shift: invalid shift values");
+         return;
+      }
+   }
 
    png_ptr->transformations |= PNG_SHIFT;
    png_ptr->shift = *true_bits;

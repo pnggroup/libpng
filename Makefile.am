@@ -1,6 +1,6 @@
 # Makefile.am, the source file for Makefile.in (and hence Makefile), is
 #
-# Copyright (c) 2018-2025 Cosmin Truta
+# Copyright (c) 2018-2026 Cosmin Truta
 # Copyright (c) 2004-2016 Glenn Randers-Pehrson
 #
 # This code is released under the libpng license.
@@ -73,21 +73,40 @@ endif
 if ENABLE_TESTS
 TESTS =\
    tests/pngtest-all\
-   tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
-   tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
+   tests/pngvalid-gamma-16-to-8\
+   tests/pngvalid-gamma-alpha-mode\
+   tests/pngvalid-gamma-background\
+   tests/pngvalid-gamma-expand16-alpha-mode\
    tests/pngvalid-gamma-expand16-background\
-   tests/pngvalid-gamma-expand16-transform tests/pngvalid-gamma-sbit\
-   tests/pngvalid-gamma-threshold tests/pngvalid-gamma-transform\
+   tests/pngvalid-gamma-expand16-transform\
+   tests/pngvalid-gamma-sbit\
+   tests/pngvalid-gamma-threshold\
+   tests/pngvalid-gamma-transform\
    tests/pngvalid-progressive-size\
    tests/pngvalid-progressive-interlace-standard\
    tests/pngvalid-transform\
-   tests/pngvalid-progressive-standard tests/pngvalid-standard\
-   tests/pngstest-1.8 tests/pngstest-1.8-alpha tests/pngstest-linear\
-   tests/pngstest-linear-alpha tests/pngstest-none tests/pngstest-none-alpha\
-   tests/pngstest-sRGB tests/pngstest-sRGB-alpha tests/pngunknown-IDAT\
-   tests/pngunknown-discard tests/pngunknown-if-safe tests/pngunknown-sAPI\
-   tests/pngunknown-sTER tests/pngunknown-save tests/pngunknown-vpAg\
-   tests/pngimage-quick tests/pngimage-full
+   tests/pngvalid-progressive-standard\
+   tests/pngvalid-standard\
+   tests/pngstest-1.8\
+   tests/pngstest-1.8-alpha\
+   tests/pngstest-linear\
+   tests/pngstest-linear-alpha\
+   tests/pngstest-none\
+   tests/pngstest-none-alpha\
+   tests/pngstest-sRGB\
+   tests/pngstest-sRGB-alpha\
+   tests/pngstest-large-stride\
+   tests/pngstest-negative-stride\
+   tests/pngstest-negative-stride-extra\
+   tests/pngunknown-IDAT\
+   tests/pngunknown-discard\
+   tests/pngunknown-if-safe\
+   tests/pngunknown-sAPI\
+   tests/pngunknown-sTER\
+   tests/pngunknown-save\
+   tests/pngunknown-vpAg\
+   tests/pngimage-quick\
+   tests/pngimage-full
 endif
 
 # man pages

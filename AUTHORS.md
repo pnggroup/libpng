@@ -16,6 +16,7 @@ Authors, for copyright and licensing purposes.
  * Glenn Randers-Pehrson
  * Greg Roelofs
  * Guy Eric Schalnat
+ * Halil Oktay
  * James Yu
  * John Bowler
  * Joshua Inscoe
@@ -36,12 +37,14 @@ Authors, for copyright and licensing purposes.
  * Sam Bushell
  * Samuel Williams
  * Simon-Pierre Cadieux
+ * Taegu Ha (하태구)
  * Tim Wegner
  * Tobias Stoeckmann
  * Tom Lane
  * Tom Tanner
  * Vadim Barkov
  * Willem van Schaik
+ * Yuelin Wang (王跃林)
  * Zhijie Liang
  * Apple Inc.
     - Zixu Wang (王子旭)

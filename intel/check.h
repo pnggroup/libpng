@@ -9,7 +9,7 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  */
-/* PNG_INTEL_SSE_IMPLEMENTATION is used in the actual implementation to selecct
+/* PNG_INTEL_SSE_IMPLEMENTATION is used in the actual implementation to select
  * the correct code.
  */
 #if defined(__SSE4_1__) || defined(__AVX__)

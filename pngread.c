@@ -779,7 +779,7 @@ png_read_end(png_struct *png_ptr, png_info *info_ptr)
       png_read_finish_IDAT(png_ptr);
 
 #ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
-   /* Report invalid palette index; added at libng-1.5.10 */
+   /* Report invalid palette index; added at libpng-1.5.10 */
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
        png_ptr->num_palette_max >= png_ptr->num_palette)
       png_benign_error(png_ptr, "Read palette index exceeding num_palette");
@@ -867,21 +867,19 @@ png_read_destroy(png_struct *png_ptr)
    png_ptr->quantize_index = NULL;
 #endif
 
-   if ((png_ptr->free_me & PNG_FREE_PLTE) != 0)
-   {
-      png_zfree(png_ptr, png_ptr->palette);
-      png_ptr->palette = NULL;
-   }
-   png_ptr->free_me &= ~PNG_FREE_PLTE;
+   /* png_ptr->palette is always independently allocated (not aliased
+    * with info_ptr->palette), so free it unconditionally.
+    */
+   png_free(png_ptr, png_ptr->palette);
+   png_ptr->palette = NULL;
 
 #if defined(PNG_tRNS_SUPPORTED) || \
     defined(PNG_READ_EXPAND_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-   if ((png_ptr->free_me & PNG_FREE_TRNS) != 0)
-   {
-      png_free(png_ptr, png_ptr->trans_alpha);
-      png_ptr->trans_alpha = NULL;
-   }
-   png_ptr->free_me &= ~PNG_FREE_TRNS;
+   /* png_ptr->trans_alpha is always independently allocated (not aliased
+    * with info_ptr->trans_alpha), so free it unconditionally.
+    */
+   png_free(png_ptr, png_ptr->trans_alpha);
+   png_ptr->trans_alpha = NULL;
 #endif
 
    inflateEnd(&png_ptr->zstream);
@@ -1343,7 +1341,7 @@ png_image_is_not_sRGB(const png_struct *png_ptr)
     * png_struct::chromaticities always exists since the simplified API
     * requires rgb-to-gray.  The mDCV, cICP and cHRM chunks may all set it to
     * a non-sRGB value, so it needs to be checked but **only** if one of
-    * those chunks occured in the file.
+    * those chunks occurred in the file.
     */
    /* Highest priority: check to be safe. */
    if (png_has_chunk(png_ptr, cICP) || png_has_chunk(png_ptr, mDCV))
@@ -2683,7 +2681,7 @@ png_image_read_colormap(void *argument)
                   {
                      r = back_r;
                      g = back_g;
-                     b = back_g;
+                     b = back_b;
                   }
 
                   /* Compare the newly-created color-map entry with the one the
@@ -2963,7 +2961,7 @@ png_image_read_and_map(void *argument)
             png_byte *outrow = first_row + y * row_step;
             png_byte *row_end = outrow + width;
 
-            /* Read read the libpng data into the temporary buffer. */
+            /* Read the libpng data into the temporary buffer. */
             png_read_row(png_ptr, inrow, NULL);
 
             /* Now process the row according to the processing option, note
@@ -3065,10 +3063,10 @@ png_image_read_and_map(void *argument)
                          */
                         if (inrow[0] & 0x80) back_i += 9; /* red */
                         if (inrow[0] & 0x40) back_i += 9;
-                        if (inrow[0] & 0x80) back_i += 3; /* green */
-                        if (inrow[0] & 0x40) back_i += 3;
-                        if (inrow[0] & 0x80) back_i += 1; /* blue */
-                        if (inrow[0] & 0x40) back_i += 1;
+                        if (inrow[1] & 0x80) back_i += 3; /* green */
+                        if (inrow[1] & 0x40) back_i += 3;
+                        if (inrow[2] & 0x80) back_i += 1; /* blue */
+                        if (inrow[2] & 0x40) back_i += 1;
 
                         *outrow = (png_byte)back_i;
                      }
@@ -4200,7 +4198,7 @@ png_image_finish_read(png_image *image, const png_color *background,
             row_stride = (png_int_32)/*SAFE*/png_row_stride;
 
          if (row_stride < 0)
-            check = (png_uint_32)(-row_stride);
+            check = -(png_uint_32)row_stride;
 
          else
             check = (png_uint_32)row_stride;

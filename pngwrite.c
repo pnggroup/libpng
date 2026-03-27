@@ -164,7 +164,7 @@ png_write_info_before_PLTE(png_struct *png_ptr, const png_info *info_ptr)
     * them.
     *
     * PNG v3: Chunks mDCV and cLLI provide ancillary information for the
-    * interpretation of the colourspace chunkgs but do not require support for
+    * interpretation of the colourspace chunks but do not require support for
     * those chunks so are outside the "COLORSPACE" check but before the write of
     * the colourspace chunks themselves.
     */
@@ -1019,6 +1019,16 @@ png_write_destroy(png_struct *png_ptr)
    png_free(png_ptr, png_ptr->chunk_list);
    png_ptr->chunk_list = NULL;
 #endif
+
+#if defined(PNG_tRNS_SUPPORTED)
+   /* Free the independent copy of trans_alpha owned by png_struct. */
+   png_free(png_ptr, png_ptr->trans_alpha);
+   png_ptr->trans_alpha = NULL;
+#endif
+
+   /* Free the independent copy of the palette owned by png_struct. */
+   png_free(png_ptr, png_ptr->palette);
+   png_ptr->palette = NULL;
 
    /* The error handling and memory handling information is left intact at this
     * point: the jmp_buf may still have to be freed.  See png_destroy_png_struct
@@ -2039,7 +2049,7 @@ png_image_write_main(void *argument)
             display->row_stride = (png_int_32)/*SAFE*/png_row_stride;
 
          if (display->row_stride < 0)
-            check = (png_uint_32)(-display->row_stride);
+            check = -(png_uint_32)display->row_stride;
 
          else
             check = (png_uint_32)display->row_stride;

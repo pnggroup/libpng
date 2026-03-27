@@ -14,7 +14,7 @@
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
  *   libpng versions 0.97, January 1998, through 1.6.35, July 2018:
  *     Glenn Randers-Pehrson
- *   libpng versions 1.6.36, December 2018, through 1.6.55, February 2026:
+ *   libpng versions 1.6.36, December 2018, through 1.6.56, March 2026:
  *     Cosmin Truta
  *   See also "Contributing Authors", below.
  */
@@ -2260,7 +2260,7 @@ PNG_EXPORT(int, png_get_text,
 #endif
 
 /* Note while png_set_text() will accept a structure whose text,
- * language, and  translated keywords are NULL pointers, the structure
+ * language, and translated keywords are NULL pointers, the structure
  * returned by png_get_text will always contain regular
  * zero-terminated C strings.  They might be empty strings but
  * they will never be NULL pointers.
@@ -3358,7 +3358,7 @@ PNG_EXPORT(int, png_image_write_to_memory,
  *           For backward compatibility the original options are defined as
  *           the 'new' hardware option.  libpng can be compiled without
  *           hardware support (check PNG_TARGET_SPECIFIC_CODE_SUPPORTED and
- *           the documenation in pngtarget.h).
+ *           the documentation in pngtarget.h).
  *
  * SOFTWARE: sometimes software optimizations actually result in performance
  *           decrease on some architectures or systems, or with some sets of
