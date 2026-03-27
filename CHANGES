@@ -6368,6 +6368,8 @@ Version 1.6.56 [March 25, 2026]
     (Contributed by Bob Friesenhahn and Philippe Antoine.)
   Performed various refactorings and cleanups.
 
+Version 1.6.57 [TODO]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
 <https://lists.sourceforge.net/lists/listinfo/png-mng-implement>
