@@ -89,10 +89,6 @@ typedef enum
 } png_index;
 #undef PNG_CHUNK
 
-/* Chunk flag values.  These are (png_uint_32 values) with exactly one bit set
- * and can be combined into a flag set with bitwise 'or'.
- */
-
 struct png_struct_def
 {
 #ifdef PNG_SETJMP_SUPPORTED
@@ -452,26 +448,30 @@ struct png_struct_def
 #endif
 };
 
-static inline png_uint_32 png_chunk_flag_from_index(png_index i)
-{
-   return 0x80000000U >> (31 - (i));
-}
+/* Chunk flag values.  These are (png_uint_32 values) with exactly one bit set
+ * and can be combined into a flag set with bitwise 'or'.
+ */
+
 /* The flag corresponding to the given png_index enum value.  This is defined
  * for png_unknown as well (until it reaches the value 32) but this should
  * not be relied on.
  */
+static inline png_uint_32 png_chunk_flag_from_index(png_index i)
+{
+   return 0x80000000U >> (31 - (i));
+}
 
+/* The chunk has been recorded in png_struct */
 static inline png_uint_32 png_file_has_chunk(const png_struct *png_ptr,
     png_index i)
 {
    return ((png_ptr)->chunks & png_chunk_flag_from_index(i)) != 0;
 }
-/* The chunk has been recorded in png_struct */
 
+/* Record the chunk in png_struct */
 static inline void png_file_add_chunk(png_struct *png_ptr, png_index i)
 {
    (png_ptr)->chunks |= png_chunk_flag_from_index(i);
 }
-/* Record the chunk in the png_struct */
 
 #endif /* PNGSTRUCT_H */
