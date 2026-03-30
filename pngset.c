@@ -954,6 +954,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
     png_const_textp text_ptr, int num_text)
 {
    int i;
+   png_textp old_text = NULL;
 
    png_debug1(1, "in text storage function, chunk typeid = 0x%lx",
       png_ptr == NULL ? 0xabadca11UL : (unsigned long)png_ptr->chunk_name);
@@ -1001,7 +1002,10 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
          return 1;
       }
 
-      png_free(png_ptr, info_ptr->text);
+      /* Defer freeing the old array until after the copy loop below,
+       * in case text_ptr aliases info_ptr->text (getter-to-setter).
+       */
+      old_text = info_ptr->text;
 
       info_ptr->text = new_text;
       info_ptr->free_me |= PNG_FREE_TEXT;
@@ -1086,6 +1090,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       {
          png_chunk_report(png_ptr, "text chunk: out of memory",
              PNG_CHUNK_WRITE_ERROR);
+         png_free(png_ptr, old_text);
 
          return 1;
       }
@@ -1138,6 +1143,8 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       info_ptr->num_text++;
       png_debug1(3, "transferred text chunk %d", info_ptr->num_text);
    }
+
+   png_free(png_ptr, old_text);
 
    return 0;
 }
@@ -1276,6 +1283,7 @@ png_set_sPLT(png_const_structrp png_ptr,
  */
 {
    png_sPLT_tp np;
+   png_sPLT_tp old_spalettes;
 
    png_debug1(1, "in %s storage function", "sPLT");
 
@@ -1296,7 +1304,10 @@ png_set_sPLT(png_const_structrp png_ptr,
       return;
    }
 
-   png_free(png_ptr, info_ptr->splt_palettes);
+   /* Defer freeing the old array until after the copy loop below,
+    * in case entries aliases info_ptr->splt_palettes (getter-to-setter).
+    */
+   old_spalettes = info_ptr->splt_palettes;
 
    info_ptr->splt_palettes = np;
    info_ptr->free_me |= PNG_FREE_SPLT;
@@ -1360,6 +1371,8 @@ png_set_sPLT(png_const_structrp png_ptr,
    }
    while (--nentries);
 
+   png_free(png_ptr, old_spalettes);
+
    if (nentries > 0)
       png_chunk_report(png_ptr, "sPLT out of memory", PNG_CHUNK_WRITE_ERROR);
 }
@@ -1408,6 +1421,7 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
     png_inforp info_ptr, png_const_unknown_chunkp unknowns, int num_unknowns)
 {
    png_unknown_chunkp np;
+   png_unknown_chunkp old_unknowns;
 
    if (png_ptr == NULL || info_ptr == NULL || num_unknowns <= 0 ||
        unknowns == NULL)
@@ -1454,7 +1468,10 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
       return;
    }
 
-   png_free(png_ptr, info_ptr->unknown_chunks);
+   /* Defer freeing the old array until after the copy loop below,
+    * in case unknowns aliases info_ptr->unknown_chunks (getter-to-setter).
+    */
+   old_unknowns = info_ptr->unknown_chunks;
 
    info_ptr->unknown_chunks = np; /* safe because it is initialized */
    info_ptr->free_me |= PNG_FREE_UNKN;
@@ -1500,6 +1517,8 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
       ++np;
       ++(info_ptr->unknown_chunks_num);
    }
+
+   png_free(png_ptr, old_unknowns);
 }
 
 void PNGAPI
