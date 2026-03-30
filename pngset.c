@@ -385,6 +385,7 @@ void PNGAPI
 png_set_hIST(png_const_structrp png_ptr, png_inforp info_ptr,
     png_const_uint_16p hist)
 {
+   png_uint_16 safe_hist[PNG_MAX_PALETTE_LENGTH];
    int i;
 
    png_debug1(1, "in %s storage function", "hIST");
@@ -400,6 +401,13 @@ png_set_hIST(png_const_structrp png_ptr, png_inforp info_ptr,
 
       return;
    }
+
+   /* Snapshot the caller's hist before freeing, in case it points to
+    * info_ptr->hist (getter-to-setter aliasing).
+    */
+   memcpy(safe_hist, hist, (unsigned int)info_ptr->num_palette *
+       (sizeof (png_uint_16)));
+   hist = safe_hist;
 
    png_free_data(png_ptr, info_ptr, PNG_FREE_HIST, 0);
 
@@ -742,7 +750,7 @@ void PNGAPI
 png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
     png_const_colorp palette, int num_palette)
 {
-
+   png_color safe_palette[PNG_MAX_PALETTE_LENGTH];
    png_uint_32 max_palette_length;
 
    png_debug1(1, "in %s storage function", "PLTE");
@@ -775,6 +783,15 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
    {
       png_error(png_ptr, "Invalid palette");
    }
+
+   /* Snapshot the caller's palette before freeing, in case it points to
+    * info_ptr->palette (getter-to-setter aliasing).
+    */
+   if (num_palette > 0)
+      memcpy(safe_palette, palette, (unsigned int)num_palette *
+          (sizeof (png_color)));
+
+   palette = safe_palette;
 
    png_free_data(png_ptr, info_ptr, PNG_FREE_PLTE, 0);
 
@@ -1165,6 +1182,16 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
 
    if (trans_alpha != NULL)
    {
+       /* Snapshot the caller's trans_alpha before freeing, in case it
+        * points to info_ptr->trans_alpha (getter-to-setter aliasing).
+        */
+       png_byte safe_trans[PNG_MAX_PALETTE_LENGTH];
+
+       if (num_trans > 0 && num_trans <= PNG_MAX_PALETTE_LENGTH)
+          memcpy(safe_trans, trans_alpha, (size_t)num_trans);
+
+       trans_alpha = safe_trans;
+
        png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
 
        if (num_trans > 0 && num_trans <= PNG_MAX_PALETTE_LENGTH)
