@@ -4928,8 +4928,16 @@ png_progressive_read_reset(png_struct *png_ptr)
    png_ptr->zstream.avail_in = 0;
    png_ptr->zstream.next_in = 0;
    png_ptr->zstream.next_out = png_ptr->row_buf;
-   png_ptr->zstream.avail_out =
-      (uInt)PNG_ROWBYTES(png_ptr->pixel_depth, png_ptr->iwidth) + 1;
+   {
+      size_t out_size = PNG_ROWBYTES(png_ptr->pixel_depth,
+          png_ptr->iwidth) + 1;
+      uInt avail = ZLIB_IO_MAX;
+
+      if (avail > out_size)
+         avail = (uInt)out_size;
+
+      png_ptr->zstream.avail_out = avail;
+   }
 }
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 #endif /* PNG_READ_APNG_SUPPORTED */
