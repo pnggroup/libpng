@@ -186,7 +186,7 @@ png_target_do_expand_palette_neon(png_struct *png_ptr, png_row_info *row_info,
          /* Finally update row_info to reflect the expanded output: */
          row_info->bit_depth = 8;
          row_info->pixel_depth = 32;
-         row_info->rowbytes = row_width * 4;
+         row_info->rowbytes = (size_t)row_width * 4;
          row_info->color_type = 6;
          row_info->channels = 4;
          return 1;
@@ -194,7 +194,7 @@ png_target_do_expand_palette_neon(png_struct *png_ptr, png_row_info *row_info,
       else
       {
          /* No tRNS chunk (num_trans == 0), expand to RGB not RGBA. */
-         png_byte *dp = row + (3/*RGB*/*row_width - 1);
+         png_byte *dp = row + (3/*RGB*/ * (size_t)row_width - 1);
 
          png_uint_32 i = png_target_do_expand_palette_rgb8_neon(palette,
                row_info->width, &sp, &dp);
@@ -213,7 +213,7 @@ png_target_do_expand_palette_neon(png_struct *png_ptr, png_row_info *row_info,
 
          row_info->bit_depth = 8;
          row_info->pixel_depth = 24;
-         row_info->rowbytes = row_width * 3;
+         row_info->rowbytes = (size_t)row_width * 3;
          row_info->color_type = 2;
          row_info->channels = 3;
          return 1;

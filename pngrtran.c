@@ -2361,7 +2361,7 @@ png_do_unpack(png_row_info *row_info, png_byte *row)
       }
       row_info->bit_depth = 8;
       row_info->pixel_depth = (png_byte)(8 * row_info->channels);
-      row_info->rowbytes = row_width * row_info->channels;
+      row_info->rowbytes = (size_t)row_width * row_info->channels;
    }
 }
 #endif
@@ -2563,7 +2563,7 @@ png_do_scale_16_to_8(png_row_info *row_info, png_byte *row)
 
       row_info->bit_depth = 8;
       row_info->pixel_depth = (png_byte)(8 * row_info->channels);
-      row_info->rowbytes = row_info->width * row_info->channels;
+      row_info->rowbytes = (size_t)row_info->width * row_info->channels;
    }
 }
 #endif
@@ -2591,7 +2591,7 @@ png_do_chop(png_row_info *row_info, png_byte *row)
 
       row_info->bit_depth = 8;
       row_info->pixel_depth = (png_byte)(8 * row_info->channels);
-      row_info->rowbytes = row_info->width * row_info->channels;
+      row_info->rowbytes = (size_t)row_info->width * row_info->channels;
    }
 }
 #endif
@@ -2827,7 +2827,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
             *(--dp) = lo_filler;
             row_info->channels = 2;
             row_info->pixel_depth = 16;
-            row_info->rowbytes = row_width * 2;
+            row_info->rowbytes = (size_t)row_width * 2;
          }
 
          else
@@ -2842,7 +2842,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
             }
             row_info->channels = 2;
             row_info->pixel_depth = 16;
-            row_info->rowbytes = row_width * 2;
+            row_info->rowbytes = (size_t)row_width * 2;
          }
       }
 
@@ -2865,7 +2865,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
             *(--dp) = hi_filler;
             row_info->channels = 2;
             row_info->pixel_depth = 32;
-            row_info->rowbytes = row_width * 4;
+            row_info->rowbytes = (size_t)row_width * 4;
          }
 
          else
@@ -2882,7 +2882,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
             }
             row_info->channels = 2;
             row_info->pixel_depth = 32;
-            row_info->rowbytes = row_width * 4;
+            row_info->rowbytes = (size_t)row_width * 4;
          }
       }
 #endif
@@ -2906,7 +2906,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
             *(--dp) = lo_filler;
             row_info->channels = 4;
             row_info->pixel_depth = 32;
-            row_info->rowbytes = row_width * 4;
+            row_info->rowbytes = (size_t)row_width * 4;
          }
 
          else
@@ -2923,7 +2923,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
             }
             row_info->channels = 4;
             row_info->pixel_depth = 32;
-            row_info->rowbytes = row_width * 4;
+            row_info->rowbytes = (size_t)row_width * 4;
          }
       }
 
@@ -2950,7 +2950,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
             *(--dp) = hi_filler;
             row_info->channels = 4;
             row_info->pixel_depth = 64;
-            row_info->rowbytes = row_width * 8;
+            row_info->rowbytes = (size_t)row_width * 8;
          }
 
          else
@@ -2972,7 +2972,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
 
             row_info->channels = 4;
             row_info->pixel_depth = 64;
-            row_info->rowbytes = row_width * 8;
+            row_info->rowbytes = (size_t)row_width * 8;
          }
       }
 #endif
@@ -4451,7 +4451,7 @@ png_do_expand_palette(png_row_info *row_info, png_byte *row,
                }
                row_info->bit_depth = 8;
                row_info->pixel_depth = 32;
-               row_info->rowbytes = row_width * 4;
+               row_info->rowbytes = (size_t)row_width * 4;
                row_info->color_type = 6;
                row_info->channels = 4;
             }
@@ -4459,7 +4459,7 @@ png_do_expand_palette(png_row_info *row_info, png_byte *row,
             else
             {
                sp = row + (size_t)row_width - 1;
-               dp = row + (size_t)(row_width * 3) - 1;
+               dp = row + (size_t)row_width * 3 - 1;
                for (i = 0; i < row_width; i++)
                {
                   *dp-- = palette[*sp].blue;
@@ -4470,7 +4470,7 @@ png_do_expand_palette(png_row_info *row_info, png_byte *row,
 
                row_info->bit_depth = 8;
                row_info->pixel_depth = 24;
-               row_info->rowbytes = row_width * 3;
+               row_info->rowbytes = (size_t)row_width * 3;
                row_info->color_type = 2;
                row_info->channels = 3;
             }
