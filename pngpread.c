@@ -1,6 +1,6 @@
 /* pngpread.c - read a png file in push mode
  *
- * Copyright (c) 2018-2025 Cosmin Truta
+ * Copyright (c) 2018-2026 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -216,19 +216,12 @@ png_push_read_chunk(png_struct *png_ptr, png_info *info_ptr)
             return;
          }
 
+         png_crc_finish(png_ptr, png_ptr->push_length);
          png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
          return;
       }
       else if (chunk_name == png_fdAT)
       {
-         if (png_ptr->buffer_size < 4)
-         {
-            png_push_save_buffer(png_ptr);
-            return;
-         }
-
-         png_ensure_sequence_number(png_ptr, 4);
-
          if (!(png_ptr->mode & PNG_HAVE_fcTL))
          {
             /* Discard trailing fdATs for frames other than the first. */
@@ -241,6 +234,8 @@ png_push_read_chunk(png_struct *png_ptr, png_info *info_ptr)
                return;
             }
 
+            png_ensure_sequence_number(png_ptr, png_ptr->push_length);
+            png_crc_finish(png_ptr, png_ptr->push_length - 4);
             png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
             return;
          }
@@ -248,6 +243,13 @@ png_push_read_chunk(png_struct *png_ptr, png_info *info_ptr)
          else
          {
             /* Frame data follows. */
+            if (png_ptr->buffer_size < 4)
+            {
+               png_push_save_buffer(png_ptr);
+               return;
+            }
+
+            png_ensure_sequence_number(png_ptr, png_ptr->push_length);
             png_ptr->idat_size = png_ptr->push_length - 4;
             png_ptr->mode |= PNG_HAVE_IDAT;
             png_ptr->process_mode = PNG_READ_IDAT_MODE;
@@ -291,6 +293,7 @@ png_push_read_chunk(png_struct *png_ptr, png_info *info_ptr)
             return;
          }
          png_warning(png_ptr, "Ignoring unexpected chunk in APNG sequence");
+         png_crc_finish(png_ptr, png_ptr->push_length);
          png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
          return;
       }
