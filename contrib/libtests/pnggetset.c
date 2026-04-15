@@ -6,12 +6,7 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  *
- * Test the get-then-set roundtrip for chunk types whose getters return
- * a pointer to internal storage.
- *
- * Passing such a pointer back into the corresponding setter must not
- * cause a use-after-free.  A previous version freed the internal buffer
- * before copying from the caller-supplied pointer.
+ * Test getter and setter correctness.
  */
 
 #include <stdio.h>
@@ -99,9 +94,9 @@ test_plte_roundtrip(void)
    }
    for (i = 0; i < 4; i++)
    {
-      if (got_palette[i].red   != (png_byte)(i * 10) ||
-          got_palette[i].green != (png_byte)(i * 20) ||
-          got_palette[i].blue  != (png_byte)(i * 30))
+      if ((got_palette[i].red != (png_byte)(i * 10))
+          || (got_palette[i].green != (png_byte)(i * 20))
+          || (got_palette[i].blue != (png_byte)(i * 30)))
       {
          fprintf(stderr,
              "pnggetset: PLTE entry %d corrupted after roundtrip\n", i);
@@ -569,6 +564,215 @@ test_unknown_roundtrip(void)
 }
 #endif /* PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED */
 
+/* Memory buffer for PNG I/O without temp files. */
+#define MEM_BUF_SIZE 4096
+
+typedef struct
+{
+   png_byte data[MEM_BUF_SIZE];
+   size_t len;
+   size_t pos;
+} mem_buf;
+
+static void PNGCBAPI
+mem_write(png_structp png_ptr, png_bytep buf, png_size_t length)
+{
+   mem_buf *mb = (mem_buf *)png_get_io_ptr(png_ptr);
+
+   if (mb->len + length > MEM_BUF_SIZE)
+      png_error(png_ptr, "pnggetset: write overflow");
+
+   memcpy(mb->data + mb->len, buf, length);
+   mb->len += length;
+}
+
+static void PNGCBAPI
+mem_flush(png_structp png_ptr)
+{
+   (void)png_ptr;
+}
+
+static void PNGCBAPI
+mem_read(png_structp png_ptr, png_bytep buf, png_size_t length)
+{
+   mem_buf *mb = (mem_buf *)png_get_io_ptr(png_ptr);
+
+   if (mb->pos + length > mb->len)
+      png_error(png_ptr, "pnggetset: read overflow");
+
+   memcpy(buf, mb->data + mb->pos, length);
+   mb->pos += length;
+}
+
+/* Palette sync after gamma correction.
+ *
+ * When info_ptr->palette and png_ptr->palette are separate buffers,
+ * in-place gamma correction of png_ptr->palette must be synced back
+ * to info_ptr->palette so that png_get_PLTE returns the corrected
+ * values.
+ */
+#define PLTE_SYNC_NPALETTE 4
+
+static const png_color plte_sync_original[PLTE_SYNC_NPALETTE] =
+{
+   {  64,  96, 128 },
+   { 128, 160, 192 },
+   { 192, 224, 240 },
+   {  32,  48,  64 }
+};
+
+static int
+test_plte_palette_sync(void)
+{
+   mem_buf buf;
+   png_structp png_ptr;
+   png_infop info_ptr;
+   png_colorp got_palette;
+   int num_palette;
+   double file_gamma;
+   png_byte row[1];
+   int i;
+   int changed;
+
+   /* Write a 1x1 palette PNG with gAMA = 1.0 (linear). */
+   buf.len = 0;
+   buf.pos = 0;
+
+   png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+       NULL, NULL, NULL);
+   if (png_ptr == NULL)
+   {
+      fprintf(stderr, "pnggetset: png_create_write_struct failed\n");
+      return 1;
+   }
+
+   info_ptr = png_create_info_struct(png_ptr);
+   if (info_ptr == NULL)
+   {
+      fprintf(stderr, "pnggetset: png_create_info_struct failed\n");
+      png_destroy_write_struct(&png_ptr, NULL);
+      return 1;
+   }
+
+   if (setjmp(png_jmpbuf(png_ptr)))
+   {
+      fprintf(stderr, "pnggetset: libpng error in test_plte_palette_sync"
+          " (write)\n");
+      png_destroy_write_struct(&png_ptr, &info_ptr);
+      return 1;
+   }
+
+   png_set_write_fn(png_ptr, &buf, mem_write, mem_flush);
+   png_set_IHDR(png_ptr, info_ptr, 1, 1, 8, PNG_COLOR_TYPE_PALETTE,
+       PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE,
+       PNG_FILTER_TYPE_BASE);
+   png_set_PLTE(png_ptr, info_ptr,
+       (png_colorp)plte_sync_original, PLTE_SYNC_NPALETTE);
+   png_set_gAMA(png_ptr, info_ptr, 1.0);
+   png_write_info(png_ptr, info_ptr);
+
+   row[0] = 0;
+   png_write_row(png_ptr, row);
+   png_write_end(png_ptr, info_ptr);
+   png_destroy_write_struct(&png_ptr, &info_ptr);
+
+   /* Read back with gamma correction as the sole transform. */
+   buf.pos = 0;
+
+   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
+       NULL, NULL, NULL);
+   if (png_ptr == NULL)
+   {
+      fprintf(stderr, "pnggetset: png_create_read_struct failed\n");
+      return 1;
+   }
+
+   info_ptr = png_create_info_struct(png_ptr);
+   if (info_ptr == NULL)
+   {
+      fprintf(stderr, "pnggetset: png_create_info_struct failed\n");
+      png_destroy_read_struct(&png_ptr, NULL, NULL);
+      return 1;
+   }
+
+   if (setjmp(png_jmpbuf(png_ptr)))
+   {
+      fprintf(stderr, "pnggetset: libpng error in test_plte_palette_sync"
+          " (read)\n");
+      png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+      return 1;
+   }
+
+   png_set_read_fn(png_ptr, &buf, mem_read);
+   png_read_info(png_ptr, info_ptr);
+
+   if (png_get_gAMA(png_ptr, info_ptr, &file_gamma) == 0)
+   {
+      fprintf(stderr, "pnggetset: gAMA chunk not found\n");
+      png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+      return 1;
+   }
+
+   png_set_gamma(png_ptr, 2.2, file_gamma);
+   png_read_update_info(png_ptr, info_ptr);
+
+   if (png_get_PLTE(png_ptr, info_ptr, &got_palette, &num_palette) == 0)
+   {
+      fprintf(stderr, "pnggetset: png_get_PLTE failed after update\n");
+      png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+      return 1;
+   }
+
+   if (num_palette != PLTE_SYNC_NPALETTE)
+   {
+      fprintf(stderr, "pnggetset: palette size %d, expected %d\n",
+          num_palette, PLTE_SYNC_NPALETTE);
+      png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+      return 1;
+   }
+
+   /* Every entry must differ from the original after gamma correction
+    * (file_gamma=1.0, screen_gamma=2.2).  If the sync was skipped,
+    * info_ptr->palette still holds the stale pre-correction values.
+    */
+   changed = 0;
+
+   for (i = 0; i < PLTE_SYNC_NPALETTE; i++)
+   {
+      if ((got_palette[i].red != plte_sync_original[i].red)
+          || (got_palette[i].green != plte_sync_original[i].green)
+          || (got_palette[i].blue != plte_sync_original[i].blue))
+      {
+         changed++;
+      }
+      else
+      {
+         fprintf(stderr,
+             "pnggetset: palette entry %d NOT gamma-corrected: "
+             "got {%u, %u, %u}, same as original\n",
+             i,
+             (unsigned)got_palette[i].red,
+             (unsigned)got_palette[i].green,
+             (unsigned)got_palette[i].blue);
+      }
+   }
+
+   png_read_row(png_ptr, row, NULL);
+   png_read_end(png_ptr, NULL);
+   png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+
+   if (changed != PLTE_SYNC_NPALETTE)
+   {
+      fprintf(stderr,
+          "pnggetset: only %d of %d palette entries were "
+          "gamma-corrected (palette sync failed)\n",
+          changed, PLTE_SYNC_NPALETTE);
+      return 1;
+   }
+
+   return 0;
+}
+
 int
 main(void)
 {
@@ -643,6 +847,16 @@ main(void)
    else
       printf("PASS\n");
 #endif
+
+   printf("Testing PLTE sync after gamma correction... ");
+   fflush(stdout);
+   if (test_plte_palette_sync() != 0)
+   {
+      printf("FAIL\n");
+      result = 1;
+   }
+   else
+      printf("PASS\n");
 
    return result;
 }
