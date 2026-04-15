@@ -848,6 +848,27 @@ png_set_user_transform_info(png_struct *png_ptr, void *user_transform_ptr,
    }
 #endif
 
+   /* Validate depth and channels before any assignments, so that in
+    * benign-errors mode (where png_app_error returns) the function
+    * does not leave an inconsistent state (new pointer with old
+    * depth/channels).  A value of 0 means "keep the current value".
+    */
+   if (user_transform_depth != 0 &&
+       user_transform_depth != 1 && user_transform_depth != 2 &&
+       user_transform_depth != 4 && user_transform_depth != 8 &&
+       user_transform_depth != 16)
+   {
+      png_app_error(png_ptr, "invalid user transform depth");
+      return;
+   }
+
+   if (user_transform_channels != 0 &&
+       (user_transform_channels < 1 || user_transform_channels > 4))
+   {
+      png_app_error(png_ptr, "invalid user transform channels");
+      return;
+   }
+
    png_ptr->user_transform_ptr = user_transform_ptr;
    png_ptr->user_transform_depth = (png_byte)user_transform_depth;
    png_ptr->user_transform_channels = (png_byte)user_transform_channels;
