@@ -162,6 +162,7 @@ pngprefix.h
 /png-fix-itxt
 /pngcp
 /pngfix
+/pnggetset
 /pngimage
 /pngstest
 /pngtest
