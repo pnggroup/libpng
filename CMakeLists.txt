@@ -390,6 +390,9 @@ set(pngstest_sources
 set(pnggetset_sources
     contrib/libtests/pnggetset.c
 )
+set(pngoverflow_sources
+    contrib/libtests/pngoverflow.c
+)
 set(pngunknown_sources
     contrib/libtests/pngunknown.c
 )
@@ -560,6 +563,15 @@ if(PNG_TESTS AND PNG_SHARED)
 
   png_add_test(NAME pnggetset
                COMMAND pnggetset)
+
+  # pngoverflow test:
+  # Overflow-checking primitives: png_mul_size, PNG_ROWBYTES.
+  add_executable(pngoverflow ${pngoverflow_sources})
+  target_link_libraries(pngoverflow
+                        PRIVATE png_shared)
+
+  png_add_test(NAME pngoverflow
+               COMMAND pngoverflow)
 
   # pngvalid tests:
   # Internal validation of standard and progressive reading,

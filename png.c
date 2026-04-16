@@ -130,6 +130,40 @@ png_zfree(voidpf png_ptr, voidpf ptr)
    png_free(png_voidcast(const png_struct *,png_ptr), ptr);
 }
 
+/* Checked version of PNG_ROWBYTES: compute the number of bytes in a row
+ * given pixel_depth (bits per pixel) and width (pixels).  Calls png_error
+ * if the result would overflow size_t.
+ */
+size_t /* PRIVATE */
+png_rowbytes_checked(png_const_structrp png_ptr, unsigned int pixel_depth,
+    png_uint_32 width)
+{
+   size_t rowbytes;
+
+   if (pixel_depth >= 8)
+   {
+      size_t bytes_per_pixel = pixel_depth >> 3;
+
+      rowbytes = png_mul_size(width, bytes_per_pixel);
+
+      if (rowbytes == 0 && width != 0 && bytes_per_pixel != 0)
+         png_error(png_ptr, "Row has too many bytes to allocate in memory");
+   }
+
+   else
+   {
+      /* Sub-byte pixels: pixel_depth is 1, 2, or 4.  Since width fits in
+       * png_uint_32 and pixel_depth <= 4, the full intermediate
+       * (width * pixel_depth + 7) fits in 35 bits, which cannot overflow
+       * size_t (>= 32 bits on all supported platforms, and the 32-bit
+       * case is limited by png_check_IHDR).
+       */
+      rowbytes = ((size_t)width * pixel_depth + 7) >> 3;
+   }
+
+   return rowbytes;
+}
+
 /* Reset the CRC variable to 32 bits of 1's.  Care must be taken
  * in case CRC is > 32 bits to leave the top bits 0.
  */

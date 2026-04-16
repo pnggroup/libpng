@@ -529,10 +529,28 @@
 #define PNG_DIV65535(v24) (((v24) + 32895) >> 16)
 #define PNG_DIV257(v16) PNG_DIV65535((png_uint_32)(v16) * 255)
 
-/* Added to libpng-1.2.6 JB */
+/* Overflow-checked size_t multiplication.  Returns the product of (a) and
+ * (b) or 0 if the product would overflow size_t.  This uses the same
+ * division-based check as png_malloc_array_checked() in pngmem.c.
+ *
+ * NOTE: this is a macro; (a) and (b) are evaluated multiple times.
+ */
+#define png_mul_size(a, b) \
+    ((size_t)(b) != (size_t)0 && \
+     (size_t)(a) > PNG_SIZE_MAX / (size_t)(b) ? \
+     (size_t)0 : (size_t)(a) * (size_t)(b))
+
+/* Added to libpng-1.2.6 JB
+ *
+ * Since libpng 1.8.0 the >= 8 case uses png_mul_size to return 0 on
+ * overflow instead of silently wrapping.  For sub-byte pixel depths
+ * overflow is not possible because pixel_bits <= 4 and width fits in
+ * png_uint_32, so the full intermediate (width * pixel_bits + 7)
+ * fits in 35 bits.
+ */
 #define PNG_ROWBYTES(pixel_bits, width) \
     ((pixel_bits) >= 8 ? \
-    ((size_t)(width) * (((size_t)(pixel_bits)) >> 3)) : \
+    png_mul_size((width), ((size_t)(pixel_bits)) >> 3) : \
     (( ((size_t)(width) * ((size_t)(pixel_bits))) + 7) >> 3) )
 
 /* This returns the number of trailing bits in the last byte of a row, 0 if the
@@ -1624,6 +1642,16 @@ PNG_INTERNAL_FUNCTION(void, png_check_IHDR,
    (const png_struct *png_ptr,
     png_uint_32 width, png_uint_32 height, int bit_depth, int color_type,
     int interlace_type, int compression_type, int filter_type),
+   PNG_EMPTY);
+
+/* Added at libpng version 1.8.0 */
+/* Checked version of PNG_ROWBYTES that calls png_error on overflow.
+ * Use at allocation and initialization sites where png_structrp is
+ * available.
+ */
+PNG_INTERNAL_FUNCTION(size_t, png_rowbytes_checked,
+   (png_const_structrp png_ptr, unsigned int pixel_depth,
+    png_uint_32 width),
    PNG_EMPTY);
 
 /* Added at libpng version 1.5.10 */

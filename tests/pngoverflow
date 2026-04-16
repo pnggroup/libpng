@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# pngoverflow test:
+# Overflow-checking primitives for png_mul_size and PNG_ROWBYTES.
+exec ./pngoverflow

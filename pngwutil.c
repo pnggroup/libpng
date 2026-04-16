@@ -820,7 +820,8 @@ png_write_IHDR(png_struct *png_ptr, png_uint_32 width, png_uint_32 height,
    png_ptr->height = height;
 
    png_ptr->pixel_depth = (png_byte)(bit_depth * png_ptr->channels);
-   png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth, width);
+   png_ptr->rowbytes = png_rowbytes_checked(png_ptr, png_ptr->pixel_depth,
+       width);
    /* Set the usr info, so any transformations can modify it */
    png_ptr->usr_width = png_ptr->width;
    png_ptr->usr_bit_depth = png_ptr->bit_depth;
@@ -2039,7 +2040,8 @@ png_write_start_row(png_struct *png_ptr)
    png_debug(1, "in png_write_start_row");
 
    usr_pixel_depth = png_ptr->usr_channels * png_ptr->usr_bit_depth;
-   buf_size = PNG_ROWBYTES(usr_pixel_depth, png_ptr->width) + 1;
+   buf_size = png_rowbytes_checked(png_ptr, (unsigned)usr_pixel_depth,
+       png_ptr->width) + 1;
 
    /* 1.5.6: added to allow checking in the row write code. */
    png_ptr->transformed_pixel_depth = png_ptr->pixel_depth;
@@ -2180,8 +2182,9 @@ png_write_finish_row(png_struct *png_ptr)
       {
          if (png_ptr->prev_row != NULL)
             memset(png_ptr->prev_row, 0,
-                PNG_ROWBYTES(png_ptr->usr_channels *
-                png_ptr->usr_bit_depth, png_ptr->width) + 1);
+                png_rowbytes_checked(png_ptr,
+                (unsigned)(png_ptr->usr_channels *
+                png_ptr->usr_bit_depth), png_ptr->width) + 1);
 
          return;
       }
@@ -2360,6 +2363,9 @@ png_do_write_interlace(png_row_info *row_info, png_byte *row, int pass)
           png_pass_start[pass]) /
           png_pass_inc[pass];
 
+      /* Safe: PNG_ROWBYTES uses png_mul_size for >= 8 bpp; sub-byte
+       * depths cannot overflow (width limited by png_check_IHDR).
+       */
       row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,
           row_info->width);
    }
@@ -2907,7 +2913,8 @@ png_write_reinit(png_struct *png_ptr, png_info *info_ptr,
 
    png_ptr->width = width;
    png_ptr->height = height;
-   png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth, width);
+   png_ptr->rowbytes = png_rowbytes_checked(png_ptr, png_ptr->pixel_depth,
+       width);
    png_ptr->usr_width = png_ptr->width;
 }
 #endif /* PNG_WRITE_APNG_SUPPORTED */

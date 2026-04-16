@@ -943,7 +943,8 @@ png_handle_IHDR(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 
    /* Set up other useful info */
    png_ptr->pixel_depth = (png_byte)(png_ptr->bit_depth * png_ptr->channels);
-   png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth, png_ptr->width);
+   png_ptr->rowbytes = png_rowbytes_checked(png_ptr, png_ptr->pixel_depth,
+       png_ptr->width);
    png_debug1(3, "bit_depth = %d", png_ptr->bit_depth);
    png_debug1(3, "channels = %d", png_ptr->channels);
    png_debug1(3, "rowbytes = %lu", (unsigned long)png_ptr->rowbytes);
@@ -3411,7 +3412,7 @@ png_combine_row(const png_struct *png_ptr, png_byte *dp, int display)
     * this wrong.
     */
    if (png_ptr->info_rowbytes != 0 && png_ptr->info_rowbytes !=
-          PNG_ROWBYTES(pixel_depth, row_width))
+          png_rowbytes_checked(png_ptr, pixel_depth, row_width))
       png_error(png_ptr, "internal row size calculation error");
 
    /* Don't expect this to ever happen: */
@@ -3426,7 +3427,8 @@ png_combine_row(const png_struct *png_ptr, png_byte *dp, int display)
    if (end_mask != 0)
    {
       /* end_ptr == NULL is a flag to say do nothing */
-      end_ptr = dp + PNG_ROWBYTES(pixel_depth, row_width) - 1;
+      end_ptr = dp + png_rowbytes_checked(png_ptr, pixel_depth,
+          row_width) - 1;
       end_byte = *end_ptr;
 #     ifdef PNG_READ_PACKSWAP_SUPPORTED
       if ((png_ptr->transformations & PNG_PACKSWAP) != 0)
@@ -3863,7 +3865,7 @@ png_combine_row(const png_struct *png_ptr, png_byte *dp, int display)
     * from the temporary row buffer (notice that this overwrites the end of the
     * destination row if it is a partial byte.)
     */
-   memcpy(dp, sp, PNG_ROWBYTES(pixel_depth, row_width));
+   memcpy(dp, sp, png_rowbytes_checked(png_ptr, pixel_depth, row_width));
 
    /* Restore the overwritten bits from the last byte if necessary. */
    if (end_ptr != NULL)
@@ -4778,8 +4780,8 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    /* Calculate the maximum bytes needed, adding a byte and a pixel
     * for safety's sake
     */
-   row_bytes = PNG_ROWBYTES(max_pixel_depth, row_bytes) +
-       1 + ((max_pixel_depth + 7) >> 3U);
+   row_bytes = png_rowbytes_checked(png_ptr, max_pixel_depth,
+       (png_uint_32)row_bytes) + 1 + ((max_pixel_depth + 7) >> 3U);
 
 #ifdef PNG_MAX_MALLOC_64K
    if (row_bytes > (png_uint_32)65536L)
@@ -4886,10 +4888,12 @@ png_read_reinit(png_struct *png_ptr, png_info *info_ptr)
 {
    png_ptr->width = info_ptr->next_frame_width;
    png_ptr->height = info_ptr->next_frame_height;
-   png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth,png_ptr->width);
+   png_ptr->rowbytes = png_rowbytes_checked(png_ptr, png_ptr->pixel_depth,
+       png_ptr->width);
    if (png_ptr->info_rowbytes != 0)
       png_ptr->info_rowbytes = info_ptr->rowbytes =
-         PNG_ROWBYTES(info_ptr->pixel_depth, png_ptr->width);
+         png_rowbytes_checked(png_ptr, info_ptr->pixel_depth,
+             png_ptr->width);
    if (png_ptr->prev_row)
       memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
 }
@@ -4929,7 +4933,8 @@ png_progressive_read_reset(png_struct *png_ptr)
    png_ptr->zstream.next_in = 0;
    png_ptr->zstream.next_out = png_ptr->row_buf;
    png_ptr->zstream.avail_out =
-      (uInt)PNG_ROWBYTES(png_ptr->pixel_depth, png_ptr->iwidth) + 1;
+      (uInt)png_rowbytes_checked(png_ptr, png_ptr->pixel_depth,
+          png_ptr->iwidth) + 1;
 }
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 #endif /* PNG_READ_APNG_SUPPORTED */

@@ -377,7 +377,7 @@ png_push_read_chunk(png_struct *png_ptr, png_info *info_ptr)
       png_ptr->process_mode = PNG_READ_IDAT_MODE;
       png_push_have_info(png_ptr, info_ptr);
       png_ptr->zstream.avail_out =
-          (uInt) PNG_ROWBYTES(png_ptr->pixel_depth,
+          (uInt) png_rowbytes_checked(png_ptr, png_ptr->pixel_depth,
           png_ptr->iwidth) + 1;
       png_ptr->zstream.next_out = png_ptr->row_buf;
       return;
@@ -714,8 +714,8 @@ png_process_IDAT_data(png_struct *png_ptr, png_byte *buffer,
       if (!(png_ptr->zstream.avail_out > 0))
       {
          /* TODO: WARNING: TRUNCATION ERROR: DANGER WILL ROBINSON: */
-         png_ptr->zstream.avail_out = (uInt)(PNG_ROWBYTES(png_ptr->pixel_depth,
-             png_ptr->iwidth) + 1);
+         png_ptr->zstream.avail_out = (uInt)(png_rowbytes_checked(png_ptr,
+             png_ptr->pixel_depth, png_ptr->iwidth) + 1);
 
          png_ptr->zstream.next_out = png_ptr->row_buf;
       }
@@ -805,7 +805,8 @@ png_push_process_row(png_struct *png_ptr)
    row_info.bit_depth = png_ptr->bit_depth;
    row_info.channels = png_ptr->channels;
    row_info.pixel_depth = png_ptr->pixel_depth;
-   row_info.rowbytes = PNG_ROWBYTES(row_info.pixel_depth, row_info.width);
+   row_info.rowbytes = png_rowbytes_checked(png_ptr, row_info.pixel_depth,
+       row_info.width);
 
    if (png_ptr->row_buf[0] > PNG_FILTER_VALUE_NONE)
    {

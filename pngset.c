@@ -459,7 +459,8 @@ png_set_IHDR(const png_struct *png_ptr, png_info *info_ptr,
 
    info_ptr->pixel_depth = (png_byte)(info_ptr->channels * info_ptr->bit_depth);
 
-   info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth, width);
+   info_ptr->rowbytes = png_rowbytes_checked(png_ptr, info_ptr->pixel_depth,
+       width);
 
 #ifdef PNG_APNG_SUPPORTED
    /* Assume a non-animated PNG in the beginning. This may be overridden after

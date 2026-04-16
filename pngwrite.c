@@ -887,7 +887,8 @@ png_write_row(png_struct *png_ptr, const png_byte *row)
    row_info.channels = png_ptr->usr_channels;
    row_info.bit_depth = png_ptr->usr_bit_depth;
    row_info.pixel_depth = (png_byte)(row_info.bit_depth * row_info.channels);
-   row_info.rowbytes = PNG_ROWBYTES(row_info.pixel_depth, row_info.width);
+   row_info.rowbytes = png_rowbytes_checked(png_ptr, row_info.pixel_depth,
+       row_info.width);
 
    png_debug1(3, "row_info->color_type = %d", row_info.color_type);
    png_debug1(3, "row_info->width = %u", row_info.width);
@@ -1169,7 +1170,8 @@ png_set_filter(png_struct *png_ptr, int method, int filters)
          /* Allocate needed row buffers if they have not already been
           * allocated.
           */
-         buf_size = PNG_ROWBYTES(png_ptr->usr_channels * png_ptr->usr_bit_depth,
+         buf_size = png_rowbytes_checked(png_ptr,
+             (unsigned)(png_ptr->usr_channels * png_ptr->usr_bit_depth),
              png_ptr->width) + 1;
 
          if (png_ptr->try_row == NULL)
