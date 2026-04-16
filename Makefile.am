@@ -13,7 +13,7 @@ ACLOCAL_AMFLAGS = -I scripts/autoconf
 
 # test programs - run on make check, make distcheck
 if ENABLE_TESTS
-check_PROGRAMS= pngtest pnggetset pngunknown pngstest pngvalid pngimage pngcp
+check_PROGRAMS= pngtest pnggetset pngunknown pngstest pngvalid pngimage pngoverflow pngcp
 if HAVE_CLOCK_GETTIME
 check_PROGRAMS += timepng
 endif
@@ -59,6 +59,9 @@ pngimage_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 timepng_SOURCES = contrib/libtests/timepng.c
 timepng_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+
+pngoverflow_SOURCES = contrib/libtests/pngoverflow.c
+pngoverflow_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 pngcp_SOURCES = contrib/tools/pngcp.c
 pngcp_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
@@ -110,7 +113,8 @@ TESTS =\
    tests/pngunknown-save\
    tests/pngunknown-vpAg\
    tests/pngimage-quick\
-   tests/pngimage-full
+   tests/pngimage-full\
+   tests/pngoverflow
 endif
 
 # man pages
