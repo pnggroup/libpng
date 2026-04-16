@@ -137,8 +137,34 @@ if(PNG_BUILD_ZLIB)
   endif()
 endif()
 
-# Find the zlib library.
-find_package(ZLIB REQUIRED)
+# Check for useable config from zlib first
+if(PNG_SHARED)
+  list(APPEND PNG_ZLIB_COMPONENTS "shared")
+endif()
+
+if(PNG_STATIC)
+  list(APPEND PNG_ZLIB_COMPONENTS "static")
+  set(PNG_LINK_LIBRARIES_STATIC ZLIB::ZLIBSTATIC)
+else()
+  set(PNG_LINK_LIBRARIES_STATIC ZLIB::ZLIB)
+endif()
+
+find_package(ZLIB CONFIG COMPONENTS ${PNG_ZLIB_COMPONENTS})
+
+# Find the zlib library the old way if config is not present
+if(NOT ZLIB_DIR)
+  find_package(ZLIB REQUIRED)
+else()
+  set(ZLIB_CONFIG True) # Needed in PNGConfig.cmake
+  get_target_property(ZLIB_INCLUDE_DIRS
+                      ${PNG_LINK_LIBRARIES_STATIC}
+                      INTERFACE_INCLUDE_DIRECTORIES)
+endif()
+
+if(NOT TARGET ZLIB::ZLIBSTATIC)
+  add_library(ZLIB::ZLIBSTATIC ALIAS ZLIB::ZLIB)
+endif(NOT TARGET ZLIB::ZLIBSTATIC)
+
 set(PNG_LINK_LIBRARIES ZLIB::ZLIB)
 
 # Find the math library (unless we already know it's not available or
@@ -148,6 +174,7 @@ if(UNIX AND NOT (APPLE OR BEOS OR HAIKU OR EMSCRIPTEN))
 endif()
 if(PNG_HAVE_LIBM_POW)
   list(APPEND PNG_LINK_LIBRARIES m)
+  list(APPEND PNG_LINK_LIBRARIES_STATIC m)
 endif()
 
 # Silence function deprecation warnings on the Windows compilers that might
@@ -479,7 +506,7 @@ if(PNG_STATIC)
                              SYSTEM
                              INTERFACE "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>")
   target_link_libraries(png_static
-                        PUBLIC ${PNG_LINK_LIBRARIES})
+                        PUBLIC ${PNG_LINK_LIBRARIES_STATIC})
 endif()
 
 if(PNG_FRAMEWORK AND NOT APPLE)
@@ -949,6 +976,9 @@ if(NOT SKIP_INSTALL_CONFIG_FILE AND NOT SKIP_INSTALL_ALL)
           ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
           FRAMEWORK DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/PNGConfig.cmake.in"
+                 "${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/PNGConfig.cmake"
+                 @ONLY)
   include(CMakePackageConfigHelpers)
   write_basic_package_version_file(PNGConfigVersion.cmake
                                    VERSION ${PNGLIB_VERSION}
@@ -959,7 +989,7 @@ if(NOT SKIP_INSTALL_CONFIG_FILE AND NOT SKIP_INSTALL_ALL)
           NAMESPACE PNG::
           DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/PNG")
 
-  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/PNGConfig.cmake"
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/PNGConfig.cmake"
                 "${CMAKE_CURRENT_BINARY_DIR}/PNGConfigVersion.cmake"
           DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/PNG")
 endif()
