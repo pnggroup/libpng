@@ -792,15 +792,28 @@ main(int argc, const char **argv)
       * I don't see where the image gets rejected when the buffer is too
       * large before the malloc is attempted.
       */
+      
       if (image.height > ((size_t)(-1))/(8*image.width)) {
          fprintf(stderr, "genpng: image buffer would be too big");
          return 1;
       }
+      
 #endif
 
-      /* Create the buffer: */
-      buffer = malloc(PNG_IMAGE_SIZE(image));
-
+      /* Create the buffer:
+       * Buffer uses image dimensions provided directly to avoid overflows 
+       * On the off chance a large input is given, an error will be raised
+       */
+       
+      size_t total_alloc = (size_t)image.width * image.height * 8;
+       
+      if (total_alloc>=1099511627776){
+         fprintf(stderr, "genpng: Maximum size is 1099511627776 bytes. Requested %zu bytes", total_alloc);
+         return 1;
+      }
+       
+      buffer = malloc(total_alloc);
+      
       if (buffer != NULL)
       {
          png_uint_32 y;
@@ -812,7 +825,7 @@ main(int argc, const char **argv)
 
             /* Each pixel in each row: */
             for (x=0; x<image.width; ++x)
-               pixel(buffer + 4*(x + y*image.width), arg_list, nshapes, x, y);
+               pixel(buffer + 4*((size_t)x + y*image.width), arg_list, nshapes, x, y);
          }
 
          /* Write the result (to stdout) */
