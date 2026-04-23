@@ -35,8 +35,8 @@ BOOL do_pnm2png (png_struct *png_ptr, png_info *info_ptr,
 int fscan_pnm_magic (FILE *pnm_file, char *magic_buf, size_t magic_buf_size);
 int fscan_pnm_token (FILE *pnm_file, char *token_buf, size_t token_buf_size);
 int fscan_pnm_uint_32 (FILE *pnm_file, png_uint_32 *num_ptr);
-png_uint_32 get_pnm_data (FILE *pnm_file, int depth);
-png_uint_32 get_pnm_value (FILE *pnm_file, int depth);
+int get_pnm_data (FILE *pnm_file, int depth);
+int get_pnm_value (FILE *pnm_file, int depth);
 
 /*
  *  main
@@ -397,7 +397,9 @@ BOOL do_pnm2png (png_struct *png_ptr, png_info *info_ptr,
       for (i = 0; i < row_bytes; i++)
       {
         /* png supports this format natively so no conversion is needed */
-        *pix_ptr++ = get_pnm_data (pnm_file, 8);
+        int val = get_pnm_data (pnm_file, 8);
+        if (val < 0) return FALSE; /* EOF/error */
+        *pix_ptr++ = (png_byte)val;
       }
     }
     else
@@ -408,19 +410,28 @@ BOOL do_pnm2png (png_struct *png_ptr, png_info *info_ptr,
         {
           if (raw)
           {
-            *pix_ptr++ = get_pnm_data (pnm_file, bit_depth);
+            int val = get_pnm_data (pnm_file, bit_depth);
+            if (val < 0) return FALSE; /* EOF/error */
+            *pix_ptr++ = (png_byte)val;
             if (bit_depth == 16)
-              *pix_ptr++ = get_pnm_data (pnm_file, bit_depth);
+            {
+              val = get_pnm_data (pnm_file, bit_depth);
+              if (val < 0) return FALSE; /* EOF/error */
+              *pix_ptr++ = (png_byte)val;
+            }
           }
           else
           {
             if (bit_depth <= 8)
             {
-              *pix_ptr++ = get_pnm_value (pnm_file, bit_depth);
+              int val = get_pnm_value (pnm_file, bit_depth);
+              if (val < 0) return FALSE; /* EOF/error */
+              *pix_ptr++ = (png_byte)val;
             }
             else
             {
               val16 = get_pnm_value (pnm_file, bit_depth);
+              if ((int)val16 < 0) return FALSE; /* EOF/error */
               *pix_ptr = (png_byte) ((val16 >> 8) & 0xFF);
               pix_ptr++;
               *pix_ptr = (png_byte) (val16 & 0xFF);
@@ -433,19 +444,28 @@ BOOL do_pnm2png (png_struct *png_ptr, png_info *info_ptr,
         {
           if (alpha_raw)
           {
-            *pix_ptr++ = get_pnm_data (alpha_file, alpha_depth);
+            int val = get_pnm_data (alpha_file, alpha_depth);
+            if (val < 0) return FALSE; /* EOF/error */
+            *pix_ptr++ = (png_byte)val;
             if (alpha_depth == 16)
-              *pix_ptr++ = get_pnm_data (alpha_file, alpha_depth);
+            {
+              val = get_pnm_data (alpha_file, alpha_depth);
+              if (val < 0) return FALSE; /* EOF/error */
+              *pix_ptr++ = (png_byte)val;
+            }
           }
           else
           {
             if (alpha_depth <= 8)
             {
-              *pix_ptr++ = get_pnm_value (alpha_file, bit_depth);
+              int val = get_pnm_value (alpha_file, bit_depth);
+              if (val < 0) return FALSE; /* EOF/error */
+              *pix_ptr++ = (png_byte)val;
             }
             else
             {
               val16 = get_pnm_value (alpha_file, bit_depth);
+              if ((int)val16 < 0) return FALSE; /* EOF/error */
               *pix_ptr++ = (png_byte) ((val16 >> 8) & 0xFF);
               *pix_ptr++ = (png_byte) (val16 & 0xFF);
             }
@@ -593,14 +613,15 @@ int fscan_pnm_uint_32 (FILE *pnm_file, png_uint_32 *num_ptr)
  *  get_pnm_data - takes first byte and converts into next pixel value,
  *                 taking as many bits as defined by bit-depth and
  *                 using the bit-depth to fill up a byte (0x0A -> 0xAA)
+ *                 Returns -1 on EOF/error.
  */
 
-png_uint_32 get_pnm_data (FILE *pnm_file, int depth)
+int get_pnm_data (FILE *pnm_file, int depth)
 {
   static int bits_left = 0;
   static int old_value = 0;
   static int mask = 0;
-  png_uint_32 ret_value;
+  int ret_value;
   int i;
 
   if (mask == 0)
@@ -609,11 +630,13 @@ png_uint_32 get_pnm_data (FILE *pnm_file, int depth)
 
   if (bits_left <= 0)
   {
-    /* FIXME:
-     * signal the premature end of file, instead of pretending to read zeroes
-     */
     old_value = fgetc (pnm_file);
-    if (old_value == EOF) return 0;
+    if (old_value == EOF)
+    {
+      fprintf (stderr, "PNM2PNG\n");
+      fprintf (stderr, "Error: premature end of file while reading pixel data\n");
+      return -1;
+    }
     bits_left = 8;
   }
 
@@ -630,9 +653,10 @@ png_uint_32 get_pnm_data (FILE *pnm_file, int depth)
 /*
  *  get_pnm_value - takes first (numeric) string and converts into number,
  *                  using the bit-depth to fill up a byte (0x0A -> 0xAA)
+ *                  Returns -1 on EOF/error.
  */
 
-png_uint_32 get_pnm_value (FILE *pnm_file, int depth)
+int get_pnm_value (FILE *pnm_file, int depth)
 {
   static png_uint_32 mask = 0;
   png_uint_32 ret_value;
@@ -644,11 +668,9 @@ png_uint_32 get_pnm_value (FILE *pnm_file, int depth)
 
   if (fscan_pnm_uint_32 (pnm_file, &ret_value) != 1)
   {
-    /* FIXME:
-     * signal the invalid numeric tokens or the premature end of file,
-     * instead of pretending to read zeroes
-     */
-    return 0;
+    fprintf (stderr, "PNM2PNG\n");
+    fprintf (stderr, "Error: invalid numeric token or premature end of file while reading pixel data\n");
+    return -1;
   }
 
   ret_value &= mask;
@@ -657,7 +679,7 @@ png_uint_32 get_pnm_value (FILE *pnm_file, int depth)
     for (i = 0; i < (8 / depth); i++)
       ret_value = (ret_value << depth) || ret_value;
 
-  return ret_value;
+  return (int)ret_value;
 }
 
 /* end of source */
