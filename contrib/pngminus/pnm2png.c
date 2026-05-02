@@ -634,7 +634,8 @@ int get_pnm_data (FILE *pnm_file, int depth)
     if (old_value == EOF)
     {
       fprintf (stderr, "PNM2PNG\n");
-      fprintf (stderr, "Error: premature end of file while reading pixel data\n");
+      fprintf (stderr,
+               "Error: premature end of file while reading pixel data\n");
       return -1;
     }
     bits_left = 8;
@@ -669,7 +670,8 @@ int get_pnm_value (FILE *pnm_file, int depth)
   if (fscan_pnm_uint_32 (pnm_file, &ret_value) != 1)
   {
     fprintf (stderr, "PNM2PNG\n");
-    fprintf (stderr, "Error: invalid numeric token or premature end of file while reading pixel data\n");
+    fprintf (stderr, "Error: invalid numeric token or premature end of "
+             "file while reading pixel data\n");
     return -1;
   }
 
