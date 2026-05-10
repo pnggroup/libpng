@@ -12,6 +12,7 @@ Author List
  * Benjamin Buch
  * Bernd Kuhls
  * Cameron Cawley
+ * Carlo Bramini
  * Christian Ehrlicher
  * Christopher Sean Morrison
  * Claudio Bley
