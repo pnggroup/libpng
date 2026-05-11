@@ -3160,27 +3160,33 @@ png_image_read_direct_scaled(png_voidp argument)
    }
 
    /* Read each pass using local_row as intermediate buffer. */
-   while (--passes >= 0)
    {
-      png_uint_32 y = image->height;
-      png_bytep output_row = first_row;
+      int pass = 0;
 
-      for (; y > 0; --y)
+      while (--passes >= 0)
       {
-         /* Read into local_row (gets transformed 8-bit data). */
-         png_read_row(png_ptr, local_row, NULL);
+         png_uint_32 y = image->height;
+         png_bytep output_row = first_row;
 
-         /* Copy from local_row to user buffer.
-          * Use row_bytes (i.e. the actual size in bytes of the row data) for
-          * copying into output_row. Use row_step for advancing output_row,
-          * to respect the caller's stride for padding or negative (bottom-up)
-          * layouts.
-          */
-         memcpy(output_row, local_row, row_bytes);
-         output_row += row_step;
+         for (; y > 0; --y)
+         {
+            if (pass > 0)
+               memcpy(local_row, output_row, row_bytes);
+            /* Read into local_row (gets transformed 8-bit data). */
+            png_read_row(png_ptr, local_row, NULL);
+
+            /* Copy from local_row to user buffer.
+            * Use row_bytes (i.e. the actual size in bytes of the row data) for
+            * copying into output_row. Use row_step for advancing output_row,
+            * to respect the caller's stride for padding or negative (bottom-up)
+            * layouts.
+            */
+            memcpy(output_row, local_row, row_bytes);
+            output_row += row_step;
+         }
+         ++pass;
       }
    }
-
    return 1;
 }
 
