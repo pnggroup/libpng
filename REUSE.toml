@@ -1,0 +1,5 @@
+version = 1
+
+[[annotations]]
+SPDX-License-Identifier = "MIT"
+path = "ci/**"
