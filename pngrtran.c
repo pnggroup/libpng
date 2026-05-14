@@ -2247,7 +2247,8 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
    info_ptr->pixel_depth = (png_byte)(info_ptr->channels *
        info_ptr->bit_depth);
 
-   info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth, info_ptr->width);
+   info_ptr->rowbytes = png_rowbytes_checked(png_ptr, info_ptr->pixel_depth,
+       info_ptr->width);
 
    /* Adding in 1.5.4: cache the above value in png_struct so that we can later
     * check in png_rowbytes that the user buffer won't get overwritten.  Note
@@ -2357,7 +2358,7 @@ png_do_unpack(png_row_info *row_info, png_byte *row)
       }
       row_info->bit_depth = 8;
       row_info->pixel_depth = (png_byte)(8 * row_info->channels);
-      row_info->rowbytes = (size_t)row_width * row_info->channels;
+      row_info->rowbytes = png_mul_size(row_width, row_info->channels);
    }
 }
 #endif
@@ -2559,7 +2560,8 @@ png_do_scale_16_to_8(png_row_info *row_info, png_byte *row)
 
       row_info->bit_depth = 8;
       row_info->pixel_depth = (png_byte)(8 * row_info->channels);
-      row_info->rowbytes = (size_t)row_info->width * row_info->channels;
+      row_info->rowbytes = png_mul_size(row_info->width,
+          row_info->channels);
    }
 }
 #endif
@@ -2587,7 +2589,8 @@ png_do_chop(png_row_info *row_info, png_byte *row)
 
       row_info->bit_depth = 8;
       row_info->pixel_depth = (png_byte)(8 * row_info->channels);
-      row_info->rowbytes = (size_t)row_info->width * row_info->channels;
+      row_info->rowbytes = png_mul_size(row_info->width,
+          row_info->channels);
    }
 }
 #endif
@@ -2823,7 +2826,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
             *(--dp) = lo_filler;
             row_info->channels = 2;
             row_info->pixel_depth = 16;
-            row_info->rowbytes = (size_t)row_width * 2;
+            row_info->rowbytes = png_mul_size(row_width, 2);
          }
 
          else
@@ -2838,7 +2841,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
             }
             row_info->channels = 2;
             row_info->pixel_depth = 16;
-            row_info->rowbytes = (size_t)row_width * 2;
+            row_info->rowbytes = png_mul_size(row_width, 2);
          }
       }
 
@@ -2861,7 +2864,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
             *(--dp) = hi_filler;
             row_info->channels = 2;
             row_info->pixel_depth = 32;
-            row_info->rowbytes = (size_t)row_width * 4;
+            row_info->rowbytes = png_mul_size(row_width, 4);
          }
 
          else
@@ -2878,7 +2881,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
             }
             row_info->channels = 2;
             row_info->pixel_depth = 32;
-            row_info->rowbytes = (size_t)row_width * 4;
+            row_info->rowbytes = png_mul_size(row_width, 4);
          }
       }
 #endif
@@ -2902,7 +2905,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
             *(--dp) = lo_filler;
             row_info->channels = 4;
             row_info->pixel_depth = 32;
-            row_info->rowbytes = (size_t)row_width * 4;
+            row_info->rowbytes = png_mul_size(row_width, 4);
          }
 
          else
@@ -2919,7 +2922,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
             }
             row_info->channels = 4;
             row_info->pixel_depth = 32;
-            row_info->rowbytes = (size_t)row_width * 4;
+            row_info->rowbytes = png_mul_size(row_width, 4);
          }
       }
 
@@ -2946,7 +2949,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
             *(--dp) = hi_filler;
             row_info->channels = 4;
             row_info->pixel_depth = 64;
-            row_info->rowbytes = (size_t)row_width * 8;
+            row_info->rowbytes = png_mul_size(row_width, 8);
          }
 
          else
@@ -2968,7 +2971,7 @@ png_do_read_filler(png_row_info *row_info, png_byte *row,
 
             row_info->channels = 4;
             row_info->pixel_depth = 64;
-            row_info->rowbytes = (size_t)row_width * 8;
+            row_info->rowbytes = png_mul_size(row_width, 8);
          }
       }
 #endif
@@ -3059,7 +3062,8 @@ png_do_gray_to_rgb(png_row_info *row_info, png_byte *row)
       row_info->color_type |= PNG_COLOR_MASK_COLOR;
       row_info->pixel_depth = (png_byte)(row_info->channels *
           row_info->bit_depth);
-      row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth, row_width);
+      row_info->rowbytes = png_mul_size(row_width,
+          row_info->pixel_depth >> 3);
    }
 }
 #endif
@@ -3306,7 +3310,8 @@ png_do_rgb_to_gray(png_struct *png_ptr, png_row_info *row_info, png_byte *row)
           ~PNG_COLOR_MASK_COLOR);
       row_info->pixel_depth = (png_byte)(row_info->channels *
           row_info->bit_depth);
-      row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth, row_width);
+      row_info->rowbytes = png_rowbytes_checked(png_ptr,
+          row_info->pixel_depth, row_width);
    }
    return rgb_error;
 }
@@ -4447,7 +4452,7 @@ png_do_expand_palette(png_row_info *row_info, png_byte *row,
                }
                row_info->bit_depth = 8;
                row_info->pixel_depth = 32;
-               row_info->rowbytes = (size_t)row_width * 4;
+               row_info->rowbytes = png_mul_size(row_width, 4);
                row_info->color_type = 6;
                row_info->channels = 4;
             }
@@ -4466,7 +4471,7 @@ png_do_expand_palette(png_row_info *row_info, png_byte *row,
 
                row_info->bit_depth = 8;
                row_info->pixel_depth = 24;
-               row_info->rowbytes = (size_t)row_width * 3;
+               row_info->rowbytes = png_mul_size(row_width, 3);
                row_info->color_type = 2;
                row_info->channels = 3;
             }
@@ -4632,8 +4637,8 @@ png_do_expand(png_row_info *row_info, png_byte *row,
          row_info->color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
          row_info->channels = 2;
          row_info->pixel_depth = (png_byte)(row_info->bit_depth << 1);
-         row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,
-             row_width);
+         row_info->rowbytes = png_mul_size(row_width,
+             row_info->pixel_depth >> 3);
       }
    }
    else if (row_info->color_type == PNG_COLOR_TYPE_RGB &&
@@ -4699,7 +4704,8 @@ png_do_expand(png_row_info *row_info, png_byte *row,
       row_info->color_type = PNG_COLOR_TYPE_RGB_ALPHA;
       row_info->channels = 4;
       row_info->pixel_depth = (png_byte)(row_info->bit_depth << 2);
-      row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth, row_width);
+      row_info->rowbytes = png_mul_size(row_width,
+          row_info->pixel_depth >> 3);
    }
 }
 #endif
@@ -4730,7 +4736,7 @@ png_do_expand_16(png_row_info *row_info, png_byte *row)
          dp[-2] = dp[-1] = *--sp; dp -= 2;
       }
 
-      row_info->rowbytes *= 2;
+      row_info->rowbytes = png_mul_size(row_info->rowbytes, 2);
       row_info->bit_depth = 16;
       row_info->pixel_depth = (png_byte)(row_info->channels * 16);
    }
@@ -4783,7 +4789,8 @@ png_do_quantize(png_row_info *row_info, png_byte *row,
          row_info->color_type = PNG_COLOR_TYPE_PALETTE;
          row_info->channels = 1;
          row_info->pixel_depth = row_info->bit_depth;
-         row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth, row_width);
+         row_info->rowbytes = png_mul_size(row_width,
+             row_info->pixel_depth >> 3);
       }
 
       else if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA &&
@@ -4814,7 +4821,8 @@ png_do_quantize(png_row_info *row_info, png_byte *row,
          row_info->color_type = PNG_COLOR_TYPE_PALETTE;
          row_info->channels = 1;
          row_info->pixel_depth = row_info->bit_depth;
-         row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth, row_width);
+         row_info->rowbytes = png_mul_size(row_width,
+             row_info->pixel_depth >> 3);
       }
 
       else if (row_info->color_type == PNG_COLOR_TYPE_PALETTE &&
@@ -5124,6 +5132,9 @@ png_do_read_transformations(png_struct *png_ptr, png_row_info *row_info)
       row_info->pixel_depth = (png_byte)(row_info->bit_depth *
           row_info->channels);
 
+      /* Safe: PNG_ROWBYTES uses png_mul_size for >= 8 bpp; sub-byte
+       * depths cannot overflow (width limited by png_check_IHDR).
+       */
       row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth, row_info->width);
    }
 #endif

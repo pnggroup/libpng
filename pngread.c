@@ -395,7 +395,8 @@ png_read_row(png_struct *png_ptr, png_byte *row, png_byte *dsp_row)
    row_info.bit_depth = png_ptr->bit_depth;
    row_info.channels = png_ptr->channels;
    row_info.pixel_depth = png_ptr->pixel_depth;
-   row_info.rowbytes = PNG_ROWBYTES(row_info.pixel_depth, row_info.width);
+   row_info.rowbytes = png_rowbytes_checked(png_ptr, row_info.pixel_depth,
+       row_info.width);
 
 #ifdef PNG_WARNINGS_SUPPORTED
    if (png_ptr->row_number == 0 && png_ptr->pass == 0)
@@ -1132,9 +1133,14 @@ png_read_png(png_struct *png_ptr, png_info *info_ptr,
    if (info_ptr->row_pointers == NULL)
    {
       png_uint_32 iptr;
+      size_t row_ptrs_size = png_mul_size(info_ptr->height,
+          (sizeof (png_byte *)));
 
-      info_ptr->row_pointers = png_voidcast(png_byte **, png_malloc(png_ptr,
-          info_ptr->height * (sizeof (png_byte *))));
+      if (row_ptrs_size == 0 && info_ptr->height != 0)
+         png_error(png_ptr, "Image is too tall to process");
+
+      info_ptr->row_pointers = png_voidcast(png_byte **,
+          png_malloc(png_ptr, row_ptrs_size));
 
       for (iptr=0; iptr<info_ptr->height; iptr++)
          info_ptr->row_pointers[iptr] = NULL;
