@@ -407,8 +407,11 @@ png_read_buffer(png_struct *png_ptr, png_alloc_size_t new_size)
 
 /* png_inflate_claim: claim the zstream for some nefarious purpose that involves
  * decompression.  Returns Z_OK on success, else a zlib error code.  It checks
- * the owner but, in final release builds, just issues a warning if some other
- * chunk apparently owns the stream.  Prior to release it does a png_error.
+ * the owner but, in final release builds, issues a warning and refuses to evict
+ * the IDAT owner (returning Z_STREAM_ERROR instead).  For other owners in
+ * release builds the stream is torn down with inflateEnd() before being
+ * re-initialized, so zlib resources are not leaked.  Prior to release it always
+ * calls png_chunk_error.
  */
 static int
 png_inflate_claim(png_struct *png_ptr, png_uint_32 owner)
@@ -425,6 +428,29 @@ png_inflate_claim(png_struct *png_ptr, png_uint_32 owner)
       (void)png_safecat(msg, (sizeof msg), 4, " using zstream");
 #if PNG_RELEASE_BUILD
       png_chunk_warning(png_ptr, msg);
+
+      /* Refuse to steal the zstream from the IDAT chunk.  IDAT is the only
+       * critical compressed chunk during a read; evicting it would silently
+       * corrupt row decompression with no further error indication.  This
+       * mirrors the identical guard in png_deflate_claim (pngwutil.c).
+       */
+      if (png_ptr->zowner == png_IDAT)
+      {
+         png_ptr->zstream.msg = "in use by IDAT";
+         return Z_STREAM_ERROR;
+      }
+
+      /* For non-IDAT owners: tear the stream down cleanly so that zlib
+       * releases its internal window allocation before inflateInit2() is
+       * called below.  Calling inflateReset2/inflateInit2 on an already-active
+       * stream without inflateEnd first is undefined behaviour in zlib.
+       */
+      if ((png_ptr->flags & PNG_FLAG_ZSTREAM_INITIALIZED) != 0)
+      {
+         (void)inflateEnd(&png_ptr->zstream);
+         png_ptr->flags &= ~PNG_FLAG_ZSTREAM_INITIALIZED;
+      }
+
       png_ptr->zowner = 0;
 #else
       png_chunk_error(png_ptr, msg);
