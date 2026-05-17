@@ -220,26 +220,28 @@ png_write_chunk(png_struct *png_ptr, const png_byte *chunk_string,
 static png_alloc_size_t
 png_image_size(png_struct *png_ptr)
 {
-   /* Only return sizes up to the maximum of a png_uint_32; do this by limiting
-    * the width and height used to 15 bits.
+   /* Only return sizes up to the maximum of a png_uint_64; do this by limiting
+    * the width and height used to 32 bits. Maximum changed to 64-bit from 32-bit 
+    * to allow for larger pngs. Limit is also changed to 32-bit from 16-bit for 
+    * the same reason. Prevents heap-buffer overflow
     */
-   png_uint_32 h = png_ptr->height;
+   png_uint_64 h = png_ptr->height;
 
-   if (png_ptr->rowbytes < 32768 && h < 32768)
+   if (png_ptr->rowbytes < 2147483647 && h < 2147483647)
    {
       if (png_ptr->interlaced != 0)
       {
          /* Interlacing makes the image larger because of the replication of
           * both the filter byte and the padding to a byte boundary.
           */
-         png_uint_32 w = png_ptr->width;
+         png_uint_64 w = png_ptr->width;
          unsigned int pd = png_ptr->pixel_depth;
          png_alloc_size_t cb_base;
          int pass;
 
          for (cb_base=0, pass=0; pass<=6; ++pass)
          {
-            png_uint_32 pw = PNG_PASS_COLS(w, pass);
+            png_uint_64 pw = PNG_PASS_COLS(w, pass);
 
             if (pw > 0)
                cb_base += (PNG_ROWBYTES(pd, pw)+1) * PNG_PASS_ROWS(h, pass);
