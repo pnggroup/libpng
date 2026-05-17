@@ -1000,6 +1000,10 @@ PNG_EXPORT(void, png_convert_from_struct_tm,
 /* Convert from time_t to png_time.  Uses gmtime() */
 PNG_EXPORT(void, png_convert_from_time_t,
    (png_time *ptime, time_t ttime));
+
+/* Raise error on invalid time */
+PNG_EXPORT(void, png_convert_from_time_t_strict,
+   (png_struct *png_ptr, png_time *ptime, time_t ttime));
 #endif /* CONVERT_tIME */
 
 #ifdef PNG_READ_EXPAND_SUPPORTED
