@@ -4790,6 +4790,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    {
       png_free(png_ptr, png_ptr->big_row_buf);
       png_free(png_ptr, png_ptr->big_prev_row);
+      png_ptr->big_row_buf = png_ptr->big_prev_row = NULL;
 
       if (png_ptr->interlaced != 0)
          png_ptr->big_row_buf = (png_byte *)png_calloc(png_ptr,

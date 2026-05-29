@@ -7,6 +7,7 @@ Authors, for copyright and licensing purposes.
  * Adam Richter
  * Alexander Smorkalov
  * Andreas Dilger
+ * Anthony Hurtado
  * Chris Blume
  * Cosmin Truta
  * Daisuke Nishikawa
