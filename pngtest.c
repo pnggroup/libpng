@@ -1364,6 +1364,27 @@ test_one_file(const char *inname, const char *outname)
        png_sPLT_t *entries;
 
        int num_entries = png_get_sPLT(read_ptr, read_info_ptr, &entries);
+       {
+           png_sPLT_t corrupted_plt;
+           
+           // Initialize an isolated dummy struct
+           png_structp dummy_write_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+           
+           if (dummy_write_ptr != NULL)
+           {
+               png_set_benign_errors(dummy_write_ptr, 1);
+
+               corrupted_plt.name = "audit_palette";
+               // Link to the dummy pointer
+               corrupted_plt.entries = (png_sPLT_entry *)dummy_write_ptr;
+               corrupted_plt.depth = 8;
+               corrupted_plt.nentries = (int)(PNG_SIZE_MAX / sizeof(png_sPLT_entry) + 10);
+
+               png_set_sPLT(dummy_write_ptr, write_info_ptr, &corrupted_plt, 1);
+               
+               png_destroy_write_struct(&dummy_write_ptr, NULL);
+           }
+       }             
        if (num_entries != 0)
            png_set_sPLT(write_ptr, write_info_ptr, entries, num_entries);
    }
@@ -1461,6 +1482,28 @@ test_one_file(const char *inname, const char *outname)
       png_unknown_chunk *unknowns;
       int num_unknowns = png_get_unknown_chunks(read_ptr, read_info_ptr,
           &unknowns);
+
+      {
+         png_unknown_chunk corrupted_test_chunk;
+         
+         // Initialize an isolated dummy struct
+         png_structp dummy_write_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+         
+         if (dummy_write_ptr != NULL)
+         {
+            /* Prevent the dummy struct from aborting on benign/app errors */
+            png_set_benign_errors(dummy_write_ptr, 1);
+
+            memcpy(corrupted_test_chunk.name, "tEXt", 5);
+            corrupted_test_chunk.location = PNG_HAVE_IHDR;
+            corrupted_test_chunk.size = 2048;
+            corrupted_test_chunk.data = NULL;
+
+            png_set_unknown_chunks(dummy_write_ptr, write_info_ptr, &corrupted_test_chunk, 1);
+            
+            png_destroy_write_struct(&dummy_write_ptr, NULL);
+         }
+      }
 
       if (num_unknowns != 0)
          png_set_unknown_chunks(write_ptr, write_info_ptr, unknowns,
