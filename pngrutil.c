@@ -1092,6 +1092,13 @@ png_handle_gAMA(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_gAMA");
 
+   if (length != 4)
+   {
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "invalid length");
+      return handled_error;
+   }
+
    png_crc_read(png_ptr, buf, 4);
 
    if (png_crc_finish(png_ptr, 0) != 0)
@@ -1218,6 +1225,13 @@ png_handle_cHRM(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_cHRM");
 
+   if (length != 32)
+   {
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "invalid length");
+      return handled_error;
+   }
+
    png_crc_read(png_ptr, buf, 32);
 
    if (png_crc_finish(png_ptr, 0) != 0)
@@ -1270,6 +1284,13 @@ png_handle_sRGB(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
    png_byte intent;
 
    png_debug(1, "in png_handle_sRGB");
+
+   if (length != 1)
+   {
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "invalid length");
+      return handled_error;
+   }
 
    png_crc_read(png_ptr, &intent, 1);
 
@@ -2078,6 +2099,13 @@ png_handle_pHYs(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_pHYs");
 
+   if (length != 9)
+   {
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "invalid length");
+      return handled_error;
+   }
+
    png_crc_read(png_ptr, buf, 9);
 
    if (png_crc_finish(png_ptr, 0) != 0)
@@ -2088,7 +2116,6 @@ png_handle_pHYs(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
    unit_type = buf[8];
    png_set_pHYs(png_ptr, info_ptr, res_x, res_y, unit_type);
    return handled_ok;
-   PNG_UNUSED(length)
 }
 #else
 #  define png_handle_pHYs NULL
@@ -2104,6 +2131,13 @@ png_handle_oFFs(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_oFFs");
 
+   if (length != 9)
+   {
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "invalid length");
+      return handled_error;
+   }
+
    png_crc_read(png_ptr, buf, 9);
 
    if (png_crc_finish(png_ptr, 0) != 0)
@@ -2114,7 +2148,6 @@ png_handle_oFFs(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
    unit_type = buf[8];
    png_set_oFFs(png_ptr, info_ptr, offset_x, offset_y, unit_type);
    return handled_ok;
-   PNG_UNUSED(length)
 }
 #else
 #  define png_handle_oFFs NULL
