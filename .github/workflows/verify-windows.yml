@@ -13,6 +13,9 @@ on:
       - libpng16
       - libpng18
 
+permissions:
+  contents: read
+
 jobs:
   verify-windows:
     strategy:
