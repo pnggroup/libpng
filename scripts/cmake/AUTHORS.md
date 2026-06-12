@@ -11,6 +11,7 @@ Author List
  * B. Scott Michel
  * Benjamin Buch
  * Bernd Kuhls
+ * Brad King
  * Cameron Cawley
  * Carlo Bramini
  * Christian Ehrlicher
@@ -31,6 +32,7 @@ Author List
  * John Bowler
  * Jon Creighton
  * Joost Nieuwenhuijse
+ * Kakeyama Yaito (掛山夜糸)
  * Kyle Bentley
  * Luis Caro Campos
  * Martin Storsjö
