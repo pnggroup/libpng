@@ -13,6 +13,9 @@ on:
       - libpng16
       - libpng18
 
+permissions:
+  contents: read
+
 jobs:
   verify-linux:
     runs-on: ubuntu-latest
@@ -22,12 +25,12 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends build-essential zlib1g-dev
-          if [[ "${{ github.ref }}" != refs/*/libpng16 && "${{ github.base_ref }}" != libpng16 ]]
+          if [[ "${{ github.ref_name }}" != libpng16 && "${{ github.base_ref }}" != libpng16 ]]
           then
             sudo apt-get install -y --no-install-recommends autoconf automake libtool m4
           fi
       - name: Check out the code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - name: Run the configure verification script
         run: bash ./ci/ci_verify_configure.sh
         env:
