@@ -18,9 +18,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: windows-latest
+          - os: windows-2025
             vcpkg_triplet: x64-windows
-            cmake_generator: Visual Studio 17 2022
+            cmake_generator: Visual Studio 18 2026
             cmake_generator_platform: x64
           - os: windows-11-arm
             vcpkg_triplet: arm64-windows
