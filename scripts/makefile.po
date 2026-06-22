@@ -1,0 +1,111 @@
+# makefile for libpng
+# Copyright (C) 2026 Nisto
+#
+# This code is released under the libpng license.
+# For conditions of distribution and use, see the disclaimer
+# and license in png.h
+#
+# Assumes that zlib.lib, zconf.h, and zlib.h is in the directory specified with ZLIBDIR
+# To use, do "pomake /F makefile.po"
+
+ZLIBDIR = ../../zlib
+
+# Compiler, linker, librarian and other tools
+CC = pocc
+LD = polink
+AR = polib
+CPPFLAGS = "-I$(ZLIBDIR)"
+CFLAGS  = -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -Ze -Go -Os -W2
+LDFLAGS = 
+ARFLAGS = 
+CP = copy
+RM = del
+
+# Uncomment next to put error messages in a file
+#ERRFILE= >> pngerrs.log
+
+# Pre-built configuration
+# See scripts\pnglibconf.mak for more options
+PNGLIBCONF_H_PREBUILT = scripts\pnglibconf.h.prebuilt
+
+# File extensions
+O = .obj
+
+# File lists
+OBJS1 = png$(O) pngerror$(O) pngget$(O) pngmem$(O) pngpread$(O)
+OBJS2 = pngread$(O) pngrio$(O) pngrtran$(O) pngrutil$(O) pngset$(O)
+OBJS3 = pngtrans$(O) pngwio$(O) pngwrite$(O) pngwtran$(O) pngwutil$(O)
+OBJS  = $(OBJS1) $(OBJS2) $(OBJS3)
+
+# Targets
+all: libpng.lib
+
+pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
+	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
+
+png$(O): pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+pngerror$(O): pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+pngget$(O): pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+pngmem$(O): pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+pngpread$(O): pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+pngread$(O): pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+pngrio$(O): pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+pngrtran$(O): pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+pngrutil$(O): pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+pngset$(O): pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+pngtrans$(O): pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+pngwio$(O): pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+pngwrite$(O): pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+pngwtran$(O): pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+pngwutil$(O): pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+libpng.lib: $(OBJS)
+	-$(RM) $@
+	$(AR) $(ARFLAGS) -out:$@ $(OBJS) $(ERRFILE)
+
+pngtest.exe: pngtest$(O) libpng.lib
+	$(LD) $(LDFLAGS) -out:$@ pngtest$(O) libpng.lib "$(ZLIBDIR)\zlib.lib" $(ERRFILE)
+
+pngtest$(O): png.h pngconf.h pnglibconf.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)
+
+test: pngtest.exe
+	pngtest.exe
+
+clean:
+	-$(RM) *$(O)
+	-$(RM) libpng.lib
+	-$(RM) pnglibconf.h
+	-$(RM) pngtest.exe
+	-$(RM) pngout.png
+
+# End of makefile for libpng
