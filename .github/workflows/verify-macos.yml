@@ -13,13 +13,16 @@ on:
       - libpng16
       - libpng18
 
+permissions:
+  contents: read
+
 jobs:
   verify-macos:
     runs-on: macos-latest
     timeout-minutes: 10
     steps:
       - name: Check out the code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - name: Run the CMake verification script
         run: bash ./ci/ci_verify_cmake.sh
         env:
