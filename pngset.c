@@ -1327,6 +1327,15 @@ png_set_sPLT(const png_struct *png_ptr,
          continue;
       }
 
+      if (entries->nentries <= 0 ||
+          (size_t)entries->nentries > (PNG_SIZE_MAX / sizeof(png_sPLT_entry))) {
+        png_app_error(png_ptr, "png_set_sPLT: invalid sPLT entry count");
+        continue;
+      }
+
+      size_t bytes;
+      bytes = (size_t)entries->nentries * sizeof(png_sPLT_entry);
+
       np->depth = entries->depth;
 
       /* In the event of out-of-memory just return - there's no point keeping
@@ -1358,8 +1367,7 @@ png_set_sPLT(const png_struct *png_ptr,
       /* This multiply can't overflow because png_malloc_array has already
        * checked it when doing the allocation.
        */
-      memcpy(np->entries, entries->entries,
-          (unsigned int)entries->nentries * sizeof (png_sPLT_entry));
+      memcpy(np->entries, entries->entries,bytes);
 
       /* Note that 'continue' skips the advance of the out pointer and out
        * count, so an invalid entry is not added.
@@ -1633,6 +1641,13 @@ png_set_unknown_chunks(const png_struct *png_ptr,
 
       else
       {
+         if(unknowns->data == NULL && unknowns->size != 0)
+         {
+            png_chunk_report(png_ptr,
+            "unknown chunk: NULL data with nonzero size",
+            PNG_CHUNK_WRITE_ERROR);
+            continue;
+         }
          np->data = png_voidcast(png_byte *,
              png_malloc_base(png_ptr, unknowns->size));
 
