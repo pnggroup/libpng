@@ -304,7 +304,7 @@ convert_gamma_value(png_struct *png_ptr, double output_gamma)
    /* This preserves -1 and -2 exactly: */
    output_gamma = floor(output_gamma + .5);
 
-   if (output_gamma > PNG_FP_MAX || output_gamma < PNG_FP_MIN)
+   if (!(output_gamma >= PNG_FP_MIN && output_gamma <= PNG_FP_MAX))
       png_fixed_error(png_ptr, "gamma value");
 
    return (png_fixed_point)output_gamma;
