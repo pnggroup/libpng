@@ -27,7 +27,7 @@ jobs:
       - name: Install yamllint
         run: pip install yamllint
       - name: Install editorconfig-checker
-        uses: editorconfig-checker/action-editorconfig-checker@main
+        uses: editorconfig-checker/action-editorconfig-checker@840e866d93b8e032123c23bac69dece044d4d84c # main
       - name: Check out the code
         uses: actions/checkout@v4
       - name: Run the linting script
