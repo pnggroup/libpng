@@ -1401,7 +1401,12 @@ png_handle_iCCP(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
                            memcpy(profile, profile_header,
                                (sizeof profile_header));
 
-                           size = 12 * tag_count;
+                           if (tag_count > (PNG_UINT_32_MAX / 12))
+                           {
+                              png_error(png_ptr, "Malformed iCCP chunk: tag count math overflow hazard");
+                           }
+
+                           size = (size_t)12 * tag_count;
 
                            (void)png_inflate_read(png_ptr, local_buffer,
                                (sizeof local_buffer), &length,
@@ -1419,12 +1424,12 @@ png_handle_iCCP(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
                                   * security issues, so read the whole thing in.
                                   */
                                  size = profile_length - (sizeof profile_header)
-                                     - 12 * tag_count;
+                                     - (size_t)12 * tag_count;
 
                                  (void)png_inflate_read(png_ptr, local_buffer,
                                      (sizeof local_buffer), &length,
                                      profile + (sizeof profile_header) +
-                                     12 * tag_count, &size, 1/*finish*/);
+                                     (size_t)12 * tag_count, &size, 1/*finish*/);
 
                                  if (length > 0 && !(png_ptr->flags &
                                      PNG_FLAG_BENIGN_ERRORS_WARN))
