@@ -13,16 +13,22 @@ on:
       - libpng16
       - libpng18
 
+permissions:
+  contents: read
+
 jobs:
   verify-linux:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Install dependencies
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          REF_NAME: ${{ github.ref }}
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends build-essential zlib1g-dev
-          if [[ "${{ github.ref }}" != refs/*/libpng16 && "${{ github.base_ref }}" != libpng16 ]]
+          if [[ "$REF_NAME" != refs/*/libpng16 && "$BASE_REF" != libpng16 ]]
           then
             sudo apt-get install -y --no-install-recommends autoconf automake libtool m4
           fi
