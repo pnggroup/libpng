@@ -536,6 +536,8 @@ if(PNG_TESTS AND PNG_SHARED)
   list(SORT PNGSUITE_PNGS)
   file(GLOB TEST_PNGS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/*.png")
   list(SORT TEST_PNGS)
+  file(GLOB TEST_APNG_PNGS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/apng/*.png")
+  list(SORT TEST_APNG_PNGS)
   file(GLOB TEST_PNG3_PNGS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/png-3/*.png")
   list(SORT TEST_PNG3_PNGS)
 
@@ -554,6 +556,11 @@ if(PNG_TESTS AND PNG_SHARED)
   png_add_test(NAME pngtest-png-3
                COMMAND pngtest
                FILES "${TEST_PNG3_PNGS}")
+
+  png_add_test(NAME pngtest-apng
+               COMMAND pngtest
+               OPTIONS --relaxed
+               FILES "${TEST_APNG_PNGS}")
 
   # pnggetset test:
   # Getter-to-setter roundtrips for various chunk types.
