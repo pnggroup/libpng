@@ -151,10 +151,11 @@ if(PNG_HAVE_LIBM_POW)
 endif()
 
 # Silence function deprecation warnings on the Windows compilers that might
-# use the MSVC Runtime library headers.
+# use the MSVC Runtime library headers, and set warnings to "production" level.
 if(WIN32 AND (CMAKE_C_COMPILER_ID MATCHES "MSVC|Intel|Clang"))
   add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
+  add_compile_options(/W3)
 endif()
 
 option(ld-version-script "Enable linker version script" ON)
