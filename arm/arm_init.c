@@ -145,7 +145,7 @@ png_target_do_expand_palette_neon(png_struct *png_ptr, png_row_info *row_info,
           * way despite the fact that the comments in the neon palette code
           * obfuscate what is happening.
           */
-         png_byte *dp = row + (4/*RGBA*/*row_width - 1);
+         png_byte *dp = row + (4/*RGBA*/*(size_t)row_width - 1);
 
          /* Cosmin Truta: "Sometimes row_info->bit_depth has been changed to 8.
           * In these cases, the palette hasn't been riffled."
@@ -186,7 +186,7 @@ png_target_do_expand_palette_neon(png_struct *png_ptr, png_row_info *row_info,
          /* Finally update row_info to reflect the expanded output: */
          row_info->bit_depth = 8;
          row_info->pixel_depth = 32;
-         row_info->rowbytes = (size_t)row_width * 4;
+         row_info->rowbytes = png_rowbytes_checked(png_ptr, 32, row_width);
          row_info->color_type = 6;
          row_info->channels = 4;
          return 1;
@@ -213,7 +213,7 @@ png_target_do_expand_palette_neon(png_struct *png_ptr, png_row_info *row_info,
 
          row_info->bit_depth = 8;
          row_info->pixel_depth = 24;
-         row_info->rowbytes = (size_t)row_width * 3;
+         row_info->rowbytes = png_rowbytes_checked(png_ptr, 24, row_width);
          row_info->color_type = 2;
          row_info->channels = 3;
          return 1;

@@ -153,6 +153,9 @@ png_do_pack(png_row_info *row_info, png_byte *row, png_uint_32 bit_depth)
 
       row_info->bit_depth = (png_byte)bit_depth;
       row_info->pixel_depth = (png_byte)(bit_depth * row_info->channels);
+      /* Safe: PNG_ROWBYTES uses png_mul_size for >= 8 bpp; sub-byte
+       * depths cannot overflow (width limited by png_check_IHDR).
+       */
       row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,
           row_info->width);
    }
