@@ -376,9 +376,16 @@ png_push_read_chunk(png_struct *png_ptr, png_info *info_ptr)
       png_ptr->idat_size = png_ptr->push_length;
       png_ptr->process_mode = PNG_READ_IDAT_MODE;
       png_push_have_info(png_ptr, info_ptr);
-      png_ptr->zstream.avail_out =
-          (uInt) PNG_ROWBYTES(png_ptr->pixel_depth,
-          png_ptr->iwidth) + 1;
+      {
+         size_t out_size = PNG_ROWBYTES(png_ptr->pixel_depth,
+             png_ptr->iwidth) + 1;
+         uInt out = ZLIB_IO_MAX;
+
+         if (out > out_size)
+            out = (uInt)out_size;
+
+         png_ptr->zstream.avail_out = out;
+      }
       png_ptr->zstream.next_out = png_ptr->row_buf;
       return;
    }
@@ -694,104 +701,180 @@ png_process_IDAT_data(png_struct *png_ptr, png_byte *buffer,
     * before returning, calling the row callback as required to
     * handle the uncompressed results.
     */
-   png_ptr->zstream.next_in = buffer;
-   /* TODO: WARNING: TRUNCATION ERROR: DANGER WILL ROBINSON: */
-   png_ptr->zstream.avail_in = (uInt)buffer_length;
-
-   /* Keep going until the decompressed data is all processed
-    * or the stream marked as finished.
-    */
-   while (png_ptr->zstream.avail_in > 0 &&
-      (png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED) == 0)
    {
-      int ret;
-
-      /* We have data for zlib, but we must check that zlib
-       * has someplace to put the results.  It doesn't matter
-       * if we don't expect any results -- it may be the input
-       * data is just the LZ end code.
+      /* Track remaining input in size_t to avoid losing bytes
+       * when buffer_length exceeds ZLIB_IO_MAX.  Re-chunk each
+       * iteration, matching the sequential reader's strategy
+       * (pngrutil.c png_read_IDAT_data).
        */
-      if (!(png_ptr->zstream.avail_out > 0))
-      {
-         /* TODO: WARNING: TRUNCATION ERROR: DANGER WILL ROBINSON: */
-         png_ptr->zstream.avail_out = (uInt)(PNG_ROWBYTES(png_ptr->pixel_depth,
-             png_ptr->iwidth) + 1);
+      size_t remaining_in = buffer_length;
 
-         png_ptr->zstream.next_out = png_ptr->row_buf;
+      png_ptr->zstream.next_in = buffer;
+
+      {
+         uInt avail = ZLIB_IO_MAX;
+
+         if (avail > remaining_in)
+            avail = (uInt)remaining_in;
+
+         png_ptr->zstream.avail_in = avail;
+         remaining_in -= avail;
       }
 
-      /* Using Z_SYNC_FLUSH here means that an unterminated
-       * LZ stream (a stream with a missing end code) can still
-       * be handled, otherwise (Z_NO_FLUSH) a future zlib
-       * implementation might defer output and therefore
-       * change the current behavior (see comments in inflate.c
-       * for why this doesn't happen at present with zlib 1.2.5).
+      /* Keep going until all input is consumed (including the
+       * remainder beyond the first ZLIB_IO_MAX chunk) or the
+       * stream is marked as finished.
        */
-      ret = png_zlib_inflate(png_ptr, Z_SYNC_FLUSH);
-
-      /* Check for any failure before proceeding. */
-      if (ret != Z_OK && ret != Z_STREAM_END)
+      while ((png_ptr->zstream.avail_in > 0 || remaining_in > 0) &&
+         (png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED) == 0)
       {
-         /* Terminate the decompression. */
-         png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
-         png_ptr->zowner = 0;
+         int ret;
 
-         /* This may be a truncated stream (missing or
-          * damaged end code).  Treat that as a warning.
-          */
-         if (png_ptr->row_number >= png_ptr->num_rows ||
-             png_ptr->pass > 6)
-            png_warning(png_ptr, "Truncated compressed data in IDAT");
-
-         else
+         /* Re-chunk input when zlib has consumed the current chunk. */
+         if (png_ptr->zstream.avail_in == 0 && remaining_in > 0)
          {
-            if (ret == Z_DATA_ERROR)
-               png_benign_error(png_ptr, "IDAT: ADLER32 checksum mismatch");
-            else
-               png_error(png_ptr, "Decompression error in IDAT");
+            uInt avail = ZLIB_IO_MAX;
+
+            if (avail > remaining_in)
+               avail = (uInt)remaining_in;
+
+            png_ptr->zstream.avail_in = avail;
+            remaining_in -= avail;
          }
 
-         /* Skip the check on unprocessed input */
-         return;
-      }
-
-      /* Did inflate output any data? */
-      if (png_ptr->zstream.next_out != png_ptr->row_buf)
-      {
-         /* Is this unexpected data after the last row?
-          * If it is, artificially terminate the LZ output
-          * here.
+         /* We have data for zlib, but we must check that zlib
+          * has someplace to put the results.  It doesn't matter
+          * if we don't expect any results -- it may be the input
+          * data is just the LZ end code.
           */
-         if (png_ptr->row_number >= png_ptr->num_rows ||
-             png_ptr->pass > 6)
+         if (!(png_ptr->zstream.avail_out > 0))
          {
-            /* Extra data. */
-            png_warning(png_ptr, "Extra compressed data in IDAT");
+            /* Output chunk exhausted mid-row.  Re-chunk the
+             * remaining output capacity without resetting
+             * next_out, so partial row data is preserved.
+             * Row completion (and the next_out reset) is
+             * handled after inflate, below.
+             */
+            size_t row_size = PNG_ROWBYTES(png_ptr->pixel_depth,
+                png_ptr->iwidth) + 1;
+            size_t produced = (size_t)(png_ptr->zstream.next_out -
+                png_ptr->row_buf);
+            size_t remaining_out;
+            uInt out = ZLIB_IO_MAX;
+
+            if (produced > row_size)
+               png_error(png_ptr, "IDAT: row buffer overrun");
+
+            remaining_out = row_size - produced;
+
+            if (out > remaining_out)
+               out = (uInt)remaining_out;
+
+            png_ptr->zstream.avail_out = out;
+         }
+
+         /* Using Z_SYNC_FLUSH here means that an unterminated
+          * LZ stream (a stream with a missing end code) can still
+          * be handled, otherwise (Z_NO_FLUSH) a future zlib
+          * implementation might defer output and therefore
+          * change the current behavior (see comments in inflate.c
+          * for why this doesn't happen at present with zlib 1.2.5).
+          */
+         ret = png_zlib_inflate(png_ptr, Z_SYNC_FLUSH);
+
+         /* Check for any failure before proceeding. */
+         if (ret != Z_OK && ret != Z_STREAM_END)
+         {
+            /* Terminate the decompression. */
             png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
             png_ptr->zowner = 0;
 
-            /* Do no more processing; skip the unprocessed
-             * input check below.
+            /* This may be a truncated stream (missing or
+             * damaged end code).  Treat that as a warning.
              */
+            if (png_ptr->row_number >= png_ptr->num_rows ||
+                png_ptr->pass > 6)
+               png_warning(png_ptr, "Truncated compressed data in IDAT");
+
+            else
+            {
+               if (ret == Z_DATA_ERROR)
+                  png_benign_error(png_ptr, "IDAT: ADLER32 checksum mismatch");
+               else
+                  png_error(png_ptr, "Decompression error in IDAT");
+            }
+
+            /* Skip the check on unprocessed input */
             return;
          }
 
-         /* Do we have a complete row? */
-         if (png_ptr->zstream.avail_out == 0)
-            png_push_process_row(png_ptr);
+         /* Did inflate output any data? */
+         if (png_ptr->zstream.next_out != png_ptr->row_buf)
+         {
+            /* Is this unexpected data after the last row?
+             * If it is, artificially terminate the LZ output
+             * here.
+             */
+            if (png_ptr->row_number >= png_ptr->num_rows ||
+                png_ptr->pass > 6)
+            {
+               /* Extra data. */
+               png_warning(png_ptr, "Extra compressed data in IDAT");
+               png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
+               png_ptr->zowner = 0;
+
+               /* Do no more processing; skip the unprocessed
+                * input check below.
+                */
+               return;
+            }
+
+            /* Do we have a complete row?  Check using the output
+             * position rather than avail_out==0, because avail_out
+             * may represent only a chunk of the full row.
+             */
+            {
+               size_t row_size = PNG_ROWBYTES(png_ptr->pixel_depth,
+                   png_ptr->iwidth) + 1;
+
+               if ((size_t)(png_ptr->zstream.next_out - png_ptr->row_buf)
+                   == row_size)
+               {
+                  png_push_process_row(png_ptr);
+
+                  /* Reset output for the next row.  Recompute
+                   * row_size because iwidth may have changed
+                   * (interlace pass transition).
+                   */
+                  row_size = PNG_ROWBYTES(png_ptr->pixel_depth,
+                      png_ptr->iwidth) + 1;
+
+                  {
+                     uInt out = ZLIB_IO_MAX;
+
+                     if (out > row_size)
+                        out = (uInt)row_size;
+
+                     png_ptr->zstream.avail_out = out;
+                  }
+
+                  png_ptr->zstream.next_out = png_ptr->row_buf;
+               }
+            }
+         }
+
+         /* And check for the end of the stream. */
+         if (ret == Z_STREAM_END)
+            png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
       }
 
-      /* And check for the end of the stream. */
-      if (ret == Z_STREAM_END)
-         png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
+      /* All the data should have been processed, if anything
+       * is left at this point we have bytes of IDAT data
+       * after the zlib end code.
+       */
+      if (png_ptr->zstream.avail_in > 0 || remaining_in > 0)
+         png_warning(png_ptr, "Extra compression data in IDAT");
    }
-
-   /* All the data should have been processed, if anything
-    * is left at this point we have bytes of IDAT data
-    * after the zlib end code.
-    */
-   if (png_ptr->zstream.avail_in > 0)
-      png_warning(png_ptr, "Extra compression data in IDAT");
 }
 
 void /* PRIVATE */
