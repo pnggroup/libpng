@@ -266,11 +266,11 @@ uch *readpng_get_image(double display_exponent, int *pChannels, ulg *pRowbytes)
 
     /* Guard against integer overflow */
     if (height > ((size_t)(-1))/rowbytes) {
-        fprintf(stderr, "readpng:  image_data buffer would be too large\n",
+        fprintf(stderr, "readpng:  image_data buffer would be too large\n");
         return NULL;
     }
 
-    if ((image_data = (uch *)malloc(rowbytes*height)) == NULL) {
+    if ((image_data = (uch *)malloc((size_t)rowbytes*height)) == NULL) {
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         return NULL;
     }
