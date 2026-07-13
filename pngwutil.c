@@ -2045,7 +2045,14 @@ png_write_start_row(png_struct *png_ptr)
    png_ptr->transformed_pixel_depth = png_ptr->pixel_depth;
    png_ptr->maximum_pixel_depth = (png_byte)usr_pixel_depth;
 
-   /* Set up row buffer */
+   /* Set up row buffer.  This function runs again for every APNG frame (see
+    * png_write_reset), so free any buffer left from a previous frame and clear
+    * the pointer before the allocation, matching png_read_start_row.  Without
+    * this the previous frame's row_buf is leaked, and clearing first keeps a
+    * failed re-allocation from leaving a stale pointer that is freed twice.
+    */
+   png_free(png_ptr, png_ptr->row_buf);
+   png_ptr->row_buf = NULL;
    png_ptr->row_buf = png_voidcast(png_byte *, png_malloc(png_ptr, buf_size));
 
    png_ptr->row_buf[0] = PNG_FILTER_VALUE_NONE;
@@ -2092,6 +2099,8 @@ png_write_start_row(png_struct *png_ptr)
    /* We only need to keep the previous row if we are using one of the following
     * filters.
     */
+   png_free(png_ptr, png_ptr->prev_row);
+   png_ptr->prev_row = NULL;
    if ((filters & (PNG_FILTER_AVG | PNG_FILTER_UP | PNG_FILTER_PAETH)) != 0)
       png_ptr->prev_row = png_voidcast(png_byte *,
           png_calloc(png_ptr, buf_size));
