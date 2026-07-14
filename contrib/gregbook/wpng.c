@@ -706,8 +706,8 @@ int main(int argc, char **argv)
         ulg image_bytes;
 
         /* Guard against integer overflow */
-        if (wpng_info_height > ((size_t)(-1)/rowbytes ||
-            wpng_info_height > ((ulg)(-1)/rowbytes) {
+        if (wpng_info.height > ((size_t)(-1))/rowbytes ||
+            wpng_info.height > ((ulg)(-1))/rowbytes) {
             fprintf(stderr, PROGNAME ":  image_data buffer too large\n");
             writepng_cleanup(&wpng_info);
             wpng_cleanup();
