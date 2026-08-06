@@ -817,6 +817,8 @@ png_set_quantize(png_struct *png_ptr, png_color *palette,
       int num_blue = (1 << PNG_QUANTIZE_BLUE_BITS);
       size_t num_entries = ((size_t)1 << total_bits);
 
+      png_free(png_ptr, png_ptr->palette_lookup);
+      png_ptr->palette_lookup = NULL;
       png_ptr->palette_lookup = (png_byte *)png_calloc(png_ptr,
           (png_alloc_size_t)(num_entries));
 
