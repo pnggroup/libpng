@@ -533,7 +533,9 @@ png_push_restore_buffer(png_struct *png_ptr, png_byte *buffer,
 void /* PRIVATE */
 png_push_read_IDAT(png_struct *png_ptr)
 {
+#ifdef PNG_READ_APNG_SUPPORTED
    int chunk_header_read = 0;
+#endif
 
    if ((png_ptr->mode & PNG_HAVE_CHUNK_HEADER) == 0)
    {
@@ -552,9 +554,10 @@ png_push_read_IDAT(png_struct *png_ptr)
       png_crc_read(png_ptr, chunk_tag, 4);
       png_ptr->chunk_name = PNG_CHUNK_FROM_STRING(chunk_tag);
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
-      chunk_header_read = 1;
 
 #ifdef PNG_READ_APNG_SUPPORTED
+      chunk_header_read = 1;
+
       if (png_ptr->chunk_name != png_fdAT && png_ptr->num_frames_read > 0)
       {
          if (png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED)
@@ -596,6 +599,10 @@ png_push_read_IDAT(png_struct *png_ptr)
 
          return;
       }
+
+#ifndef PNG_READ_APNG_SUPPORTED
+      png_ptr->idat_size = png_ptr->push_length;
+#endif
    }
 
 #ifdef PNG_READ_APNG_SUPPORTED
@@ -625,18 +632,18 @@ png_push_read_IDAT(png_struct *png_ptr)
    }
 #endif
 
+#ifdef PNG_READ_APNG_SUPPORTED
    if (chunk_header_read != 0)
    {
       png_ptr->idat_size = png_ptr->push_length;
 
-#ifdef PNG_READ_APNG_SUPPORTED
       if (png_ptr->num_frames_read > 0)
       {
          png_ensure_sequence_number(png_ptr, png_ptr->push_length);
          png_ptr->idat_size -= 4;
       }
-#endif
    }
+#endif
 
    if (png_ptr->idat_size != 0 && png_ptr->save_buffer_size != 0)
    {
