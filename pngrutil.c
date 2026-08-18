@@ -1315,6 +1315,7 @@ png_handle_iCCP(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 {
    const char *errmsg = NULL; /* error message output, or no error */
    int finished = 0; /* crc checked */
+   int ret; /* zlib status of the final inflate call */
 
    png_debug(1, "in png_handle_iCCP");
 
@@ -1421,7 +1422,7 @@ png_handle_iCCP(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
                                  size = profile_length - (sizeof profile_header)
                                      - 12 * tag_count;
 
-                                 (void)png_inflate_read(png_ptr, local_buffer,
+                                 ret = png_inflate_read(png_ptr, local_buffer,
                                      (sizeof local_buffer), &length,
                                      profile + (sizeof profile_header) +
                                      12 * tag_count, &size, 1/*finish*/);
@@ -1431,7 +1432,7 @@ png_handle_iCCP(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
                                     errmsg = "extra compressed data";
 
                                  /* But otherwise allow extra data: */
-                                 else if (size == 0)
+                                 else if (ret == Z_STREAM_END && size == 0)
                                  {
                                     if (length > 0)
                                     {
@@ -1480,6 +1481,16 @@ png_handle_iCCP(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
                                        png_ptr->zowner = 0;
                                        return handled_ok;
                                     }
+                                 }
+                                 else if (size == 0)
+                                 {
+                                    /* The LZ stream produced more output
+                                     * than the declared profile length;
+                                     * accepting it would silently truncate
+                                     * the profile.
+                                     */
+                                    errmsg = "decompressed data exceeds "
+                                        "declared profile length";
                                  }
                                  if (errmsg == NULL)
                                     errmsg = png_ptr->zstream.msg;
@@ -3232,7 +3243,7 @@ read_chunks[PNG_INDEX_unknown] =
       /* Allocates 'length+1'; checked in the handler */
 #  define CDtIME       7U,    7U,      0, hIHDR,        0
 #  define CDacTL       8U,    8U,  hIDAT, hIHDR,        0
-#  define CDfcTL      25U,   26U,      0, hIHDR,        1
+#  define CDfcTL      26U,   26U,      0, hIHDR,        1
 #  define CDfdAT    Limit,    4U,  hIDAT, hIHDR,        1
    /* Supported chunks from PNG extensions 1.5.0, NYI so limit */
 #  define CDoFFs       9U,    9U,  hIDAT, hIHDR,        0

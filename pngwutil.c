@@ -1545,6 +1545,16 @@ png_write_eXIf(png_struct *png_ptr, png_byte *exif, int num_exif)
 
    png_debug(1, "in png_write_eXIf");
 
+   if (num_exif < 0)
+   {
+      /* num_exif is signed in the API; a negative value would wrap into a
+       * huge chunk length field and corrupt the output stream.
+       */
+      png_warning(png_ptr, "Invalid eXIf chunk length");
+
+      return;
+   }
+
    png_write_chunk_header(png_ptr, png_eXIf, (png_uint_32)(num_exif));
 
    for (i = 0; i < num_exif; i++)
