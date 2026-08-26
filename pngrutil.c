@@ -4597,37 +4597,17 @@ png_read_finish_row(png_struct *png_ptr)
 }
 #endif /* SEQUENTIAL_READ */
 
-void /* PRIVATE */
-png_read_start_row(png_struct *png_ptr)
+/* Compute the maximum pixel depth that any row could have after all of
+ * the enabled read transformations.  This was previously open-coded
+ * here only; keeping it in one place makes it possible to reason about
+ * (and assert on) consistency with png_do_read_transformations and
+ * png_read_transform_info, which must agree with this value - see the
+ * warning in png_read_start_row.
+ */
+static unsigned int
+png_read_max_pixel_depth(png_struct *png_ptr)
 {
    unsigned int max_pixel_depth;
-   size_t row_bytes;
-
-   png_debug(1, "in png_read_start_row");
-
-#ifdef PNG_READ_TRANSFORMS_SUPPORTED
-   png_init_read_transformations(png_ptr);
-#endif
-   if (png_ptr->interlaced != 0)
-   {
-      if ((png_ptr->transformations & PNG_INTERLACE) == 0)
-         png_ptr->num_rows = (png_ptr->height + png_pass_yinc[0] - 1 -
-             png_pass_ystart[0]) / png_pass_yinc[0];
-
-      else
-         png_ptr->num_rows = png_ptr->height;
-
-      png_ptr->iwidth = (png_ptr->width +
-          png_pass_inc[png_ptr->pass] - 1 -
-          png_pass_start[png_ptr->pass]) /
-          png_pass_inc[png_ptr->pass];
-   }
-
-   else
-   {
-      png_ptr->num_rows = png_ptr->height;
-      png_ptr->iwidth = png_ptr->width;
-   }
 
    max_pixel_depth = (unsigned int)png_ptr->pixel_depth;
 
@@ -4771,6 +4751,46 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
          max_pixel_depth = user_pixel_depth;
    }
 #endif
+
+   return max_pixel_depth;
+}
+
+void /* PRIVATE */
+png_read_start_row(png_struct *png_ptr)
+{
+   unsigned int max_pixel_depth;
+   size_t row_bytes;
+
+   png_debug(1, "in png_read_start_row");
+
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
+   png_init_read_transformations(png_ptr);
+#endif
+   if (png_ptr->interlaced != 0)
+   {
+      if ((png_ptr->transformations & PNG_INTERLACE) == 0)
+         png_ptr->num_rows = (png_ptr->height + png_pass_yinc[0] - 1 -
+             png_pass_ystart[0]) / png_pass_yinc[0];
+
+      else
+         png_ptr->num_rows = png_ptr->height;
+
+      png_ptr->iwidth = (png_ptr->width +
+          png_pass_inc[png_ptr->pass] - 1 -
+          png_pass_start[png_ptr->pass]) /
+          png_pass_inc[png_ptr->pass];
+   }
+
+   else
+   {
+      png_ptr->num_rows = png_ptr->height;
+      png_ptr->iwidth = png_ptr->width;
+   }
+
+   /* Calculate the maximum transformed pixel depth (see the warning
+    * above png_read_max_pixel_depth).
+   */
+   max_pixel_depth = png_read_max_pixel_depth(png_ptr);
 
    /* This value is stored in png_struct and double checked in the row read
     * code.
