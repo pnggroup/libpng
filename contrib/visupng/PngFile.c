@@ -280,6 +280,7 @@ BOOL PngLoadImage (PTSTR pstrFileName, png_byte **ppbImageData,
     {
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 
+        if (pbImageData) free (pbImageData);
         *ppbImageData = pbImageData = NULL;
 
         if(ppbRowPointers)
