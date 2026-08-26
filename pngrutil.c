@@ -3232,7 +3232,14 @@ read_chunks[PNG_INDEX_unknown] =
       /* Allocates 'length+1'; checked in the handler */
 #  define CDtIME       7U,    7U,      0, hIHDR,        0
 #  define CDacTL       8U,    8U,  hIDAT, hIHDR,        0
-#  define CDfcTL      25U,   26U,      0, hIHDR,        1
+#  define CDfcTL      26U,   26U,      0, hIHDR,        1
+   /* The minimum and maximum fcTL lengths are equal because an fcTL is
+    * exactly 26 bytes long: a 4-byte big-endian sequence number followed by
+    * 22 bytes of frame data.  The earlier value of 25U for max_length was
+    * inconsistent with min_length=26U and would have rejected every valid
+    * fcTL if this table entry were ever consulted (the handler is currently
+    * compiled out; see the '#define png_handle_fcTL NULL' above).
+    */
 #  define CDfdAT    Limit,    4U,  hIDAT, hIHDR,        1
    /* Supported chunks from PNG extensions 1.5.0, NYI so limit */
 #  define CDoFFs       9U,    9U,  hIDAT, hIHDR,        0
