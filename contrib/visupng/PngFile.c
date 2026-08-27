@@ -131,6 +131,7 @@ BOOL PngLoadImage (PTSTR pstrFileName, png_byte **ppbImageData,
     if (png_sig_cmp(pbSig, 0, 8))
     {
         *ppbImageData = pbImageData = NULL;
+        fclose(pfFile);
         return FALSE;
     }
 
@@ -141,6 +142,7 @@ BOOL PngLoadImage (PTSTR pstrFileName, png_byte **ppbImageData,
     if (!png_ptr)
     {
         *ppbImageData = pbImageData = NULL;
+        fclose(pfFile);
         return FALSE;
     }
 
@@ -149,6 +151,7 @@ BOOL PngLoadImage (PTSTR pstrFileName, png_byte **ppbImageData,
     {
         png_destroy_read_struct(&png_ptr, NULL, NULL);
         *ppbImageData = pbImageData = NULL;
+        fclose(pfFile);
         return FALSE;
     }
 
