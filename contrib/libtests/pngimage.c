@@ -1159,7 +1159,7 @@ compare_read(struct display *dp, int applied_transforms)
          {
             int b;
 
-            for (b=0; 8*b<bpp; ++b)
+            for (b=0; b*bit_depth<bpp; ++b)
             {
                /* libpng should catch this; if not there is a security issue
                 * because an app (like this one) may overflow an array. In fact
@@ -1188,10 +1188,10 @@ compare_read(struct display *dp, int applied_transforms)
             case 16: /* Two bytes per component, big-endian */
                for (b = (bpp >> 4); b > 0; --b)
                {
-                  unsigned int sig = (unsigned int)(0xffff0000 >> sig_bits[b]);
+                  unsigned int sig = (unsigned int)(0xffff0000 >> sig_bits[b-1]);
 
-                  sig_bits[2*b+1] = (png_byte)sig;
-                  sig_bits[2*b+0] = (png_byte)(sig >> 8); /* big-endian */
+                  sig_bits[2*b-1] = (png_byte)sig;
+                  sig_bits[2*b-2] = (png_byte)(sig >> 8); /* big-endian */
                }
                break;
 
