@@ -1112,9 +1112,14 @@ compare_read(struct display *dp, int applied_transforms)
 #     ifdef PNG_sBIT_SUPPORTED
       {
          unsigned long y;
-         int bpp;   /* bits-per-pixel then bytes-per-pixel */
-         /* components are up to 8 bytes in size */
-         png_byte sig_bits[8];
+         int components; /* number of colour components */
+         int bpp;        /* bytes-per-pixel */
+         /* One sBIT value per colour component: */
+         png_byte sig_bits[4];
+         /* The mask of the significant bits, one entry per byte of a pixel; a
+          * pixel is at most 8 bytes (RGBA at bit depth 16).
+          */
+         png_byte sig_mask[8];
          png_color_8p sBIT;
 
          if (png_get_sBIT(dp->read_pp, dp->read_ip, &sBIT) != PNG_INFO_sBIT)
@@ -1125,20 +1130,20 @@ compare_read(struct display *dp, int applied_transforms)
          {
             case PNG_COLOR_TYPE_GRAY:
                sig_bits[0] = sBIT->gray;
-               bpp = bit_depth;
+               components = 1;
                break;
 
             case PNG_COLOR_TYPE_GA:
                sig_bits[0] = sBIT->gray;
                sig_bits[1] = sBIT->alpha;
-               bpp = 2 * bit_depth;
+               components = 2;
                break;
 
             case PNG_COLOR_TYPE_RGB:
                sig_bits[0] = sBIT->red;
                sig_bits[1] = sBIT->green;
                sig_bits[2] = sBIT->blue;
-               bpp = 3 * bit_depth;
+               components = 3;
                break;
 
             case PNG_COLOR_TYPE_RGBA:
@@ -1146,7 +1151,7 @@ compare_read(struct display *dp, int applied_transforms)
                sig_bits[1] = sBIT->green;
                sig_bits[2] = sBIT->blue;
                sig_bits[3] = sBIT->alpha;
-               bpp = 4 * bit_depth;
+               components = 4;
                break;
 
             default:
@@ -1154,14 +1159,14 @@ compare_read(struct display *dp, int applied_transforms)
                   color_type);
                /*NOTREACHED*/
                memset(sig_bits, 0, sizeof(sig_bits));
-               bpp = 0;
+               components = 0;
                break;
          }
 
          {
             int b;
 
-            for (b=0; 8*b<bpp; ++b)
+            for (b=0; b<components; ++b)
             {
                /* libpng should catch this; if not there is a security issue
                 * because an app (like this one) may overflow an array. In fact
@@ -1174,37 +1179,31 @@ compare_read(struct display *dp, int applied_transforms)
             }
          }
 
-         if (bpp < 8 && bpp != bit_depth)
-         {
-            /* sanity check; this is a grayscale PNG; something is wrong in the
-             * code above.
-             */
-            display_log(dp, INTERNAL_ERROR, "invalid bpp %u for bit_depth %u",
-               bpp, bit_depth);
-         }
+         /* Only the bytes of a pixel get set below: */
+         memset(sig_mask, 0, sizeof(sig_mask));
 
          switch (bit_depth)
          {
             int b;
 
             case 16: /* Two bytes per component, big-endian */
-               for (b = (bpp >> 4); b > 0; --b)
+               for (b = components-1; b >= 0; --b)
                {
-                  unsigned int sig = (unsigned int)(0xffff0000 >> sig_bits[b]);
+                  unsigned int sig = 0xffff0000 >> sig_bits[b];
 
-                  sig_bits[2*b+1] = (png_byte)sig;
-                  sig_bits[2*b+0] = (png_byte)(sig >> 8); /* big-endian */
+                  sig_mask[2*b+1] = (png_byte)sig;
+                  sig_mask[2*b+0] = (png_byte)(sig >> 8); /* big-endian */
                }
                break;
 
             case 8: /* One byte per component */
-               for (b=0; b*8 < bpp; ++b)
-                  sig_bits[b] = (png_byte)(0xff00 >> sig_bits[b]);
+               for (b=0; b<components; ++b)
+                  sig_mask[b] = (png_byte)(0xff00 >> sig_bits[b]);
                break;
 
             case 1: /* allowed, but dumb */
                /* Value is 1 */
-               sig_bits[0] = 0xff;
+               sig_mask[0] = 0xff;
                break;
 
             case 2: /* Replicate 4 times */
@@ -1212,14 +1211,14 @@ compare_read(struct display *dp, int applied_transforms)
                b = 0x3 & ((0x3<<2) >> sig_bits[0]);
                b |= b << 2;
                b |= b << 4;
-               sig_bits[0] = (png_byte)b;
+               sig_mask[0] = (png_byte)b;
                break;
 
             case 4: /* Replicate twice */
                /* Value is 1, 2, 3 or 4 */
                b = 0xf & ((0xf << 4) >> sig_bits[0]);
                b |= b << 4;
-               sig_bits[0] = (png_byte)b;
+               sig_mask[0] = (png_byte)b;
                break;
 
             default:
@@ -1227,15 +1226,15 @@ compare_read(struct display *dp, int applied_transforms)
                break;
          }
 
-         /* Convert bpp to bytes; this gives '1' for low-bit depth grayscale,
-          * where there are multiple pixels per byte.
+         /* Bytes per pixel; this gives '1' for low-bit depth grayscale, where
+          * there are multiple pixels per byte.
           */
-         bpp = (bpp+7) >> 3;
+         bpp = (components * bit_depth + 7) >> 3;
 
-         /* The mask can be combined with sig_bits[0] */
+         /* The mask can be combined with sig_mask[0] */
          if (mask != 0)
          {
-            mask &= sig_bits[0];
+            mask &= sig_mask[0];
 
             if (bpp != 1 || mask == 0)
                display_log(dp, INTERNAL_ERROR, "mask calculation error %u, %u",
@@ -1254,7 +1253,7 @@ compare_read(struct display *dp, int applied_transforms)
 
                for (b=0; b<bpp; ++b)
                {
-                  if ((*row++ & sig_bits[b]) != (*orig++ & sig_bits[b]))
+                  if ((*row++ & sig_mask[b]) != (*orig++ & sig_mask[b]))
                   {
                      display_log(dp, APP_FAIL,
                         "significant bits at (%lu[%u],%lu) changed %.2x->%.2x",
