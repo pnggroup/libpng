@@ -564,6 +564,133 @@ test_unknown_roundtrip(void)
 }
 #endif /* PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED */
 
+#if defined(PNG_pCAL_SUPPORTED) && defined(PNG_USER_MEM_SUPPORTED)
+typedef struct
+{
+   unsigned int calls;
+   unsigned int fail_at;
+   unsigned int live;
+} fail_allocator;
+
+static void * PNGCBAPI
+fail_malloc(png_structp png_ptr, png_alloc_size_t size)
+{
+   fail_allocator *allocator =
+       (fail_allocator *)png_get_mem_ptr(png_ptr);
+   void *result;
+
+   ++allocator->calls;
+   if (allocator->fail_at != 0 && allocator->calls == allocator->fail_at)
+      return NULL;
+
+   result = malloc(size);
+   if (result != NULL)
+      ++allocator->live;
+
+   return result;
+}
+
+static void PNGCBAPI
+fail_free(png_structp png_ptr, void *ptr)
+{
+   fail_allocator *allocator =
+       (fail_allocator *)png_get_mem_ptr(png_ptr);
+
+   if (ptr != NULL)
+   {
+      --allocator->live;
+      free(ptr);
+   }
+}
+
+static void PNGCBAPI
+ignore_warning(png_structp png_ptr, png_const_charp message)
+{
+   (void)png_ptr;
+   (void)message;
+}
+
+/* Test: a failed pCAL replacement must preserve the previous value. */
+static int
+test_pcal_oom_replacement(void)
+{
+   fail_allocator allocator;
+   png_structp png_ptr;
+   png_infop info_ptr;
+   png_charp first_params[] = {(png_charp)"1"};
+   png_charp second_params[] = {
+      (png_charp)"2", (png_charp)"3", (png_charp)"4"
+   };
+   png_charp purpose;
+   png_charp units;
+   png_charpp params;
+   png_int_32 x0, x1;
+   int type, nparams;
+   int failed = 0;
+
+   memset(&allocator, 0, sizeof allocator);
+   png_ptr = png_create_write_struct_2(PNG_LIBPNG_VER_STRING,
+       NULL, NULL, ignore_warning, &allocator, fail_malloc, fail_free);
+   if (png_ptr == NULL)
+   {
+      fprintf(stderr, "pnggetset: png_create_write_struct_2 failed\n");
+      return 1;
+   }
+
+   info_ptr = png_create_info_struct(png_ptr);
+   if (info_ptr == NULL)
+   {
+      fprintf(stderr, "pnggetset: png_create_info_struct failed\n");
+      png_destroy_write_struct(&png_ptr, NULL);
+      return 1;
+   }
+
+   if (setjmp(png_jmpbuf(png_ptr)))
+   {
+      fprintf(stderr,
+          "pnggetset: libpng error in test_pcal_oom_replacement\n");
+      png_destroy_write_struct(&png_ptr, &info_ptr);
+      return 1;
+   }
+
+   png_set_pCAL(png_ptr, info_ptr, "first", 10, 20,
+       PNG_EQUATION_LINEAR, 1, "old-unit", first_params);
+
+   /* A pCAL replacement allocates the purpose first and the units second. */
+   allocator.fail_at = allocator.calls + 2;
+   png_set_pCAL(png_ptr, info_ptr, "second", 30, 40,
+       PNG_EQUATION_LINEAR, 3, "new-unit", second_params);
+   allocator.fail_at = 0;
+
+   if (png_get_pCAL(png_ptr, info_ptr, &purpose, &x0, &x1, &type,
+       &nparams, &units, &params) == 0 ||
+       purpose == NULL || strcmp(purpose, "first") != 0 ||
+       x0 != 10 || x1 != 20 || type != PNG_EQUATION_LINEAR ||
+       nparams != 1 || units == NULL || strcmp(units, "old-unit") != 0 ||
+       params == NULL || params[0] == NULL ||
+       strcmp(params[0], "1") != 0)
+   {
+      fprintf(stderr,
+          "pnggetset: failed pCAL replacement corrupted prior state\n");
+      failed = 1;
+   }
+
+   /* Restore a consistent value before teardown on the negative control. */
+   png_set_pCAL(png_ptr, info_ptr, "cleanup", 50, 60,
+       PNG_EQUATION_LINEAR, 1, "cleanup-unit", first_params);
+
+   png_destroy_write_struct(&png_ptr, &info_ptr);
+   if (allocator.live != 0)
+   {
+      fprintf(stderr, "pnggetset: pCAL replacement leaked %u allocations\n",
+          allocator.live);
+      failed = 1;
+   }
+
+   return failed;
+}
+#endif /* PNG_pCAL_SUPPORTED && PNG_USER_MEM_SUPPORTED */
+
 /* Memory buffer for PNG I/O without temp files. */
 #define MEM_BUF_SIZE 4096
 
@@ -840,6 +967,18 @@ main(void)
    printf("Testing unknown chunks get-then-set roundtrip... ");
    fflush(stdout);
    if (test_unknown_roundtrip() != 0)
+   {
+      printf("FAIL\n");
+      result = 1;
+   }
+   else
+      printf("PASS\n");
+#endif
+
+#if defined(PNG_pCAL_SUPPORTED) && defined(PNG_USER_MEM_SUPPORTED)
+   printf("Testing pCAL replacement allocation failure... ");
+   fflush(stdout);
+   if (test_pcal_oom_replacement() != 0)
    {
       printf("FAIL\n");
       result = 1;
