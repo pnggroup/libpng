@@ -1017,6 +1017,100 @@ png_get_pCAL(const png_struct *png_ptr, png_info *info_ptr,
 #endif
 
 #ifdef PNG_sCAL_SUPPORTED
+#  if defined(PNG_FLOATING_POINT_SUPPORTED) || \
+      (defined(PNG_FIXED_POINT_SUPPORTED) && \
+       defined(PNG_FLOATING_ARITHMETIC_SUPPORTED))
+/* Convert an already-validated ASCII floating-point string (as stored for the
+ * sCAL chunk) to a double without depending on the current locale.  atof() and
+ * strtod() honor LC_NUMERIC, so under a locale whose decimal separator is not
+ * '.' they stop at the '.' and silently drop the fractional and exponent parts
+ * of the value read from the file.
+ */
+static double
+png_sCAL_strtod(const char *str)
+{
+   double value = 0;
+   int exponent = 0; /* base-ten adjustment carried by the fraction digits */
+   int sign = 1;
+   const char *p = str;
+
+   if (*p == '+')
+      ++p;
+   else if (*p == '-')
+   {
+      sign = -1;
+      ++p;
+   }
+
+   while (*p >= '0' && *p <= '9')
+      value = value * 10 + (*p++ - '0');
+
+   if (*p == '.')
+   {
+      ++p;
+      while (*p >= '0' && *p <= '9')
+      {
+         value = value * 10 + (*p++ - '0');
+         --exponent;
+      }
+   }
+
+   if (*p == 'e' || *p == 'E')
+   {
+      int exp = 0;
+      int exp_sign = 1;
+
+      ++p;
+      if (*p == '+')
+         ++p;
+      else if (*p == '-')
+      {
+         exp_sign = -1;
+         ++p;
+      }
+
+      while (*p >= '0' && *p <= '9')
+      {
+         /* Clamp to a magnitude well past the representable range so a long
+          * digit run cannot overflow the int accumulator; png_pow10-style
+          * values beyond this already collapse to +inf or 0.
+          */
+         if (exp < 1000)
+            exp = exp * 10 + (*p++ - '0');
+         else
+            ++p;
+      }
+
+      exponent += exp_sign * exp;
+   }
+
+   if (exponent != 0)
+   {
+      /* Accurate power of ten by binary decomposition; reciprocate at the end
+       * because 10 is exact in base two whereas 0.1 is not.
+       */
+      int power = exponent < 0 ? -exponent : exponent;
+      double mult = 10;
+      double scale = 1;
+
+      while (power > 0)
+      {
+         if ((power & 1) != 0)
+            scale *= mult;
+         mult *= mult;
+         power >>= 1;
+      }
+
+      if (exponent < 0)
+         value /= scale;
+      else
+         value *= scale;
+   }
+
+   return sign < 0 ? -value : value;
+}
+#  endif
+
 #  ifdef PNG_FIXED_POINT_SUPPORTED
 #    if defined(PNG_FLOATING_ARITHMETIC_SUPPORTED) || \
          defined(PNG_FLOATING_POINT_SUPPORTED)
@@ -1034,8 +1128,9 @@ png_get_sCAL_fixed(const png_struct *png_ptr, const png_info *info_ptr,
        * if neither floating point APIs nor internal floating point arithmetic
        * are enabled.
        */
-      *width = png_fixed(png_ptr, atof(info_ptr->scal_s_width), "sCAL width");
-      *height = png_fixed(png_ptr, atof(info_ptr->scal_s_height),
+      *width = png_fixed(png_ptr, png_sCAL_strtod(info_ptr->scal_s_width),
+          "sCAL width");
+      *height = png_fixed(png_ptr, png_sCAL_strtod(info_ptr->scal_s_height),
           "sCAL height");
       return PNG_INFO_sCAL;
    }
@@ -1055,8 +1150,8 @@ png_get_sCAL(const png_struct *png_ptr, const png_info *info_ptr,
        (info_ptr->valid & PNG_INFO_sCAL) != 0)
    {
       *unit = info_ptr->scal_unit;
-      *width = atof(info_ptr->scal_s_width);
-      *height = atof(info_ptr->scal_s_height);
+      *width = png_sCAL_strtod(info_ptr->scal_s_width);
+      *height = png_sCAL_strtod(info_ptr->scal_s_height);
       return PNG_INFO_sCAL;
    }
 
