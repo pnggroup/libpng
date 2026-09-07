@@ -157,7 +157,14 @@ if(WIN32 AND (CMAKE_C_COMPILER_ID MATCHES "MSVC|Intel|Clang"))
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
 endif()
 
-option(ld-version-script "Enable linker version script" ON)
+
+if (CMAKE_SYSTEM_NAME MATCHES "AIX")
+  option(ld-version-script "Disable linker version script" OFF)
+else()
+  option(ld-version-script "Enable linker version script" ON)
+endif()
+
+
 if(ld-version-script AND NOT (ANDROID OR APPLE))
   # Check if LD supports linker scripts.
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map" "
