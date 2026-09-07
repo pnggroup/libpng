@@ -459,7 +459,12 @@ png_set_IHDR(const png_struct *png_ptr, png_info *info_ptr,
 
    info_ptr->pixel_depth = (png_byte)(info_ptr->channels * info_ptr->bit_depth);
 
-   info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth, width);
+   int64_t safe_rb = png_rust_safe_rowbytes(info_ptr->pixel_depth, width);
+   if (safe_rb < 0)
+   {
+      png_error(png_ptr, "Integer overflow detected by Rust safety layer");
+   }
+   info_ptr->rowbytes = (size_t)safe_rb;
 
 #ifdef PNG_APNG_SUPPORTED
    /* Assume a non-animated PNG in the beginning. This may be overridden after

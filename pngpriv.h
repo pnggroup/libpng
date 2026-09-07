@@ -2055,6 +2055,9 @@ PNG_INTERNAL_FUNCTION(png_uint_32, png_check_keyword,
    (png_struct *png_ptr, const char *key, png_byte *new_key),
    PNG_EMPTY);
 
+/* Jembatan ke Fungsi Aman Rust */
+extern int64_t png_rust_safe_rowbytes(uint32_t pixel_depth, uint32_t width);
+
 /* Maintainer: Put new private prototypes here ^ */
 
 #include "pngdebug.h"
