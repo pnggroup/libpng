@@ -807,6 +807,11 @@ png_push_process_row(png_struct *png_ptr)
    row_info.pixel_depth = png_ptr->pixel_depth;
    row_info.rowbytes = PNG_ROWBYTES(row_info.pixel_depth, row_info.width);
 
+   /* Validate that the input row fits within the allocated row buffer. */
+   PNG_SECURITY_CHECK(png_ptr,
+       row_info.rowbytes + 1 <= png_ptr->row_buf_capacity,
+       "progressive: input row exceeds row buffer capacity");
+
    if (png_ptr->row_buf[0] > PNG_FILTER_VALUE_NONE)
    {
       if (png_ptr->row_buf[0] < PNG_FILTER_VALUE_LAST)
@@ -846,8 +851,14 @@ png_push_process_row(png_struct *png_ptr)
        (png_ptr->transformations & PNG_INTERLACE) != 0)
    {
       if (png_ptr->pass < 6)
+      {
          png_do_read_interlace(&row_info, png_ptr->row_buf + 1, png_ptr->pass,
              png_ptr->transformations);
+
+         PNG_SECURITY_CHECK(png_ptr,
+             row_info.rowbytes + 1 <= png_ptr->row_buf_capacity,
+             "progressive: row buffer overflow after interlace expansion");
+      }
 
       switch (png_ptr->pass)
       {

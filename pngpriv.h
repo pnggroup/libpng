@@ -355,6 +355,20 @@
 #  define PNG_ABORT() abort()
 #endif
 
+/* Release-surviving bounds check for memory safety invariants.
+ * Calls png_error on violation, which longjmps to the caller's setjmp
+ * point.  Appropriate for conditions where continuing would mean an
+ * out-of-bounds memory access.
+ *
+ * Disable with -DPNG_SECURITY_CHECK_ENABLED=0 for benchmarking.
+ */
+#if !defined(PNG_SECURITY_CHECK_ENABLED) || PNG_SECURITY_CHECK_ENABLED
+#  define PNG_SECURITY_CHECK(pp, cond, msg) \
+      do { if (!(cond)) png_error(pp, msg); } while (0)
+#else
+#  define PNG_SECURITY_CHECK(pp, cond, msg) ((void)0)
+#endif
+
 /* These macros may need to be architecture dependent. */
 #define PNG_ALIGN_NONE      0 /* do not use data alignment */
 #define PNG_ALIGN_ALWAYS    1 /* assume unaligned accesses are OK */

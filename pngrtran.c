@@ -4893,6 +4893,10 @@ png_do_read_transformations(png_struct *png_ptr, png_row_info *row_info)
             png_do_expand(row_info, png_ptr->row_buf + 1, NULL);
       }
    }
+
+   PNG_SECURITY_CHECK(png_ptr,
+       row_info->rowbytes + 1 <= png_ptr->row_buf_capacity,
+       "row buffer overflow after expand");
 #endif
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
@@ -4962,7 +4966,13 @@ png_do_read_transformations(png_struct *png_ptr, png_row_info *row_info)
     */
    if ((png_ptr->transformations & PNG_GRAY_TO_RGB) != 0 &&
        (png_ptr->mode & PNG_BACKGROUND_IS_GRAY) == 0)
+   {
       png_do_gray_to_rgb(row_info, png_ptr->row_buf + 1);
+
+      PNG_SECURITY_CHECK(png_ptr,
+          row_info->rowbytes + 1 <= png_ptr->row_buf_capacity,
+          "row buffer overflow after gray_to_rgb");
+   }
 #endif
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
@@ -5035,14 +5045,26 @@ png_do_read_transformations(png_struct *png_ptr, png_row_info *row_info)
     * better accuracy results faster!)
     */
    if ((png_ptr->transformations & PNG_EXPAND_16) != 0)
+   {
       png_do_expand_16(row_info, png_ptr->row_buf + 1);
+
+      PNG_SECURITY_CHECK(png_ptr,
+          row_info->rowbytes + 1 <= png_ptr->row_buf_capacity,
+          "row buffer overflow after expand_16");
+   }
 #endif
 
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
    /* NOTE: moved here in 1.5.4 (from much later in this list.) */
    if ((png_ptr->transformations & PNG_GRAY_TO_RGB) != 0 &&
        (png_ptr->mode & PNG_BACKGROUND_IS_GRAY) != 0)
+   {
       png_do_gray_to_rgb(row_info, png_ptr->row_buf + 1);
+
+      PNG_SECURITY_CHECK(png_ptr,
+          row_info->rowbytes + 1 <= png_ptr->row_buf_capacity,
+          "row buffer overflow after gray_to_rgb");
+   }
 #endif
 
 #ifdef PNG_READ_INVERT_SUPPORTED
@@ -5063,7 +5085,13 @@ png_do_read_transformations(png_struct *png_ptr, png_row_info *row_info)
 
 #ifdef PNG_READ_PACK_SUPPORTED
    if ((png_ptr->transformations & PNG_PACK) != 0)
+   {
       png_do_unpack(row_info, png_ptr->row_buf + 1);
+
+      PNG_SECURITY_CHECK(png_ptr,
+          row_info->rowbytes + 1 <= png_ptr->row_buf_capacity,
+          "row buffer overflow after unpack");
+   }
 #endif
 
 #ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
@@ -5085,8 +5113,14 @@ png_do_read_transformations(png_struct *png_ptr, png_row_info *row_info)
 
 #ifdef PNG_READ_FILLER_SUPPORTED
    if ((png_ptr->transformations & PNG_FILLER) != 0)
+   {
       png_do_read_filler(row_info, png_ptr->row_buf + 1,
           (png_uint_32)png_ptr->filler, png_ptr->flags);
+
+      PNG_SECURITY_CHECK(png_ptr,
+          row_info->rowbytes + 1 <= png_ptr->row_buf_capacity,
+          "row buffer overflow after filler");
+   }
 #endif
 
 #ifdef PNG_READ_SWAP_ALPHA_SUPPORTED
@@ -5126,6 +5160,10 @@ png_do_read_transformations(png_struct *png_ptr, png_row_info *row_info)
           row_info->channels);
 
       row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth, row_info->width);
+
+      PNG_SECURITY_CHECK(png_ptr,
+          row_info->rowbytes + 1 <= png_ptr->row_buf_capacity,
+          "row buffer overflow after user transform");
    }
 #endif
 }

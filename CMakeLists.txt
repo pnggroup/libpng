@@ -396,6 +396,9 @@ set(pnggetset_sources
 set(pngunknown_sources
     contrib/libtests/pngunknown.c
 )
+set(pngsecurity_sources
+    contrib/libtests/pngsecurity.c
+)
 set(pngimage_sources
     contrib/libtests/pngimage.c
 )
@@ -763,6 +766,18 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngimage
                OPTIONS --exhaustive --list-combos --log
                FILES ${PNGSUITE_PNGS})
+
+  # pngsecurity test:
+  # Verify that PNG_SECURITY_CHECK catches row buffer overflows.
+  # Links png_static because it accesses png_struct internals.
+  if(PNG_STATIC)
+    add_executable(pngsecurity ${pngsecurity_sources})
+    target_link_libraries(pngsecurity
+                          PRIVATE png_static)
+
+    png_add_test(NAME pngsecurity
+                 COMMAND pngsecurity)
+  endif()
 endif()
 
 if(PNG_SHARED AND PNG_TOOLS)

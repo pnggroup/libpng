@@ -531,6 +531,14 @@ png_read_row(png_struct *png_ptr, png_byte *row, png_byte *dsp_row)
    if ((png_ptr->mode & PNG_HAVE_IDAT) == 0)
       png_error(png_ptr, "Invalid attempt to read row data");
 
+   /* Validate that the input row (filter byte + pixel data) fits within the
+    * allocated row buffer.  This catches any inconsistency between the IHDR-
+    * derived rowbytes and the buffer sized by png_read_start_row().
+    */
+   PNG_SECURITY_CHECK(png_ptr,
+       row_info.rowbytes + 1 <= png_ptr->row_buf_capacity,
+       "input row exceeds row buffer capacity");
+
    /* Fill the row with IDAT data: */
    png_ptr->row_buf[0]=255; /* to force error if no data was found */
    png_read_IDAT_data(png_ptr, png_ptr->row_buf, row_info.rowbytes + 1);
@@ -586,8 +594,18 @@ png_read_row(png_struct *png_ptr, png_byte *row, png_byte *dsp_row)
       (png_ptr->transformations & PNG_INTERLACE) != 0)
    {
       if (png_ptr->pass < 6)
+      {
          png_do_read_interlace(&row_info, png_ptr->row_buf + 1, png_ptr->pass,
              png_ptr->transformations);
+
+         /* Validate that the interlace expansion did not exceed the row buffer.
+          * png_do_read_interlace replicates pixels in-place, expanding width by
+          * png_pass_inc[pass] (up to 8x).
+          */
+         PNG_SECURITY_CHECK(png_ptr,
+             row_info.rowbytes + 1 <= png_ptr->row_buf_capacity,
+             "row buffer overflow after interlace expansion");
+      }
 
       if (dsp_row != NULL)
          png_combine_row(png_ptr, dsp_row, 1/*display*/);
