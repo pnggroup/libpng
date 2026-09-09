@@ -366,7 +366,8 @@ BOOL do_pnm2png (png_struct *png_ptr, png_info *info_ptr,
   }
 
   if ((row_bytes == 0) ||
-      ((size_t) height > (size_t) (-1) / (size_t) row_bytes))
+      ((size_t) height > (size_t) (-1) / (size_t) row_bytes) ||
+      ((size_t) height > (size_t) (-1) / sizeof (png_byte *)))
   {
     /* too big */
     return FALSE;
