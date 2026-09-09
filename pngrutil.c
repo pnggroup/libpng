@@ -396,8 +396,9 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size)
 #        ifndef PNG_NO_MEMZERO /* for detecting UIM bugs **only** */
             memset(buffer, 0, new_size); /* just in case */
 #        endif
-         png_ptr->read_buffer = buffer;
+         /* counted_by: set capacity before pointer */
          png_ptr->read_buffer_size = new_size;
+         png_ptr->read_buffer = buffer;
       }
    }
 
@@ -755,8 +756,9 @@ png_decompress_chunk(png_structrp png_ptr,
                         {
                            png_bytep old_ptr = png_ptr->read_buffer;
 
-                           png_ptr->read_buffer = text;
+                           /* counted_by: set capacity before pointer */
                            png_ptr->read_buffer_size = buffer_size;
+                           png_ptr->read_buffer = text;
                            text = old_ptr; /* freed below */
                         }
                      }
@@ -1475,7 +1477,9 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                           info_ptr->iccp_proflen =
                                               profile_length;
                                           info_ptr->iccp_profile = profile;
-                                          png_ptr->read_buffer = NULL; /*steal*/
+                                          /* steal: drop counted pointer then size */
+                                          png_ptr->read_buffer = NULL;
+                                          png_ptr->read_buffer_size = 0;
                                           info_ptr->free_me |= PNG_FREE_ICCP;
                                           info_ptr->valid |= PNG_INFO_iCCP;
                                        }
@@ -4666,8 +4670,8 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    {
       png_bytep buffer = png_ptr->read_buffer;
 
-      png_ptr->read_buffer_size = 0;
       png_ptr->read_buffer = NULL;
+      png_ptr->read_buffer_size = 0;
       png_free(png_ptr, buffer);
    }
 
