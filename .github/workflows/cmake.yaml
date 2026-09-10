@@ -2,6 +2,9 @@ name: Development
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ${{matrix.os}}-latest
@@ -35,4 +38,3 @@ jobs:
     - name: Run tests
       timeout-minutes: 5
       run: ./ci/ci_cmake.sh
-
