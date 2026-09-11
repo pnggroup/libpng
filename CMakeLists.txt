@@ -1168,7 +1168,7 @@ if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL)
   install(FILES png.5
           DESTINATION "${CMAKE_INSTALL_MANDIR}/man5")
   # Install the pkg-config files.
-  if(NOT CMAKE_HOST_WIN32 OR CYGWIN OR MINGW)
+  if(NOT WIN32 OR CYGWIN OR MINGW)
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libpng.pc"
             DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
     install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/libpng-config"
