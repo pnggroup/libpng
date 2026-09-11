@@ -2192,7 +2192,13 @@ png_handle_pCAL(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 
    else if (type >= PNG_EQUATION_LAST)
    {
+      /* Reject unknown types now.  png_set_pCAL validates type > 3 with
+       * PNG_CHUNK_WRITE_ERROR which can longjmp on the read path.  By
+       * returning here we ensure type is always 0-3 when 'params' is
+       * allocated below, closing one longjmp path before it can happen.
+       */
       png_chunk_benign_error(png_ptr, "unrecognized equation type");
+      return handled_error;
    }
 
    for (buf = units; *buf; buf++)
@@ -2228,15 +2234,31 @@ png_handle_pCAL(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
       }
    }
 
+   /* Pre-validate every parameter string before calling png_set_pCAL.
+    *
+    * png_set_pCAL runs png_check_fp_string on each params[i] and calls
+    * png_chunk_report (PNG_CHUNK_WRITE_ERROR) on failure.  On the read
+    * path that escalates to png_chunk_benign_error which can longjmp,
+    * skipping the png_free(params) below and leaking the allocation.
+    *
+    * By checking the strings here first and returning before the
+    * png_set_pCAL call, we ensure that png_set_pCAL cannot longjmp on
+    * param format errors.  Combined with the 'return handled_error' added
+    * above for unrecognised types, png_set_pCAL has no data-driven
+    * longjmp paths remaining, so png_free(params) is always reached.
+    */
+   for (i = 0; i < nparams; i++)
+   {
+      if (!png_check_fp_string(params[i], strlen(params[i])))
+      {
+         png_free(png_ptr, params);
+         png_chunk_benign_error(png_ptr, "invalid parameter");
+         return handled_error;
+      }
+   }
+
    png_set_pCAL(png_ptr, info_ptr, (char *)buffer, X0, X1, type, nparams,
        (char *)units, params);
-
-   /* TODO: BUG: png_set_pCAL calls png_chunk_report which, in this case, calls
-    * png_benign_error and that can error out.
-    *
-    * png_read_buffer needs to be allocated with space for both nparams and the
-    * parameter strings.  Not hard to do.
-    */
    png_free(png_ptr, params);
    return handled_ok;
 }
