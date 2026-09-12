@@ -109,6 +109,16 @@ endif()
 # Allow the users to switch on/off the use of hardware (SIMD) optimized code.
 option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
 
+# Optional Clang -fbounds-safety. Default OFF: PNG_*COUNTED_BY* macros in
+# png_bounds_safety.h are inert and the ABI/build is unchanged. When ON,
+# requires a Clang that provides -fbounds-safety / <ptrcheck.h>.
+option(PNG_ENABLE_FBOUNDS_SAFETY
+       "Enable Clang -fbounds-safety annotations (experimental toolchain)" OFF)
+if(PNG_ENABLE_FBOUNDS_SAFETY)
+  add_definitions(-DPNG_SUPPORT_FBOUNDS_SAFETY)
+  add_compile_options(-fbounds-safety)
+endif()
+
 # Initialize and show the target architecture variable PNG_TARGET_ARCHITECTURE.
 #
 # NOTE:
@@ -588,6 +598,7 @@ set(libpng_private_hdrs
     pngdebug.h
     pnginfo.h
     pngstruct.h
+    png_bounds_safety.h
 )
 if(AWK)
   list(APPEND libpng_private_hdrs "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h")

@@ -771,6 +771,7 @@ png_read_destroy(png_structrp png_ptr)
    png_ptr->big_prev_row = NULL;
    png_free(png_ptr, png_ptr->read_buffer);
    png_ptr->read_buffer = NULL;
+   png_ptr->read_buffer_size = 0;
 
 #ifdef PNG_READ_QUANTIZE_SUPPORTED
    png_free(png_ptr, png_ptr->palette_lookup);
