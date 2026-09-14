@@ -2736,28 +2736,25 @@ zlib_check(struct file *file, png_uint_32 offset)
  * the per-file routine contains the chunk and IDAT control structures.
  */
 /* The three routines read_chunk, process_chunk and sync_stream can only be
- * called via a call to read_chunk and only exit at a return from process_chunk.
- * These routines could have been written as one confusing large routine,
- * instead this code relies on the compiler to do tail call elimination.  The
- * possible calls are as follows:
+ * called via a call to read_chunk.  read_chunk contains the loop which advances
+ * over skipped chunks and IDAT chunks; process_chunk and sync_stream return
+ * nonzero when that loop must continue.  The possible calls are as follows:
  *
  * read_chunk
  *    -> sync_stream
  *       -> process_chunk
  *    -> process_chunk
- *       -> read_chunk
- *       returns
  */
 static void read_chunk(struct file *file);
-static void
+static int
 process_chunk(struct file *file, png_uint_32 file_crc, png_uint_32 next_length,
    png_uint_32 next_type)
    /* Called when the chunk data has been read, next_length and next_type
     * will be set for the next chunk (or 0 if this is IEND).
     *
-    * When this routine returns, chunk_length and chunk_type will be set for the
-    * next chunk to write because if a chunk is skipped this return calls back
-    * to read_chunk.
+    * Return zero when the current chunk is ready to write.  Return nonzero
+    * after advancing file::length and file::type when read_chunk must continue
+    * to the next input chunk.
     */
 {
    png_uint_32 type = file->type;
@@ -2844,7 +2841,7 @@ process_chunk(struct file *file, png_uint_32 file_crc, png_uint_32 next_length,
    switch (type)
    {
       default:
-         return;
+         return 0;
 
       case png_IHDR:
          /* Read this now and update the control structure with the information
@@ -2872,26 +2869,26 @@ process_chunk(struct file *file, png_uint_32 file_crc, png_uint_32 next_length,
              */
             calc_image_size(file);
          }
-         return;
+         return 0;
 
          /* Ancillary chunks that require further processing: */
       case png_zTXt: case png_iCCP:
          if (process_zTXt_iCCP(file))
-            return;
+            return 0;
          chunk_end(&file->chunk);
          file_setpos(file, &file->data_pos);
          break;
 
       case png_iTXt:
          if (process_iTXt(file))
-            return;
+            return 0;
          chunk_end(&file->chunk);
          file_setpos(file, &file->data_pos);
          break;
 
       case png_IDAT:
          if (process_IDAT(file))
-            return;
+            return 0;
          /* First pass: */
          assert(next_type == png_IDAT);
          break;
@@ -2904,8 +2901,7 @@ process_chunk(struct file *file, png_uint_32 file_crc, png_uint_32 next_length,
     * (IDAT) chunk.  If the LZ data in an IDAT stream cannot be read 'stop' must
     * be used to halt parsing of the PNG.
     */
-   read_chunk(file);
-   return;
+   return 1;
 
    /* This is the generic code to skip the current chunk; simply jump to the
     * next one.
@@ -2914,7 +2910,7 @@ skip_chunk:
    file->length = next_length;
    file->type = next_type;
    getpos(file);
-   read_chunk(file);
+   return 1;
 }
 
 static png_uint_32
@@ -2929,10 +2925,11 @@ get32(png_byte *buffer, int offset)
       (buffer[(offset+3) & 7]      );
 }
 
-static void
+static int
 sync_stream(struct file *file)
    /* The stream seems to be messed up, attempt to resync from the current chunk
-    * header.  Executes stop on a fatal error, otherwise calls process_chunk.
+    * header.  Executes stop on a fatal error, otherwise returns the result of
+    * process_chunk.
     */
 {
    png_uint_32 file_crc;
@@ -2975,8 +2972,7 @@ sync_stream(struct file *file)
             if (type == png_IEND)
             {
                file->length = length;
-               process_chunk(file, file_crc, 0, 0);
-               return;
+               return process_chunk(file, file_crc, 0, 0);
             }
 
             else
@@ -3005,8 +3001,8 @@ sync_stream(struct file *file)
                      if (chunk_type_valid(next_type))
                      {
                         file->read_count -= 8;
-                        process_chunk(file, file_crc, next_length, next_type);
-                        return;
+                        return process_chunk(file, file_crc, next_length,
+                           next_type);
                      }
                   }
 
@@ -3062,73 +3058,79 @@ read_chunk(struct file *file)
     * of the IEND chunk will have been read.
     */
 {
-   png_uint_32 length = file->length;
-   png_uint_32 type = file->type;
-
-   /* After IEND file::type is set to 0, if libpng attempts to read
-    * more data at this point this is a bug in libpng.
-    */
-   if (type == 0)
-      stop(file, UNEXPECTED_ERROR_CODE, "read beyond IEND");
-
-   if (file->global->verbose > 2)
+   for (;;)
    {
-      fputs("   ", stderr);
-      type_name(type, stderr);
-      fprintf(stderr, " %lu\n", (unsigned long)length);
-   }
+      png_uint_32 length = file->length;
+      png_uint_32 type = file->type;
 
-   /* Start the read_crc calculation with the chunk type, then read to the end
-    * of the chunk data (without processing it in any way) to check that it is
-    * all there and calculate the CRC.
-    */
-   file->crc = crc_init_4(type);
-   if (crc_read_many(file, length)) /* else it was truncated */
-   {
-      png_uint_32 file_crc; /* CRC read from file */
-      unsigned int nread = read_4(file, &file_crc);
+      /* After IEND file::type is set to 0, if libpng attempts to read
+       * more data at this point this is a bug in libpng.
+       */
+      if (type == 0)
+         stop(file, UNEXPECTED_ERROR_CODE, "read beyond IEND");
 
-      if (nread == 4)
+      if (file->global->verbose > 2)
       {
-         if (type != png_IEND) /* do not read beyond IEND */
+         fputs("   ", stderr);
+         type_name(type, stderr);
+         fprintf(stderr, " %lu\n", (unsigned long)length);
+      }
+
+      /* Start the read_crc calculation with the chunk type, then read to the
+       * end of the chunk data (without processing it in any way) to check that
+       * it is all there and calculate the CRC.
+       */
+      file->crc = crc_init_4(type);
+      if (crc_read_many(file, length)) /* else it was truncated */
+      {
+         png_uint_32 file_crc; /* CRC read from file */
+         unsigned int nread = read_4(file, &file_crc);
+
+         if (nread == 4)
          {
-            png_uint_32 next_length;
-
-            nread += read_4(file, &next_length);
-            if (nread == 8 && next_length <= 0x7fffffff)
+            if (type != png_IEND) /* do not read beyond IEND */
             {
-               png_uint_32 next_type;
+               png_uint_32 next_length;
 
-               nread += read_4(file, &next_type);
-
-               if (nread == 12 && chunk_type_valid(next_type))
+               nread += read_4(file, &next_length);
+               if (nread == 8 && next_length <= 0x7fffffff)
                {
-                  /* Adjust the read count back to the correct value for this
-                   * chunk.
-                   */
-                  file->read_count -= 8;
-                  process_chunk(file, file_crc, next_length, next_type);
-                  return;
+                  png_uint_32 next_type;
+
+                  nread += read_4(file, &next_type);
+
+                  if (nread == 12 && chunk_type_valid(next_type))
+                  {
+                     /* Adjust the read count back to the correct value for this
+                      * chunk.
+                      */
+                     file->read_count -= 8;
+                     if (process_chunk(file, file_crc, next_length, next_type))
+                        continue;
+                     return;
+                  }
                }
             }
-         }
 
-         else /* IEND */
-         {
-            process_chunk(file, file_crc, 0, 0);
-            return;
+            else /* IEND */
+            {
+               if (process_chunk(file, file_crc, 0, 0))
+                  continue;
+               return;
+            }
          }
       }
-   }
 
-   /* Control gets to here if the stream seems invalid or damaged in some
-    * way.  Either there was a problem reading all the expected data (this
-    * chunk's data, its CRC and the length and type of the next chunk) or the
-    * next chunk length/type are invalid.  Notice that the cases that end up
-    * here all correspond to cases that would otherwise terminate the read of
-    * the PNG file.
-    */
-   sync_stream(file);
+      /* Control gets to here if the stream seems invalid or damaged in some
+       * way.  Either there was a problem reading all the expected data (this
+       * chunk's data, its CRC and the length and type of the next chunk) or the
+       * next chunk length/type are invalid.  Notice that the cases that end up
+       * here all correspond to cases that would otherwise terminate the read
+       * of the PNG file.
+       */
+      if (!sync_stream(file))
+         return;
+   }
 }
 
 /* This returns a file* from a png_struct in an implementation specific way. */
