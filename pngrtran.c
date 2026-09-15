@@ -479,6 +479,21 @@ png_set_quantize(png_struct *png_ptr, png_color *palette,
    if (palette == NULL)
       return;
 
+   /* Validate the palette counts.  A palette larger than maximum_colors is
+    * valid and is reduced below, but num_palette and maximum_colors must be
+    * positive and cannot exceed PNG_MAX_PALETTE_LENGTH entries, because PNG
+    * palettes and 8-bit quantized output indices are bounded at 256.
+    * Reject invalid values as an application error instead of silently
+    * skipping the transform, so that the application does not assume the
+    * palette mapping has been set up.
+    */
+   if (num_palette <= 0 || num_palette > PNG_MAX_PALETTE_LENGTH ||
+       maximum_colors <= 0 || maximum_colors > PNG_MAX_PALETTE_LENGTH)
+   {
+      png_app_error(png_ptr, "Invalid palette length in png_set_quantize");
+      return;
+   }
+
    png_ptr->transformations |= PNG_QUANTIZE;
 
    if (full_quantize == 0)
@@ -487,9 +502,8 @@ png_set_quantize(png_struct *png_ptr, png_color *palette,
 
       /* Initialize the array to index colors.
        *
-       * Ensure quantize_index can fit 256 elements (PNG_MAX_PALETTE_LENGTH)
-       * rather than num_palette elements. This is to prevent buffer overflows
-       * caused by malformed PNG files with out-of-range palette indices.
+       * quantize_index holds PNG_MAX_PALETTE_LENGTH (256) entries to cover
+       * all 8-bit palette indices (0..255).
        *
        * Be careful to avoid leaking memory. Applications are allowed to call
        * this function more than once per png_struct.
