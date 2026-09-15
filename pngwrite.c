@@ -2049,7 +2049,7 @@ png_image_write_main(void *argument)
             display->row_stride = (png_int_32)/*SAFE*/png_row_stride;
 
          if (display->row_stride < 0)
-            check = -(png_uint_32)display->row_stride;
+            check = 0 - (png_uint_32)display->row_stride;
 
          else
             check = (png_uint_32)display->row_stride;
