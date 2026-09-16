@@ -3418,6 +3418,14 @@ png_combine_row(const png_struct *png_ptr, png_byte *dp, int display)
    if (row_width == 0)
       png_error(png_ptr, "internal row width error");
 
+   /* Validate that the source row data (row_buf + 1) fits within the
+    * allocated row buffer.  This is the primary defense against
+    * max_pixel_depth miscalculation leading to heap buffer overflow.
+    */
+   PNG_SECURITY_CHECK(png_ptr,
+       PNG_ROWBYTES(pixel_depth, row_width) + 1 <= png_ptr->row_buf_capacity,
+       "combine_row: source exceeds row buffer capacity");
+
    /* Preserve the last byte in cases where only part of it will be overwritten,
     * the multiply below may overflow, we don't care because ANSI-C guarantees
     * we get the low bits.
@@ -4312,6 +4320,18 @@ png_read_filter_row(png_struct *pp, png_row_info *row_info, png_byte *row,
 {
    if (filter > PNG_FILTER_VALUE_NONE && filter < PNG_FILTER_VALUE_LAST)
    {
+      /* Validate that rowbytes >= bpp.  The Sub, Avg and Paeth filters
+       * compute (rowbytes - bpp) as an unsigned subtraction; underflow
+       * would cause a massive over-read.  This invariant is guaranteed by
+       * IHDR validation (width >= 1 implies rowbytes >= bpp), but we
+       * check here as defense-in-depth.
+       */
+      unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
+
+      PNG_SECURITY_CHECK(pp,
+          row_info->rowbytes >= bpp,
+          "filter row: rowbytes < bytes-per-pixel");
+
       if (pp->read_filter[0] == NULL)
          png_init_filter_functions(pp);
 
@@ -4825,6 +4845,8 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 #endif
       png_ptr->old_big_row_buf_size = row_bytes + 48;
    }
+
+   png_ptr->row_buf_capacity = row_bytes;
 
 #ifdef PNG_MAX_MALLOC_64K
    if (png_ptr->rowbytes > 65535)

@@ -432,6 +432,13 @@ struct png_struct_def
 /* New member added in libpng-1.2.26 */
    size_t old_big_row_buf_size;
 
+   size_t row_buf_capacity;        /* usable bytes in row_buf, including the
+                                    * filter byte; set by png_read_start_row.
+                                    * Used by transform safety checks to detect
+                                    * row buffer overflows before they corrupt
+                                    * the heap.
+                                    */
+
 #ifdef PNG_READ_SUPPORTED
 /* New member added in libpng-1.2.30 */
   png_byte *        read_buffer;      /* buffer for reading chunk data */
