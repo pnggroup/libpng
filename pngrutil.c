@@ -2134,12 +2134,30 @@ png_handle_pCAL(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
    png_byte *units;
    char **params;
    int i;
+   size_t params_offset;
+   png_alloc_size_t max_alloc;
+   png_alloc_size_t params_space;
 
    png_debug(1, "in png_handle_pCAL");
    png_debug1(2, "Allocating and reading pCAL chunk data (%u bytes)",
        length + 1);
 
-   buffer = png_read_buffer(png_ptr, length+1);
+   /* Allocate space for chunk data plus parameter pointers (nparams is at most
+    * 255 as a png_byte) within png_read_buffer. This ensures the temporary
+    * parameter array is owned by png_struct and automatically freed on error,
+    * avoiding heap leaks if png_set_pCAL calls png_chunk_report and errors out.
+    */
+   max_alloc = png_chunk_max(png_ptr);
+   params_space = 256 * (sizeof (char *)) + (sizeof (char *));
+
+   if (max_alloc < params_space + 1 || length > max_alloc - params_space - 1)
+   {
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "out of memory");
+      return handled_error;
+   }
+
+   buffer = png_read_buffer(png_ptr, length + 1 + params_space);
 
    if (buffer == NULL)
    {
@@ -2198,16 +2216,10 @@ png_handle_pCAL(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
    for (buf = units; *buf; buf++)
       /* Empty loop to move past the units string. */ ;
 
-   png_debug(3, "Allocating pCAL parameters array");
-
-   params = png_voidcast(char **, png_malloc_warn(png_ptr,
-       nparams * (sizeof (char *))));
-
-   if (params == NULL)
-   {
-      png_chunk_benign_error(png_ptr, "out of memory");
-      return handled_error;
-   }
+   png_debug(3, "Setting up pCAL parameters array in read buffer");
+   params_offset = (length + 1 + (sizeof (char *) - 1)) &
+       ~(sizeof (char *) - 1);
+   params = png_voidcast(char **, buffer + params_offset);
 
    /* Get pointers to the start of each parameter string. */
    for (i = 0; i < nparams; i++)
@@ -2222,7 +2234,6 @@ png_handle_pCAL(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
       /* Make sure we haven't run out of data yet */
       if (buf > endptr)
       {
-         png_free(png_ptr, params);
          png_chunk_benign_error(png_ptr, "invalid data");
          return handled_error;
       }
@@ -2231,13 +2242,6 @@ png_handle_pCAL(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
    png_set_pCAL(png_ptr, info_ptr, (char *)buffer, X0, X1, type, nparams,
        (char *)units, params);
 
-   /* TODO: BUG: png_set_pCAL calls png_chunk_report which, in this case, calls
-    * png_benign_error and that can error out.
-    *
-    * png_read_buffer needs to be allocated with space for both nparams and the
-    * parameter strings.  Not hard to do.
-    */
-   png_free(png_ptr, params);
    return handled_ok;
 }
 #else
