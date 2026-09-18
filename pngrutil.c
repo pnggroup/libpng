@@ -1546,6 +1546,9 @@ png_handle_sPLT(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
    png_uint_32 skip = 0;
    png_uint_32 dl;
    size_t max_dl;
+   size_t entries_offset;
+   png_alloc_size_t max_alloc;
+   png_alloc_size_t entries_space;
 
    png_debug(1, "in png_handle_sPLT");
 
@@ -1567,7 +1570,41 @@ png_handle_sPLT(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
    }
 #endif
 
-   buffer = png_read_buffer(png_ptr, length+1);
+   /* Allocate space for chunk data plus temporary palette entries within
+    * png_read_buffer. This ensures the temporary entries array is owned by
+    * png_struct and automatically freed on error, avoiding heap leaks if
+    * png_set_sPLT calls png_chunk_report and errors out.
+    */
+   max_alloc = png_chunk_max(png_ptr);
+
+   if (length > 0)
+   {
+      png_uint_32 max_entries = length / 6U;
+
+      if (max_entries > max_alloc / (sizeof (png_sPLT_entry)))
+      {
+         png_crc_finish(png_ptr, length);
+         png_chunk_benign_error(png_ptr, "out of memory");
+         return handled_error;
+      }
+
+      entries_space = (png_alloc_size_t)max_entries * (sizeof (png_sPLT_entry));
+   }
+
+   else
+      entries_space = 0;
+
+   if (max_alloc < length + 1 + (sizeof (void *)) ||
+       entries_space > max_alloc - (length + 1 + (sizeof (void *))))
+   {
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "out of memory");
+      return handled_error;
+   }
+
+   buffer = png_read_buffer(png_ptr,
+       length + 1 + (sizeof (void *)) + entries_space);
+
    if (buffer == NULL)
    {
       png_crc_finish(png_ptr, length);
@@ -1624,14 +1661,9 @@ png_handle_sPLT(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 
    new_palette.nentries = (png_int_32)(data_length / (unsigned int)entry_size);
 
-   new_palette.entries = (png_sPLT_entry *)png_malloc_warn(png_ptr,
-       (png_alloc_size_t) new_palette.nentries * (sizeof (png_sPLT_entry)));
-
-   if (new_palette.entries == NULL)
-   {
-      png_warning(png_ptr, "sPLT chunk requires too much memory");
-      return handled_error;
-   }
+   entries_offset = (length + 1 + (sizeof (void *) - 1)) &
+       ~(sizeof (void *) - 1);
+   new_palette.entries = png_voidcast(png_sPLT_entry *, buffer + entries_offset);
 
    for (i = 0; i < new_palette.nentries; i++)
    {
@@ -1661,7 +1693,6 @@ png_handle_sPLT(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 
    png_set_sPLT(png_ptr, info_ptr, &new_palette, 1);
 
-   png_free(png_ptr, new_palette.entries);
    return handled_ok;
 }
 #else
