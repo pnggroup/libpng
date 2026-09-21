@@ -4360,6 +4360,10 @@ png_read_IDAT_data(png_struct *png_ptr, png_byte *output,
                   png_error(png_ptr, "Not enough image data");
                if (png_ptr->chunk_name != png_fdAT)
                {
+                  if (PNG_CHUNK_CRITICAL(png_ptr->chunk_name))
+                     png_error(png_ptr,
+                         "Unexpected critical chunk in APNG sequence");
+
                   png_warning(png_ptr,
                               "Ignoring unexpected chunk in APNG sequence");
                   bytes_to_skip = png_ptr->idat_size;

@@ -292,6 +292,10 @@ png_push_read_chunk(png_struct *png_ptr, png_info *info_ptr)
             png_push_save_buffer(png_ptr);
             return;
          }
+
+         if (PNG_CHUNK_CRITICAL(chunk_name))
+            png_error(png_ptr, "Unexpected critical chunk in APNG sequence");
+
          png_warning(png_ptr, "Ignoring unexpected chunk in APNG sequence");
          png_crc_finish(png_ptr, png_ptr->push_length);
          png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
@@ -571,6 +575,11 @@ png_push_read_IDAT(png_struct *png_ptr)
                png_push_save_buffer(png_ptr);
                return;
             }
+
+            if (PNG_CHUNK_CRITICAL(png_ptr->chunk_name))
+               png_error(png_ptr,
+                   "Unexpected critical chunk in APNG sequence");
+
             png_warning(png_ptr, "Ignoring unexpected chunk in APNG sequence");
             png_crc_finish(png_ptr, png_ptr->push_length);
             png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;

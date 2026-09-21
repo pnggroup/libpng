@@ -248,6 +248,9 @@ png_read_frame_head(png_struct *png_ptr, png_info *info_ptr)
       }
       else
       {
+         if (PNG_CHUNK_CRITICAL(png_ptr->chunk_name))
+            png_error(png_ptr, "Unexpected critical chunk in APNG sequence");
+
          png_warning(png_ptr, "Ignoring unexpected chunk in APNG sequence");
          png_crc_finish(png_ptr, length);
       }
