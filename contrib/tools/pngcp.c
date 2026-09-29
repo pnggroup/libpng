@@ -2242,6 +2242,11 @@ better_options(const struct display *dp)
    }
 
    assert(0 && "unreached");
+#if defined(__GNUC__) || defined(__clang__)
+   __builtin_unreachable();
+#else
+   return 0;
+#endif
 }
 
 static void
