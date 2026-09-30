@@ -3241,8 +3241,8 @@ read_chunks[PNG_INDEX_unknown] =
       /* Allocates 'length+1'; checked in the handler */
 #  define CDtIME       7U,    7U,      0, hIHDR,        0
 #  define CDacTL       8U,    8U,  hIDAT, hIHDR,        0
-#  define CDfcTL      25U,   26U,      0, hIHDR,        1
-#  define CDfdAT    Limit,    4U,  hIDAT, hIHDR,        1
+#  define CDfcTL      26U,   26U,      0, hIHDR,        1
+#  define CDfdAT    Limit,    4U,      0, hIHDR,        1
    /* Supported chunks from PNG extensions 1.5.0, NYI so limit */
 #  define CDoFFs       9U,    9U,  hIDAT, hIHDR,        0
 #  define CDpCAL  NoCheck,   14U,  hIDAT, hIHDR,        0
