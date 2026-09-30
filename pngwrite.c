@@ -1551,7 +1551,12 @@ png_write_frame_tail(png_struct *png_ptr, png_info *info_ptr)
 static int
 png_image_write_init(png_image *image)
 {
-   png_struct *png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, image,
+   png_struct *png_ptr;
+
+   if (image->width == 0 || image->height == 0)
+      return 0;
+
+   png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, image,
        png_safe_error, png_safe_warning);
 
    if (png_ptr != NULL)
