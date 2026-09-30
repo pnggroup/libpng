@@ -770,8 +770,10 @@ png_read_end(png_struct *png_ptr, png_info *info_ptr)
    if (png_ptr == NULL)
       return;
 
-   /* If png_read_end is called in the middle of reading the rows there may
-    * still be pending IDAT data and an owned zstream.  Deal with this here.
+   /* If png_read_end is called in the middle of reading the rows,
+    * there may still be pending IDAT data and an owned zstream.
+    * If it is called before row reading starts, there is pending
+    * IDAT data but no owned zstream.
     */
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
    if (png_chunk_unknown_handling(png_ptr, png_IDAT) == 0)

@@ -604,7 +604,7 @@ png_push_read_IDAT(png_struct *png_ptr)
 #ifdef PNG_READ_APNG_SUPPORTED
       if (png_ptr->num_frames_read > 0)
       {
-         png_ensure_sequence_number(png_ptr, 4);
+         png_ensure_sequence_number(png_ptr, png_ptr->push_length);
          png_ptr->idat_size -= 4;
       }
 #endif

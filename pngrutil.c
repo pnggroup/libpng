@@ -405,6 +405,18 @@ png_read_buffer(png_struct *png_ptr, png_alloc_size_t new_size)
 }
 #endif /* READ_iCCP|iTXt|pCAL|sCAL|sPLT|tEXt|zTXt|eXIf|SEQUENTIAL_READ */
 
+/* Detach the zstream from the input and output buffers left by
+ * the current or a previous owner, and possibly deallocated since.
+ */
+static void
+png_inflate_detach_buffers(png_struct *png_ptr)
+{
+   png_ptr->zstream.next_in = NULL;
+   png_ptr->zstream.avail_in = 0;
+   png_ptr->zstream.next_out = NULL;
+   png_ptr->zstream.avail_out = 0;
+}
+
 /* png_inflate_claim: claim the zstream for some nefarious purpose that involves
  * decompression.  Returns Z_OK on success, else a zlib error code.  It checks
  * the owner but, in final release builds, just issues a warning if some other
@@ -456,13 +468,7 @@ png_inflate_claim(png_struct *png_ptr, png_uint_32 owner)
          png_ptr->zstream_start = 1;
       }
 
-      /* Set this for safety, just in case the previous owner left pointers to
-       * memory allocations.
-       */
-      png_ptr->zstream.next_in = NULL;
-      png_ptr->zstream.avail_in = 0;
-      png_ptr->zstream.next_out = NULL;
-      png_ptr->zstream.avail_out = 0;
+      png_inflate_detach_buffers(png_ptr);
 
       if ((png_ptr->flags & PNG_FLAG_ZSTREAM_INITIALIZED) != 0)
       {
@@ -789,7 +795,8 @@ png_decompress_chunk(png_struct *png_ptr,
          else if (ret == Z_OK)
             ret = PNG_UNEXPECTED_ZLIB_RETURN;
 
-         /* Release the claimed stream */
+         /* Release the claimed stream. */
+         png_inflate_detach_buffers(png_ptr);
          png_ptr->zowner = 0;
       }
 
@@ -1477,6 +1484,7 @@ png_handle_iCCP(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 
                                     if (errmsg == NULL)
                                     {
+                                       png_inflate_detach_buffers(png_ptr);
                                        png_ptr->zowner = 0;
                                        return handled_ok;
                                     }
@@ -1503,7 +1511,8 @@ png_handle_iCCP(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
                else /* profile truncated */
                   errmsg = png_ptr->zstream.msg;
 
-               /* Release the stream */
+               /* Release the claimed stream. */
+               png_inflate_detach_buffers(png_ptr);
                png_ptr->zowner = 0;
             }
 
@@ -3226,7 +3235,7 @@ read_chunks[PNG_INDEX_unknown] =
 #  define CDiTXt  NoCheck,    6U,      0, hIHDR,        1
       /* Allocates 'length+1'; checked in the handler */
 #  define CDbKGD       6U,    1U,  hIDAT, hIHDR,        0
-#  define CDhIST    1024U,    0U,  hPLTE, hIHDR,        0
+#  define CDhIST    1024U,    0U,  hIDAT, hPLTE,        0
 #  define CDpHYs       9U,    9U,  hIDAT, hIHDR,        0
 #  define CDsPLT  NoCheck,    3U,  hIDAT, hIHDR,        1
       /* Allocates 'length+1'; checked in the handler */
@@ -4523,11 +4532,7 @@ png_read_finish_IDAT(png_struct *png_ptr)
     */
    if (png_ptr->zowner == png_IDAT)
    {
-      /* Always do this; the pointers otherwise point into the read buffer. */
-      png_ptr->zstream.next_in = NULL;
-      png_ptr->zstream.avail_in = 0;
-
-      /* Now we no longer own the zstream. */
+      png_inflate_detach_buffers(png_ptr);
       png_ptr->zowner = 0;
 
       /* The slightly weird semantics of the sequential IDAT reading is that we
@@ -4790,6 +4795,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    {
       png_free(png_ptr, png_ptr->big_row_buf);
       png_free(png_ptr, png_ptr->big_prev_row);
+      png_ptr->big_row_buf = png_ptr->big_prev_row = NULL;
 
       if (png_ptr->interlaced != 0)
          png_ptr->big_row_buf = (png_byte *)png_calloc(png_ptr,

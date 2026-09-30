@@ -14,7 +14,7 @@
 #
 # SPDX-License-Identifier: libpng-2.0
 
-cmake_minimum_required(VERSION 3.14...4.2)
+cmake_minimum_required(VERSION 3.14...4.4)
 
 set(PNGLIB_MAJOR 2)
 set(PNGLIB_MINOR 0)
@@ -164,34 +164,37 @@ if(ld-version-script AND NOT (ANDROID OR APPLE))
 VERS_1 { global: sym1; local: *; };
 VERS_2 { global: sym2; main; } VERS_1;
 ")
-  set(_SAVED_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
+  # CMAKE_REQUIRED_FLAGS is a space-separated string, not a CMake list.
+  # Use string(APPEND) instead of list(APPEND) to prevent misparsing by
+  # try_compile under CMake 4.4 or newer.
+  set(_SAVED_CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS}")
   if(NOT CMAKE_HOST_SOLARIS)
     # Avoid using CMAKE_SHARED_LIBRARY_C_FLAGS in version script checks on
     # Solaris, because of an incompatibility with the Solaris link editor.
-    list(APPEND CMAKE_REQUIRED_FLAGS ${CMAKE_SHARED_LIBRARY_C_FLAGS})
+    string(APPEND CMAKE_REQUIRED_FLAGS " ${CMAKE_SHARED_LIBRARY_C_FLAGS}")
   endif()
-  list(APPEND CMAKE_REQUIRED_FLAGS
-              "-Wl,--version-script='${CMAKE_CURRENT_BINARY_DIR}/conftest.map'")
+  string(APPEND CMAKE_REQUIRED_FLAGS
+                " -Wl,--version-script='${CMAKE_CURRENT_BINARY_DIR}/conftest.map'")
   check_c_source_compiles("
 void sym1(void) {}
 void sym2(void) {}
 int main(void) { return 0; }
 " HAVE_LD_VERSION_SCRIPT)
   if(NOT HAVE_LD_VERSION_SCRIPT)
-    set(CMAKE_REQUIRED_FLAGS ${_SAVED_CMAKE_REQUIRED_FLAGS})
+    set(CMAKE_REQUIRED_FLAGS "${_SAVED_CMAKE_REQUIRED_FLAGS}")
     if(NOT CMAKE_HOST_SOLARIS)
       # Again, avoid using CMAKE_SHARED_LIBRARY_C_FLAGS in version script
       # checks on Solaris.
-      list(APPEND CMAKE_REQUIRED_FLAGS ${CMAKE_SHARED_LIBRARY_C_FLAGS})
+      string(APPEND CMAKE_REQUIRED_FLAGS " ${CMAKE_SHARED_LIBRARY_C_FLAGS}")
     endif()
-    list(APPEND CMAKE_REQUIRED_FLAGS "-Wl,-M -Wl,${CMAKE_CURRENT_BINARY_DIR}/conftest.map")
+    string(APPEND CMAKE_REQUIRED_FLAGS " -Wl,-M -Wl,${CMAKE_CURRENT_BINARY_DIR}/conftest.map")
     check_c_source_compiles("
 void sym1(void) {}
 void sym2(void) {}
 int main(void) { return 0; }
 " HAVE_SOLARIS_LD_VERSION_SCRIPT)
   endif()
-  set(CMAKE_REQUIRED_FLAGS ${_SAVED_CMAKE_REQUIRED_FLAGS})
+  set(CMAKE_REQUIRED_FLAGS "${_SAVED_CMAKE_REQUIRED_FLAGS}")
   file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map")
 endif()
 
@@ -877,10 +880,17 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
           FRAMEWORK DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 
   if(PNG_SHARED)
-    # Create a symlink for libpng.dll.a => libpng2.dll.a on Cygwin
+    # Create an unversioned symlink to the shared library's link-time file.
     if(NOT WIN32 OR CYGWIN OR MINGW)
-      create_symlink(libpng${CMAKE_SHARED_LIBRARY_SUFFIX} TARGET png_shared)
-      install(FILES "$<TARGET_LINKER_FILE_DIR:png_shared>/libpng${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      if(CYGWIN OR MINGW)
+        # The symlink is for the import library (e.g., libpng.dll.a => libpng2.dll.a).
+        set(libpng_symlink_name "libpng${CMAKE_IMPORT_LIBRARY_SUFFIX}")
+      else()
+        # The symlink is for the shared object (e.g., libpng.so => libpng2.so).
+        set(libpng_symlink_name "libpng${CMAKE_SHARED_LIBRARY_SUFFIX}")
+      endif()
+      create_symlink(${libpng_symlink_name} TARGET png_shared)
+      install(FILES "$<TARGET_LINKER_FILE_DIR:png_shared>/${libpng_symlink_name}"
               DESTINATION "${CMAKE_INSTALL_LIBDIR}")
     endif()
   endif()
