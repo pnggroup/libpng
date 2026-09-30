@@ -6399,6 +6399,8 @@ Version 1.6.59 [September 28, 2026]
   Applied fixes and updates to the CMake build.
   Adopted the REUSE Specification for licensing the CI files.
 
+Version 1.6.60 [TODO]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
 <https://lists.sourceforge.net/lists/listinfo/png-mng-implement>
