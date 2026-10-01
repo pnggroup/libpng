@@ -492,8 +492,11 @@ png_free_data(const png_struct *png_ptr, png_info *info_ptr, png_uint_32 mask,
    {
       if (num != -1)
       {
-         png_free(png_ptr, info_ptr->text[num].key);
-         info_ptr->text[num].key = NULL;
+         if (num >= 0 && num < info_ptr->num_text)
+         {
+            png_free(png_ptr, info_ptr->text[num].key);
+            info_ptr->text[num].key = NULL;
+         }
       }
 
       else
@@ -576,10 +579,13 @@ png_free_data(const png_struct *png_ptr, png_info *info_ptr, png_uint_32 mask,
    {
       if (num != -1)
       {
-         png_free(png_ptr, info_ptr->splt_palettes[num].name);
-         png_free(png_ptr, info_ptr->splt_palettes[num].entries);
-         info_ptr->splt_palettes[num].name = NULL;
-         info_ptr->splt_palettes[num].entries = NULL;
+         if (num >= 0 && num < info_ptr->splt_palettes_num)
+         {
+            png_free(png_ptr, info_ptr->splt_palettes[num].name);
+            png_free(png_ptr, info_ptr->splt_palettes[num].entries);
+            info_ptr->splt_palettes[num].name = NULL;
+            info_ptr->splt_palettes[num].entries = NULL;
+         }
       }
 
       else
@@ -606,8 +612,11 @@ png_free_data(const png_struct *png_ptr, png_info *info_ptr, png_uint_32 mask,
    {
       if (num != -1)
       {
-          png_free(png_ptr, info_ptr->unknown_chunks[num].data);
-          info_ptr->unknown_chunks[num].data = NULL;
+         if (num >= 0 && num < info_ptr->unknown_chunks_num)
+         {
+            png_free(png_ptr, info_ptr->unknown_chunks[num].data);
+            info_ptr->unknown_chunks[num].data = NULL;
+         }
       }
 
       else

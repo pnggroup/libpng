@@ -747,9 +747,10 @@ png_get_sPLT(const png_struct *png_ptr, png_info *info_ptr,
 {
    png_debug1(1, "in %s retrieval function", "sPLT");
 
-   if (png_ptr != NULL && info_ptr != NULL && spalettes != NULL)
+   if (png_ptr != NULL && info_ptr != NULL)
    {
-      *spalettes = info_ptr->splt_palettes;
+      if (spalettes != NULL)
+         *spalettes = info_ptr->splt_palettes;
       return info_ptr->splt_palettes_num;
    }
 
@@ -767,14 +768,16 @@ png_get_cICP(const png_struct *png_ptr,
     png_debug1(1, "in %s retrieval function", "cICP");
 
     if (png_ptr != NULL && info_ptr != NULL &&
-        (info_ptr->valid & PNG_INFO_cICP) != 0 &&
-        colour_primaries != NULL && transfer_function != NULL &&
-        matrix_coefficients != NULL && video_full_range_flag != NULL)
+        (info_ptr->valid & PNG_INFO_cICP) != 0)
     {
-        *colour_primaries = info_ptr->cicp_colour_primaries;
-        *transfer_function = info_ptr->cicp_transfer_function;
-        *matrix_coefficients = info_ptr->cicp_matrix_coefficients;
-        *video_full_range_flag = info_ptr->cicp_video_full_range_flag;
+        if (colour_primaries != NULL)
+            *colour_primaries = info_ptr->cicp_colour_primaries;
+        if (transfer_function != NULL)
+            *transfer_function = info_ptr->cicp_transfer_function;
+        if (matrix_coefficients != NULL)
+            *matrix_coefficients = info_ptr->cicp_matrix_coefficients;
+        if (video_full_range_flag != NULL)
+            *video_full_range_flag = info_ptr->cicp_video_full_range_flag;
         return (PNG_INFO_cICP);
     }
 
@@ -895,10 +898,12 @@ png_get_eXIf_1(const png_struct *png_ptr, const png_info *info_ptr,
    png_debug1(1, "in %s retrieval function", "eXIf");
 
    if (png_ptr != NULL && info_ptr != NULL &&
-       (info_ptr->valid & PNG_INFO_eXIf) != 0 && exif != NULL)
+       (info_ptr->valid & PNG_INFO_eXIf) != 0)
    {
-      *num_exif = info_ptr->num_exif;
-      *exif = info_ptr->exif;
+      if (num_exif != NULL)
+         *num_exif = info_ptr->num_exif;
+      if (exif != NULL)
+         *exif = info_ptr->exif;
       return PNG_INFO_eXIf;
    }
 
@@ -976,12 +981,14 @@ png_get_oFFs(const png_struct *png_ptr, const png_info *info_ptr,
    png_debug1(1, "in %s retrieval function", "oFFs");
 
    if (png_ptr != NULL && info_ptr != NULL &&
-       (info_ptr->valid & PNG_INFO_oFFs) != 0 &&
-       offset_x != NULL && offset_y != NULL && unit_type != NULL)
+       (info_ptr->valid & PNG_INFO_oFFs) != 0)
    {
-      *offset_x = info_ptr->x_offset;
-      *offset_y = info_ptr->y_offset;
-      *unit_type = (int)info_ptr->offset_unit_type;
+      if (offset_x != NULL)
+         *offset_x = info_ptr->x_offset;
+      if (offset_y != NULL)
+         *offset_y = info_ptr->y_offset;
+      if (unit_type != NULL)
+         *unit_type = (int)info_ptr->offset_unit_type;
       return PNG_INFO_oFFs;
    }
 
@@ -998,17 +1005,22 @@ png_get_pCAL(const png_struct *png_ptr, png_info *info_ptr,
    png_debug1(1, "in %s retrieval function", "pCAL");
 
    if (png_ptr != NULL && info_ptr != NULL &&
-       (info_ptr->valid & PNG_INFO_pCAL) != 0 &&
-       purpose != NULL && X0 != NULL && X1 != NULL && type != NULL &&
-       nparams != NULL && units != NULL && params != NULL)
+       (info_ptr->valid & PNG_INFO_pCAL) != 0)
    {
-      *purpose = info_ptr->pcal_purpose;
-      *X0 = info_ptr->pcal_X0;
-      *X1 = info_ptr->pcal_X1;
-      *type = (int)info_ptr->pcal_type;
-      *nparams = (int)info_ptr->pcal_nparams;
-      *units = info_ptr->pcal_units;
-      *params = info_ptr->pcal_params;
+      if (purpose != NULL)
+         *purpose = info_ptr->pcal_purpose;
+      if (X0 != NULL)
+         *X0 = info_ptr->pcal_X0;
+      if (X1 != NULL)
+         *X1 = info_ptr->pcal_X1;
+      if (type != NULL)
+         *type = (int)info_ptr->pcal_type;
+      if (nparams != NULL)
+         *nparams = (int)info_ptr->pcal_nparams;
+      if (units != NULL)
+         *units = info_ptr->pcal_units;
+      if (params != NULL)
+         *params = info_ptr->pcal_params;
       return PNG_INFO_pCAL;
    }
 
@@ -1124,11 +1136,13 @@ png_get_PLTE(const png_struct *png_ptr, png_info *info_ptr,
    png_debug1(1, "in %s retrieval function", "PLTE");
 
    if (png_ptr != NULL && info_ptr != NULL &&
-       (info_ptr->valid & PNG_INFO_PLTE) != 0 && palette != NULL)
+       (info_ptr->valid & PNG_INFO_PLTE) != 0)
    {
-      *palette = info_ptr->palette;
-      *num_palette = info_ptr->num_palette;
-      png_debug1(3, "num_palette = %d", *num_palette);
+      if (palette != NULL)
+         *palette = info_ptr->palette;
+      if (num_palette != NULL)
+         *num_palette = info_ptr->num_palette;
+      png_debug1(3, "num_palette = %d", info_ptr->num_palette);
       return PNG_INFO_PLTE;
    }
 
@@ -1249,9 +1263,10 @@ int
 png_get_unknown_chunks(const png_struct *png_ptr, png_info *info_ptr,
     png_unknown_chunk **unknowns)
 {
-   if (png_ptr != NULL && info_ptr != NULL && unknowns != NULL)
+   if (png_ptr != NULL && info_ptr != NULL)
    {
-      *unknowns = info_ptr->unknown_chunks;
+      if (unknowns != NULL)
+         *unknowns = info_ptr->unknown_chunks;
       return info_ptr->unknown_chunks_num;
    }
 
@@ -1364,11 +1379,12 @@ png_get_acTL(png_struct *png_ptr, png_info *info_ptr,
    png_debug1(1, "in %s retrieval function", "acTL");
 
    if (png_ptr != NULL && info_ptr != NULL &&
-       (info_ptr->valid & PNG_INFO_acTL) &&
-       num_frames != NULL && num_plays != NULL)
+       (info_ptr->valid & PNG_INFO_acTL))
    {
-      *num_frames = info_ptr->num_frames;
-      *num_plays = info_ptr->num_plays;
+      if (num_frames != NULL)
+         *num_frames = info_ptr->num_frames;
+      if (num_plays != NULL)
+         *num_plays = info_ptr->num_plays;
       return 1;
    }
 
@@ -1405,20 +1421,24 @@ png_get_next_frame_fcTL(png_struct *png_ptr, png_info *info_ptr,
    png_debug1(1, "in %s retrieval function", "fcTL");
 
    if (png_ptr != NULL && info_ptr != NULL &&
-       (info_ptr->valid & PNG_INFO_fcTL) &&
-       width != NULL && height != NULL &&
-       x_offset != NULL && y_offset != NULL &&
-       delay_num != NULL && delay_den != NULL &&
-       dispose_op != NULL && blend_op != NULL)
+       (info_ptr->valid & PNG_INFO_fcTL))
    {
-      *width = info_ptr->next_frame_width;
-      *height = info_ptr->next_frame_height;
-      *x_offset = info_ptr->next_frame_x_offset;
-      *y_offset = info_ptr->next_frame_y_offset;
-      *delay_num = info_ptr->next_frame_delay_num;
-      *delay_den = info_ptr->next_frame_delay_den;
-      *dispose_op = info_ptr->next_frame_dispose_op;
-      *blend_op = info_ptr->next_frame_blend_op;
+      if (width != NULL)
+         *width = info_ptr->next_frame_width;
+      if (height != NULL)
+         *height = info_ptr->next_frame_height;
+      if (x_offset != NULL)
+         *x_offset = info_ptr->next_frame_x_offset;
+      if (y_offset != NULL)
+         *y_offset = info_ptr->next_frame_y_offset;
+      if (delay_num != NULL)
+         *delay_num = info_ptr->next_frame_delay_num;
+      if (delay_den != NULL)
+         *delay_den = info_ptr->next_frame_delay_den;
+      if (dispose_op != NULL)
+         *dispose_op = info_ptr->next_frame_dispose_op;
+      if (blend_op != NULL)
+         *blend_op = info_ptr->next_frame_blend_op;
       return 1;
    }
 
