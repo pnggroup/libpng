@@ -43,7 +43,7 @@ pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@.la
 
 pnggetset_SOURCES = contrib/libtests/pnggetset.c
-pnggetset_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+pnggetset_LDADD = libpng@PNGLIB_MAJOR@.la
 
 pngvalid_SOURCES = contrib/libtests/pngvalid.c
 pngvalid_LDADD = libpng@PNGLIB_MAJOR@.la
