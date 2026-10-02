@@ -7,10 +7,12 @@ on:
   push:
     branches:
       - libpng16
+      - libpng18
       - develop
   pull_request:
     branches:
       - libpng16
+      - libpng18
       - develop
 
 permissions:
