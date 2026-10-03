@@ -332,6 +332,10 @@ test_text_roundtrip(void)
       text_entries[i].key = (png_charp)keys[i];
       text_entries[i].text = (png_charp)vals[i];
    }
+#ifdef PNG_iTXt_SUPPORTED
+   /* Exercise the documented NULL language pointers for iTXt. */
+   text_entries[TEXT_COUNT - 1].compression = PNG_ITXT_COMPRESSION_NONE;
+#endif
    png_set_text(png_ptr, info_ptr, text_entries, TEXT_COUNT);
 
    /* Get the internal pointer and feed it straight back (append). */
