@@ -100,6 +100,9 @@ png_set_cHRM(const png_struct *png_ptr, png_info *info_ptr,
     double white_x, double white_y, double red_x, double red_y,
     double green_x, double green_y, double blue_x, double blue_y)
 {
+   if (png_ptr == NULL || info_ptr == NULL)
+      return;
+
    png_set_cHRM_fixed(png_ptr, info_ptr,
        png_fixed(png_ptr, white_x, "cHRM White X"),
        png_fixed(png_ptr, white_y, "cHRM White Y"),
@@ -116,6 +119,9 @@ png_set_cHRM_XYZ(const png_struct *png_ptr, png_info *info_ptr, double red_X,
     double red_Y, double red_Z, double green_X, double green_Y, double green_Z,
     double blue_X, double blue_Y, double blue_Z)
 {
+   if (png_ptr == NULL || info_ptr == NULL)
+      return;
+
    png_set_cHRM_XYZ_fixed(png_ptr, info_ptr,
        png_fixed(png_ptr, red_X, "cHRM Red X"),
        png_fixed(png_ptr, red_Y, "cHRM Red Y"),
@@ -194,6 +200,9 @@ void
 png_set_cLLI(const png_struct *png_ptr, png_info *info_ptr,
    double maxCLL, double maxFALL)
 {
+   if (png_ptr == NULL || info_ptr == NULL)
+      return;
+
    png_set_cLLI_fixed(png_ptr, info_ptr,
        png_fixed_ITU(png_ptr, maxCLL, "png_set_cLLI(maxCLL)"),
        png_fixed_ITU(png_ptr, maxFALL, "png_set_cLLI(maxFALL)"));
@@ -299,6 +308,9 @@ png_set_mDCV(const png_struct *png_ptr, png_info *info_ptr,
     double green_y, double blue_x, double blue_y,
     double maxDL, double minDL)
 {
+   if (png_ptr == NULL || info_ptr == NULL)
+      return;
+
    png_set_mDCV_fixed(png_ptr, info_ptr,
       png_fixed(png_ptr, white_x, "png_set_mDCV(white(x))"),
       png_fixed(png_ptr, white_y, "png_set_mDCV(white(y))"),
@@ -365,6 +377,9 @@ png_set_gAMA_fixed(const png_struct *png_ptr, png_info *info_ptr,
 void
 png_set_gAMA(const png_struct *png_ptr, png_info *info_ptr, double file_gamma)
 {
+   if (png_ptr == NULL || info_ptr == NULL)
+      return;
+
    png_set_gAMA_fixed(png_ptr, info_ptr, png_fixed(png_ptr, file_gamma,
        "png_set_gAMA"));
 }
@@ -675,6 +690,9 @@ png_set_sCAL(const png_struct *png_ptr, png_info *info_ptr, int unit,
 {
    png_debug1(1, "in %s storage function", "sCAL");
 
+   if (png_ptr == NULL || info_ptr == NULL)
+      return;
+
    /* Check the arguments. */
    if (width <= 0)
       png_warning(png_ptr, "Invalid sCAL width ignored");
@@ -704,6 +722,9 @@ png_set_sCAL_fixed(const png_struct *png_ptr, png_info *info_ptr, int unit,
     png_fixed_point width, png_fixed_point height)
 {
    png_debug1(1, "in %s storage function", "sCAL");
+
+   if (png_ptr == NULL || info_ptr == NULL)
+      return;
 
    /* Check the arguments. */
    if (width <= 0)
@@ -942,6 +963,10 @@ png_set_text(const png_struct *png_ptr, png_info *info_ptr,
     const png_text *text_ptr, int num_text)
 {
    int ret;
+
+   if (png_ptr == NULL || info_ptr == NULL)
+      return;
+
    ret = png_set_text_2(png_ptr, info_ptr, text_ptr, num_text);
 
    if (ret != 0)
