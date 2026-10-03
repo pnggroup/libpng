@@ -34,7 +34,7 @@ read_png(FILE *fp)
 {
    png_struct *png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,0,0,0);
    png_info *info_ptr = NULL;
-   png_byte *row = NULL, display = NULL;
+   png_byte *row = NULL, *display = NULL;
 
    if (png_ptr == NULL)
       return 0;
