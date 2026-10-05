@@ -1,6 +1,6 @@
 /* pngpriv.h - private declarations for use inside libpng
  *
- * Copyright (c) 2018-2025 Cosmin Truta
+ * Copyright (c) 2018-2026 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -187,19 +187,12 @@
  * the functions will be used without definitions.)
  *
  * NOTE: although all the API functions are declared here they are not all
- * actually built!  Because the declarations are still made it is necessary to
- * fake out types that they depend on.
+ * actually built!
  */
 #ifndef PNG_FP_EXPORT
 #  ifndef PNG_FLOATING_POINT_SUPPORTED
 #     define PNG_FP_EXPORT(type, name, args)\
          PNG_INTERNAL_FUNCTION(type, name, args, PNG_EMPTY);
-#     ifndef PNG_VERSION_INFO_ONLY
-         typedef struct png_incomplete png_double;
-         typedef png_double*           double *;       /* [Deprecated] */
-         typedef const png_double*     const double *; /* [Deprecated] */
-         typedef png_double**          double **;      /* [Deprecated] */
-#     endif
 #  endif
 #endif
 #ifndef PNG_FIXED_EXPORT
