@@ -186,11 +186,8 @@ sprite_op(const struct sprite *sprite, int x_offset, int y_offset,
                   out_pixel[3] = in_pixel[3];
                }
             }
-         /* Stop at the right edge of the sprite; the input is truncated to
-          * the sprite area rather than written beyond sprite->buffer.
-          */
-         } while (++x < image->width && (unsigned)(x + x_offset) < sprite->width);
-      } while (++y < image->height && (unsigned)(y + y_offset) < sprite->height);
+         } while (++x < image->width && x + x_offset < sprite->width);
+      } while (++y < image->height && y + y_offset < sprite->height);
    }
 }
 
