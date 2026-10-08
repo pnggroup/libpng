@@ -571,7 +571,7 @@ int fscan_pnm_uint_32 (FILE *pnm_file, png_uint_32 *num_ptr)
   ret = fscan_pnm_token (pnm_file, token, sizeof (token));
   if (ret < 1) return ret;
 
-  if ((token[0] < '0') && (token[0] > '9'))
+  if ((token[0] < '0') || (token[0] > '9'))
     return 0; /* the token starts with junk, or a +/- sign, which is invalid */
 
   ret = sscanf (token, "%lu%*c", &token_value);
