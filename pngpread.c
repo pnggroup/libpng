@@ -591,8 +591,14 @@ png_push_read_IDAT(png_struct *png_ptr)
             png_error(png_ptr, "Not enough compressed data");
 
 #ifdef PNG_READ_APNG_SUPPORTED
-         if (png_ptr->frame_end_fn != NULL)
-            (*(png_ptr->frame_end_fn))(png_ptr, png_ptr->num_frames_read);
+         /* Default image is not an animation frame when the leading fcTL was
+          * ignored; match sequential reader (no frame_end for hidden frame).
+          */
+         if ((png_ptr->apng_flags & PNG_FIRST_FRAME_HIDDEN) == 0)
+         {
+            if (png_ptr->frame_end_fn != NULL)
+               (*(png_ptr->frame_end_fn))(png_ptr, png_ptr->num_frames_read);
+         }
          png_ptr->num_frames_read++;
 #endif
 
