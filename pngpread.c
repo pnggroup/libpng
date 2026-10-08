@@ -269,10 +269,16 @@ png_push_read_chunk(png_struct *png_ptr, png_info *info_ptr)
          png_read_reset(png_ptr);
          png_ptr->mode &= ~PNG_HAVE_fcTL;
 
-         png_handle_fcTL(png_ptr, info_ptr, png_ptr->push_length);
+          png_handle_fcTL(png_ptr, info_ptr, png_ptr->push_length);
 
-         if (!(png_ptr->mode & PNG_HAVE_fcTL))
-            png_error(png_ptr, "Missing required fcTL chunk in APNG stream");
+          /* We only get here for an fcTL chunk, so if PNG_HAVE_fcTL was not
+           * set above the chunk was present but rejected (e.g. an oversized
+           * or misplaced frame description); say that rather than claiming
+           * that the chunk is missing.
+           */
+          if (!(png_ptr->mode & PNG_HAVE_fcTL))
+             png_error(png_ptr,
+                 "Invalid or misplaced fcTL chunk in APNG stream");
 
          png_read_reinit(png_ptr, info_ptr);
          png_progressive_read_reset(png_ptr);
