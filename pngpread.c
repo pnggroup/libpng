@@ -533,6 +533,10 @@ png_push_restore_buffer(png_struct *png_ptr, png_byte *buffer,
 void /* PRIVATE */
 png_push_read_IDAT(png_struct *png_ptr)
 {
+#ifdef PNG_READ_APNG_SUPPORTED
+   int chunk_header_read = 0;
+#endif
+
    if ((png_ptr->mode & PNG_HAVE_CHUNK_HEADER) == 0)
    {
       png_byte chunk_length[4];
@@ -552,6 +556,8 @@ png_push_read_IDAT(png_struct *png_ptr)
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
 
 #ifdef PNG_READ_APNG_SUPPORTED
+      chunk_header_read = 1;
+
       if (png_ptr->chunk_name != png_fdAT && png_ptr->num_frames_read > 0)
       {
          if (png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED)
@@ -562,20 +568,15 @@ png_push_read_IDAT(png_struct *png_ptr)
             png_ptr->num_frames_read++;
             return;
          }
-         else
-         {
-            if (png_ptr->chunk_name == png_IEND)
-               png_error(png_ptr, "Not enough image data");
-            if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-            {
-               png_push_save_buffer(png_ptr);
-               return;
-            }
-            png_warning(png_ptr, "Ignoring unexpected chunk in APNG sequence");
-            png_crc_finish(png_ptr, png_ptr->push_length);
-            png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
-            return;
-         }
+
+         /* Any other chunk is skipped below, outside this block.  Skipping
+          * needs the whole chunk to be buffered, and an early return from
+          * inside this block would leave the chunk body unconsumed with the
+          * chunk header flag already set: the next call would skip the block
+          * and the code further down would then consume the first four body
+          * bytes as a CRC and re-parse the rest of the body as a chunk
+          * stream.
+          */
       }
       else
 #endif
@@ -599,16 +600,50 @@ png_push_read_IDAT(png_struct *png_ptr)
          return;
       }
 
+#ifndef PNG_READ_APNG_SUPPORTED
       png_ptr->idat_size = png_ptr->push_length;
+#endif
+   }
 
 #ifdef PNG_READ_APNG_SUPPORTED
+   /* Skip a chunk that is not frame data.  This is reached on every call
+    * while the chunk header is held, so an early return waiting for the rest
+    * of the chunk resumes here instead of falling through with the body
+    * still unconsumed.
+    */
+   if (png_ptr->num_frames_read > 0 &&
+       png_ptr->chunk_name != png_fdAT &&
+       (png_ptr->mode & PNG_HAVE_CHUNK_HEADER) != 0 &&
+       (png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED) == 0)
+   {
+      if (png_ptr->chunk_name == png_IEND)
+         png_error(png_ptr, "Not enough image data");
+
+      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
+      {
+         png_push_save_buffer(png_ptr);
+         return;
+      }
+
+      png_warning(png_ptr, "Ignoring unexpected chunk in APNG sequence");
+      png_crc_finish(png_ptr, png_ptr->push_length);
+      png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
+      return;
+   }
+#endif
+
+#ifdef PNG_READ_APNG_SUPPORTED
+   if (chunk_header_read != 0)
+   {
+      png_ptr->idat_size = png_ptr->push_length;
+
       if (png_ptr->num_frames_read > 0)
       {
          png_ensure_sequence_number(png_ptr, png_ptr->push_length);
          png_ptr->idat_size -= 4;
       }
-#endif
    }
+#endif
 
    if (png_ptr->idat_size != 0 && png_ptr->save_buffer_size != 0)
    {
