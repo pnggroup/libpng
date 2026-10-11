@@ -1,5 +1,6 @@
 #!/bin/sh
 
 # pngimage-quick test:
-# Quick read validation against the pngsuite corpus.
-exec ./pngimage --list-combos --log "${srcdir}/contrib/pngsuite/"*.png
+# Quick read validation against the pngsuite and testpngs corpora.
+exec ./pngimage --list-combos --log "${srcdir}/contrib/pngsuite/"*.png\
+    "${srcdir}/contrib/testpngs/"*.png "${srcdir}/contrib/testpngs/sBIT/"*.png

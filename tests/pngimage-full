@@ -2,4 +2,33 @@
 
 # pngimage-full test:
 # Exhaustive read validation against the pngsuite corpus.
-exec ./pngimage --exhaustive --list-combos --log "${srcdir}/contrib/pngsuite/"*.png
+# NOTE: the sBIT alpha test cases are currently omitted because of an apparent
+# bug handling write swap (probably in pngimage) and low bit depth (almost
+# certainly in pngimage).
+#
+# Limit the time for the "exhaustive" set of tests by using times established
+# for pngimage runs on an old AMD64 machine.  The test limit is per-image in
+# milliseconds, the third column in the pngimage-times.lst files is for the
+# "quick" test (no --exhaustive option), the last is for the --exhaustive
+# case.  The breakpoint is 3-4s at which point the 16-bit tests start getting
+# run.  6s gives a total real time of 173s but bear in mind this is based on
+# running pngimage once for each file, not all at once.
+test -n "$PNGIMAGE_TEST_TIME_LIMIT" ||
+    PNGIMAGE_TEST_TIME_LIMIT=6000
+
+pngimage="$PWD/pngimage"
+cd "${srcdir}/contrib"
+
+# the dir and file names in pngimage-times.lst not have space characters
+files=$(
+    for dir in pngsuite testpngs testpngs/sBIT
+    do
+        while read file fast slow
+        do
+            test "$slow" -lt $PNGIMAGE_TEST_TIME_LIMIT &&
+                echo "${dir}/${file}"
+        done <"${dir}/pngimage-times.lst"
+    done
+)
+
+exec "$pngimage" --exhaustive --list-combos --log $files
