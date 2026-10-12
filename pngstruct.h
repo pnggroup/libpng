@@ -441,9 +441,13 @@ struct png_struct_def
    size_t old_big_row_buf_size;
 
 #ifdef PNG_READ_SUPPORTED
-/* New member added in libpng-1.2.30 */
-  png_bytep        read_buffer;      /* buffer for reading chunk data */
+/* New member added in libpng-1.2.30.
+ * read_buffer_size is declared before read_buffer so PNG_COUNTED_BY_OR_NULL
+ * can name it. Capacity is assigned before the pointer at update sites.
+ */
   png_alloc_size_t read_buffer_size; /* current size of the buffer */
+  png_byte * PNG_COUNTED_BY_OR_NULL(read_buffer_size) read_buffer;
+                                 /* buffer for reading chunk data */
 #endif
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
   uInt             IDAT_read_size;   /* limit on read buffer size for IDAT */

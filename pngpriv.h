@@ -1017,6 +1017,7 @@
  */
 #ifndef PNG_VERSION_INFO_ONLY
 
+#include "png_bounds_safety.h"
 #include "pngstruct.h"
 #include "pnginfo.h"
 
