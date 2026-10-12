@@ -1247,7 +1247,15 @@ compare_read(struct display *dp, int applied_transforms)
             png_bytep orig = dp->original_rows[y];
             unsigned long x;
 
-            for (x=0; x<(width-(mask!=0)); ++x)
+            /* 'x' is in pixels but the 'for (b...' loop advances the row
+             * pointer in the larger of bytes or pixels.  Determine the advance
+             * in 'x' for each loop iteration.  The for loop only handles
+             * complete bytes, i.e. if the bit depth is less than 8 it stops
+             * immediately before the last byte.
+             */
+            int pixels_per_byte = bit_depth < 8 ? 8/bit_depth : 1;
+
+            for (x=0; x+pixels_per_byte <= width; x += pixels_per_byte)
             {
                int b;
 
