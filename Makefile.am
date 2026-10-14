@@ -68,7 +68,6 @@ endif
 # set of parameters:
 if ENABLE_TESTS
 TESTS =\
-   tests/pnginterlace\
    tests/pngtest-all\
    tests/pnggetset\
    tests/pngreadend\
@@ -87,6 +86,7 @@ TESTS =\
    tests/pngvalid-transform\
    tests/pngvalid-progressive-standard\
    tests/pngvalid-standard\
+   tests/pnginterlace\
    tests/pngstest-1.8\
    tests/pngstest-1.8-alpha\
    tests/pngstest-linear\
