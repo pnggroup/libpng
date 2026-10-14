@@ -13,7 +13,8 @@ ACLOCAL_AMFLAGS = -I scripts/autoconf
 
 # test programs - run on make check, make distcheck
 if ENABLE_TESTS
-check_PROGRAMS= pngtest pnggetset pngreadend pngunknown pngstest pngvalid pngimage
+check_PROGRAMS= pngtest pnggetset pngreadend pngunknown pngstest pngvalid pngimage \
+   pnginterlace
 if HAVE_CLOCK_GETTIME
 check_PROGRAMS += timepng
 endif
@@ -47,6 +48,9 @@ pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 pngstest_SOURCES = contrib/libtests/pngstest.c
 pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
+pnginterlace_SOURCES = contrib/libtests/pnginterlace.c
+pnginterlace_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+
 pngunknown_SOURCES = contrib/libtests/pngunknown.c
 pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
@@ -61,6 +65,7 @@ endif
 # set of parameters:
 if ENABLE_TESTS
 TESTS =\
+   tests/pnginterlace\
    tests/pngtest-all\
    tests/pnggetset\
    tests/pngreadend\
@@ -247,6 +252,7 @@ pngtest.o: pnglibconf.h
 contrib/libtests/makepng.o: pnglibconf.h
 contrib/libtests/pnggetset.o: pnglibconf.h
 contrib/libtests/pngimage.o: pnglibconf.h
+contrib/libtests/pnginterlace.o: pnglibconf.h
 contrib/libtests/pngreadend.o: pnglibconf.h
 contrib/libtests/pngstest.o: pnglibconf.h
 contrib/libtests/pngunknown.o: pnglibconf.h
