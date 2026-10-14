@@ -24,31 +24,67 @@
 #endif
 
 #if defined(PNG_SIMPLIFIED_READ_SUPPORTED) && \
-    defined(PNG_STDIO_SUPPORTED) && defined(PNG_WRITE_SUPPORTED) && \
+    defined(PNG_WRITE_SUPPORTED) && \
     defined(PNG_WRITE_INTERLACING_SUPPORTED) && \
     defined(PNG_WRITE_16BIT_SUPPORTED) && defined(PNG_WRITE_gAMA_SUPPORTED) && \
     (defined(PNG_FIXED_POINT_SUPPORTED) || \
     defined(PNG_FLOATING_POINT_SUPPORTED)) && defined(PNG_SETJMP_SUPPORTED)
 
-static FILE *make_image(unsigned int width, unsigned int height,
+/* The largest test image is 17x19 RGBA at 16 bits per channel, which takes
+ * less than 3000 bytes even when stored without compression.
+ */
+#define MEM_BUF_SIZE 8192
+
+typedef struct
+{
+   png_byte data[MEM_BUF_SIZE];
+   size_t len;
+} mem_buf;
+
+static void PNGCBAPI
+mem_write(png_struct *png_ptr, png_byte *buf, size_t length)
+{
+   mem_buf *mb = (mem_buf *)png_get_io_ptr(png_ptr);
+
+   if (length > MEM_BUF_SIZE - mb->len)
+      png_error(png_ptr, "pnginterlace: write overflow");
+
+   memcpy(mb->data + mb->len, buf, length);
+   mb->len += length;
+}
+
+static void PNGCBAPI
+mem_flush(png_struct *png_ptr)
+{
+   (void)png_ptr;
+}
+
+static int
+make_image(mem_buf *mb, unsigned int width, unsigned int height,
     int color_type, int bit_depth, int interlace)
 {
-   FILE *file = tmpfile();
-   png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL,
+   png_struct *png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL,
        NULL, NULL);
-   png_infop info = png == NULL ? NULL : png_create_info_struct(png);
+   png_info *info = png == NULL ? NULL : png_create_info_struct(png);
    png_byte pixels[19][17*8];
-   png_bytep rows[19];
+   png_byte *rows[19];
    unsigned int channels = (color_type & PNG_COLOR_MASK_COLOR) != 0 ? 3 : 1;
    unsigned int bytes = bit_depth == 16 ? 2 : 1;
    unsigned int x, y, c;
 
    if ((color_type & PNG_COLOR_MASK_ALPHA) != 0)
       ++channels;
-   if (file == NULL || png == NULL || info == NULL)
-      goto error;
+   if (png == NULL || info == NULL)
+   {
+      fprintf(stderr, "pnginterlace: out of memory\n");
+      png_destroy_write_struct(&png, &info);
+      return 0;
+   }
    if (setjmp(png_jmpbuf(png)))
-      goto error;
+   {
+      png_destroy_write_struct(&png, &info);
+      return 0;
+   }
 
    for (y=0; y<height; ++y)
    {
@@ -66,7 +102,8 @@ static FILE *make_image(unsigned int width, unsigned int height,
          }
    }
 
-   png_init_io(png, file);
+   mb->len = 0;
+   png_set_write_fn(png, mb, mem_write, mem_flush);
    png_set_IHDR(png, info, width, height, bit_depth, color_type, interlace,
        PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 #ifdef PNG_FIXED_POINT_SUPPORTED
@@ -78,23 +115,17 @@ static FILE *make_image(unsigned int width, unsigned int height,
    png_write_image(png, rows);
    png_write_end(png, info);
    png_destroy_write_struct(&png, &info);
-   rewind(file);
-   return file;
-
-error:
-   png_destroy_write_struct(&png, &info);
-   if (file != NULL)
-      fclose(file);
-   return NULL;
+   return 1;
 }
 
-static int read_image(FILE *file, unsigned int width, unsigned int height,
-    png_uint_32 format, png_int_32 stride, png_bytep buffer)
+static int
+read_image(const mem_buf *mb, unsigned int width, unsigned int height,
+    png_uint_32 format, png_int_32 stride, png_byte *buffer)
 {
    png_image image;
    memset(&image, 0, sizeof image);
    image.version = PNG_IMAGE_VERSION;
-   if (!png_image_begin_read_from_stdio(&image, file))
+   if (!png_image_begin_read_from_memory(&image, mb->data, mb->len))
       goto error;
    if (image.width != width || image.height != height)
       goto error;
@@ -105,36 +136,42 @@ static int read_image(FILE *file, unsigned int width, unsigned int height,
    return 1;
 
 error:
-   fprintf(stderr, "read failed: %s\n", image.message);
+   fprintf(stderr, "pnginterlace: read failed: %s\n", image.message);
    png_image_free(&image);
    return 0;
 }
 
-static int compare_images(unsigned int width, unsigned int height,
+static int
+compare_images(unsigned int width, unsigned int height,
     int color_type, int bit_depth, png_uint_32 format, int extra, int negative)
 {
-   FILE *flat = make_image(width, height, color_type, bit_depth,
-       PNG_INTERLACE_NONE);
-   FILE *interlaced = make_image(width, height, color_type, bit_depth,
-       PNG_INTERLACE_ADAM7);
+   static mem_buf flat, interlaced;
    png_int_32 stride = (png_int_32)(width*PNG_IMAGE_PIXEL_CHANNELS(format))
        + extra;
    size_t row_bytes = (size_t)stride*PNG_IMAGE_PIXEL_COMPONENT_SIZE(format);
    size_t pixel_bytes = width*PNG_IMAGE_PIXEL_SIZE(format);
    size_t size = row_bytes*height;
-   png_bytep a = malloc(size+64), b = malloc(size+64);
+   png_byte *a = malloc(size+64), *b = malloc(size+64);
    size_t i;
    unsigned int y;
    int ok = 0;
 
-   if (flat == NULL || interlaced == NULL || a == NULL || b == NULL)
+   if (a == NULL || b == NULL)
+   {
+      fprintf(stderr, "pnginterlace: out of memory\n");
+      goto done;
+   }
+   if (!make_image(&flat, width, height, color_type, bit_depth,
+       PNG_INTERLACE_NONE) ||
+       !make_image(&interlaced, width, height, color_type, bit_depth,
+       PNG_INTERLACE_ADAM7))
       goto done;
    memset(a, 0xa5, size+64);
    memset(b, 0xa5, size+64);
    if (negative)
       stride = -stride;
-   if (!read_image(flat, width, height, format, stride, a+32) ||
-       !read_image(interlaced, width, height, format, stride, b+32))
+   if (!read_image(&flat, width, height, format, stride, a+32) ||
+       !read_image(&interlaced, width, height, format, stride, b+32))
       goto done;
    if (memcmp(a, b, size+64) != 0)
       goto done;
@@ -150,16 +187,13 @@ static int compare_images(unsigned int width, unsigned int height,
    ok = 1;
 
 done:
-   if (flat != NULL)
-      fclose(flat);
-   if (interlaced != NULL)
-      fclose(interlaced);
    free(a);
    free(b);
    return ok;
 }
 
-int main(void)
+int
+main(void)
 {
    static const unsigned int sizes[][2] = {
       {1, 1}, {1, 9}, {9, 1}, {2, 2}, {3, 5}, {9, 13}, {16, 16}, {17, 19}
@@ -225,9 +259,10 @@ int main(void)
 
 #else
 
-int main(void)
+int
+main(void)
 {
-   fprintf(stderr, "required read/write features are disabled\n");
+   fprintf(stderr, "pnginterlace: required read/write features are disabled\n");
    return 77;
 }
 
