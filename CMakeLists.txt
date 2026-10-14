@@ -631,11 +631,14 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngvalid
                OPTIONS --transform)
 
-  # pnginterlace tests:
+  # pnginterlace test:
+  # Interlaced versus non-interlaced reads through the simplified API.
   add_executable(pnginterlace ${pnginterlace_sources})
-  target_link_libraries(pnginterlace PRIVATE png_shared)
-  add_test(NAME pnginterlace COMMAND pnginterlace)
-  set_tests_properties(pnginterlace PROPERTIES SKIP_RETURN_CODE 77)
+  target_link_libraries(pnginterlace
+                        PRIVATE png_shared)
+
+  png_add_test(NAME pnginterlace
+               COMMAND pnginterlace)
 
   # pngstest tests:
   # Format conversions through the simplified API,
