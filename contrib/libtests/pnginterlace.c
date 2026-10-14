@@ -83,7 +83,7 @@ make_image(mem_buf *mb, unsigned int width, unsigned int height,
       ++channels;
    if (png == NULL || info == NULL)
    {
-      fprintf(stderr, "pnginterlace: out of memory\n");
+      fprintf(stderr, "pnginterlace: cannot create the write structures\n");
       png_destroy_write_struct(&png, &info);
       return 0;
    }
