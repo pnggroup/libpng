@@ -3256,7 +3256,10 @@ png_image_read_direct_scaled(void *argument)
 
       for (; y > 0; --y)
       {
-         /* Sparse pass data must combine with this row's previous passes. */
+         /* After the first pass, png_read_row only fills in the pixels that
+          * belong to the current pass, so local_row must first receive the
+          * pixels that the earlier passes have stored in output_row.
+          */
          if (pass != 0)
             memcpy(local_row, output_row, row_bytes);
 
