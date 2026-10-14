@@ -3231,7 +3231,7 @@ png_image_read_direct_scaled(void *argument)
    png_byte *first_row = png_voidcast(png_byte *, display->first_row);
    ptrdiff_t row_step = display->row_step;
    size_t row_bytes = png_get_rowbytes(png_ptr, info_ptr);
-   int passes;
+   int passes, pass;
 
    /* Handle interlacing. */
    switch (png_ptr->interlaced)
@@ -3249,13 +3249,17 @@ png_image_read_direct_scaled(void *argument)
    }
 
    /* Read each pass using local_row as intermediate buffer. */
-   while (--passes >= 0)
+   for (pass = 0; pass < passes; ++pass)
    {
       png_uint_32 y = image->height;
       png_byte *output_row = first_row;
 
       for (; y > 0; --y)
       {
+         /* Sparse pass data must combine with this row's previous passes. */
+         if (pass != 0)
+            memcpy(local_row, output_row, row_bytes);
+
          /* Read into local_row (gets transformed 8-bit data). */
          png_read_row(png_ptr, local_row, NULL);
 

@@ -399,6 +399,9 @@ set(pngunknown_sources
 set(pngimage_sources
     contrib/libtests/pngimage.c
 )
+set(pnginterlace_sources
+    contrib/libtests/pnginterlace.c
+)
 set(pngfix_sources
     contrib/tools/pngfix.c
 )
@@ -613,6 +616,12 @@ if(PNG_TESTS AND PNG_SHARED)
   png_add_test(NAME pngvalid-transform
                COMMAND pngvalid
                OPTIONS --transform)
+
+  # pnginterlace tests:
+  add_executable(pnginterlace ${pnginterlace_sources})
+  target_link_libraries(pnginterlace PRIVATE png_shared)
+  add_test(NAME pnginterlace COMMAND pnginterlace)
+  set_tests_properties(pnginterlace PROPERTIES SKIP_RETURN_CODE 77)
 
   # pngstest tests:
   # Format conversions through the simplified API,
