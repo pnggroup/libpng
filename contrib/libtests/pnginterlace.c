@@ -23,6 +23,13 @@
 #  include "../../png.h"
 #endif
 
+/* The configure test harness uses 77 to indicate a skipped test. */
+#ifdef HAVE_CONFIG_H
+#  define SKIP 77
+#else
+#  define SKIP 0
+#endif
+
 #if defined(PNG_SIMPLIFIED_READ_SUPPORTED) && \
     defined(PNG_WRITE_SUPPORTED) && \
     defined(PNG_WRITE_INTERLACING_SUPPORTED) && \
@@ -263,7 +270,7 @@ int
 main(void)
 {
    fprintf(stderr, "pnginterlace: required read/write features are disabled\n");
-   return 77;
+   return SKIP;
 }
 
 #endif
