@@ -158,7 +158,8 @@ compare_images(unsigned int width, unsigned int height,
    size_t row_bytes = (size_t)stride*PNG_IMAGE_PIXEL_COMPONENT_SIZE(format);
    size_t pixel_bytes = width*PNG_IMAGE_PIXEL_SIZE(format);
    size_t size = row_bytes*height;
-   png_byte *a = malloc(size+64), *b = malloc(size+64);
+   png_byte *a = (png_byte *)malloc(size+64);
+   png_byte *b = (png_byte *)malloc(size+64);
    size_t i;
    unsigned int y;
    int ok = 0;
