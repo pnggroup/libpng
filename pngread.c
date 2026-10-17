@@ -1400,11 +1400,8 @@ png_image_read_header(void *argument)
       switch (png_ptr->color_type)
       {
          case PNG_COLOR_TYPE_GRAY:
+         case PNG_COLOR_TYPE_PALETTE: /* every index, whatever the PLTE size */
             cmap_entries = 1U << png_ptr->bit_depth;
-            break;
-
-         case PNG_COLOR_TYPE_PALETTE:
-            cmap_entries = (png_uint_32)png_ptr->num_palette;
             break;
 
          default:
@@ -2776,9 +2773,15 @@ png_image_read_colormap(void *argument)
 
             output_processing = PNG_CMAP_NONE;
             data_encoding = P_FILE; /* Don't change from color-map indices */
-            cmap_entries = (unsigned int)png_ptr->num_palette;
-            if (cmap_entries > 256)
-               cmap_entries = 256;
+
+            /* The indices are passed through unchanged, so there is an entry
+             * for every index the bit depth allows, whatever the size of PLTE.
+             * png_ptr->palette always has PNG_MAX_PALETTE_LENGTH entries and
+             * those past the end of PLTE are zero, so an index outside PLTE
+             * is opaque black, as PNG v3 requires; tRNS only sets the alpha
+             * of the entries it covers.
+             */
+            cmap_entries = 1U << png_ptr->bit_depth;
 
             if (cmap_entries > (unsigned int)image->colormap_entries)
                png_error(png_ptr, "palette color-map: too few entries");
