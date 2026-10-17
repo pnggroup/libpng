@@ -1404,7 +1404,11 @@ png_image_read_header(void *argument)
             break;
 
          case PNG_COLOR_TYPE_PALETTE:
-            cmap_entries = (png_uint_32)png_ptr->num_palette;
+            /* The image data may contain indices beyond the end of the
+             * palette, so there is an entry for every index the bit depth
+             * allows (see png_image_read_colormap).
+             */
+            cmap_entries = 1U << png_ptr->bit_depth;
             break;
 
          default:
@@ -2763,6 +2767,7 @@ png_image_read_colormap(void *argument)
           * tRNS entries though.
           */
          {
+            unsigned int num_palette = png_ptr->num_palette;
             unsigned int num_trans = png_ptr->num_trans;
             const png_byte *trans = num_trans > 0 ? png_ptr->trans_alpha : NULL;
             const png_color *colormap = png_ptr->palette;
@@ -2776,16 +2781,24 @@ png_image_read_colormap(void *argument)
 
             output_processing = PNG_CMAP_NONE;
             data_encoding = P_FILE; /* Don't change from color-map indices */
-            cmap_entries = (unsigned int)png_ptr->num_palette;
-            if (cmap_entries > 256)
-               cmap_entries = 256;
+
+            /* The indices are passed through unchanged, so the color-map needs
+             * an entry for every index the bit depth allows, not just for the
+             * palette entries.  PNG v3 requires out-of-range indices to be
+             * displayed as opaque black.
+             */
+            cmap_entries = 1U << png_ptr->bit_depth;
 
             if (cmap_entries > (unsigned int)image->colormap_entries)
                png_error(png_ptr, "palette color-map: too few entries");
 
             for (i=0; i < cmap_entries; ++i)
             {
-               if (do_background != 0 && i < num_trans && trans[i] < 255)
+               if (i >= num_palette)
+                  png_create_colormap_entry(display, i, 0, 0, 0, 255U,
+                      P_FILE/*8-bit*/);
+
+               else if (do_background != 0 && i < num_trans && trans[i] < 255)
                {
                   if (trans[i] == 0)
                      png_create_colormap_entry(display, i, back_r, back_g,
