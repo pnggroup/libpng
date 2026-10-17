@@ -870,6 +870,69 @@ png_inflate_read(png_struct *png_ptr, png_byte *read_buffer, uInt read_size,
       *out_size += png_ptr->zstream.avail_out;
       png_ptr->zstream.avail_out = 0; /* Should not be required, but is safe */
 
+      /* If finish is requested and all uncompressed data has been produced
+       * (*out_size == 0), but the zlib stream has not reached Z_STREAM_END
+       * because the trailing deflate end-of-block or 4-byte Adler-32 checksum
+       * straddles the read boundary, decompress remaining bytes into a nominal
+       * 1-byte dummy buffer to verify the Adler-32 checksum.
+       */
+      if (finish != 0 && ret == Z_OK)
+      {
+         png_byte dummy[1];
+
+         while (ret == Z_OK &&
+             (*chunk_bytes > 0 || png_ptr->zstream.avail_in > 0))
+         {
+            if (png_ptr->zstream.avail_in == 0)
+            {
+               /* Read 1 byte at a time so genuine trailing data remains in
+                * *chunk_bytes for png_handle_iCCP to detect and verify CRC.
+                */
+               uInt check_size = 1;
+
+               if (check_size > *chunk_bytes)
+                  check_size = (uInt)*chunk_bytes;
+               *chunk_bytes -= check_size;
+
+               if (check_size > 0)
+                  png_crc_read(png_ptr, read_buffer, check_size);
+
+               png_ptr->zstream.next_in = read_buffer;
+               png_ptr->zstream.avail_in = check_size;
+            }
+
+            png_ptr->zstream.next_out = dummy;
+            png_ptr->zstream.avail_out = (sizeof dummy);
+
+            ret = png_zlib_inflate(png_ptr, *chunk_bytes > 0 ?
+                Z_NO_FLUSH : Z_FINISH);
+
+            /* If any output was written to dummy, the decompressed stream is
+             * longer than the declared profile length.
+             */
+            if (png_ptr->zstream.avail_out < (sizeof dummy))
+            {
+               ret = Z_DATA_ERROR;
+               break;
+            }
+         }
+
+         png_ptr->zstream.next_out = NULL;
+         png_ptr->zstream.avail_out = 0;
+
+         /* If the chunk ended before the zlib stream reached Z_STREAM_END,
+          * the compressed stream was truncated.
+          */
+         if (ret == Z_OK)
+            ret = Z_DATA_ERROR;
+
+         /* Signal decompression failure to caller if the stream did not
+          * finish cleanly.
+          */
+         if (ret != Z_STREAM_END)
+            *out_size = 1;
+      }
+
       /* Ensure the error message pointer is always set: */
       png_zstream_error(png_ptr, ret);
       return ret;
@@ -1433,14 +1496,15 @@ png_handle_iCCP(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
                                      profile + (sizeof profile_header) +
                                      12 * tag_count, &size, 1/*finish*/);
 
-                                 if (length > 0 && !(png_ptr->flags &
+                                 if ((length > 0 || png_ptr->zstream.avail_in > 0) &&
+                                     !(png_ptr->flags &
                                      PNG_FLAG_BENIGN_ERRORS_WARN))
                                     errmsg = "extra compressed data";
 
                                  /* But otherwise allow extra data: */
                                  else if (size == 0)
                                  {
-                                    if (length > 0)
+                                    if (length > 0 || png_ptr->zstream.avail_in > 0)
                                     {
                                        /* This can be handled completely, so
                                         * keep going.
