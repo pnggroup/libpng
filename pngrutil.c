@@ -865,7 +865,7 @@ png_inflate_read(png_struct *png_ptr, png_byte *read_buffer, uInt read_size,
          ret = png_zlib_inflate(png_ptr, *chunk_bytes > 0 ?
              Z_NO_FLUSH : (finish ? Z_FINISH : Z_SYNC_FLUSH));
       }
-      while (ret == Z_OK && (*out_size > 0 || png_ptr->zstream.avail_out > 0));
+      while (ret == Z_OK);
 
       *out_size += png_ptr->zstream.avail_out;
       png_ptr->zstream.avail_out = 0; /* Should not be required, but is safe */
@@ -1433,14 +1433,15 @@ png_handle_iCCP(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
                                      profile + (sizeof profile_header) +
                                      12 * tag_count, &size, 1/*finish*/);
 
-                                 if (length > 0 && !(png_ptr->flags &
+                                 if ((length > 0 || png_ptr->zstream.avail_in > 0) &&
+                                     !(png_ptr->flags &
                                      PNG_FLAG_BENIGN_ERRORS_WARN))
                                     errmsg = "extra compressed data";
 
                                  /* But otherwise allow extra data: */
                                  else if (size == 0)
                                  {
-                                    if (length > 0)
+                                    if (length > 0 || png_ptr->zstream.avail_in > 0)
                                     {
                                        /* This can be handled completely, so
                                         * keep going.
