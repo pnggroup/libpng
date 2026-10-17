@@ -538,6 +538,8 @@ if(PNG_TESTS AND PNG_SHARED)
   list(SORT TEST_PNGS)
   file(GLOB TEST_PNG3_PNGS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/png-3/*.png")
   list(SORT TEST_PNG3_PNGS)
+  file(GLOB TEST_BADPAL_PNGS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/badpal/*.png")
+  list(SORT TEST_BADPAL_PNGS)
 
   set(PNGTEST_PNG "${CMAKE_CURRENT_SOURCE_DIR}/pngtest.png")
 
@@ -712,6 +714,14 @@ if(PNG_TESTS AND PNG_SHARED)
                      "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-alpha-8-1.8.png"
                      "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-alpha-8-sRGB.png"
                      "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/rgb-alpha-16-linear.png")
+
+  # Out-of-range palette index test:
+  # Palette images with indices beyond the end of PLTE, through all read/write
+  # paths; every index must have an entry in the color-map.
+  png_add_test(NAME pngstest-badpal
+               COMMAND pngstest
+               OPTIONS --tmpfile "badpal-" --log
+               FILES ${TEST_BADPAL_PNGS})
 
   # pngunknown tests:
   # Unknown chunk handling under various read policies.
