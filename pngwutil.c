@@ -2545,12 +2545,69 @@ png_setup_paeth_row_only(png_structrp png_ptr, png_uint_32 bpp,
 }
 #endif /* WRITE_FILTER */
 
+static
+void clear_unused_pixels_at_row_end(png_byte *row_buf,
+      const png_row_info *row_info)
+{
+   /* At this point png_ptr->row_buf[rowbytes] (i.e. the byte at the end of the
+    * row) will contain undefined bits if the bit_depth of the row is less and 8
+    * *and* the bit-width of the row is not a multiple of 8.  These bits
+    * correspond to pixels that are outside the image.  If the application
+    * simply passed in rows in a larger image these are valid but were cropped
+    * out by the application; libpng needs to remove them.  If the application
+    * used transforms the bits correspond to whatever was left after the
+    * transforms were performed; effectively random data.
+    *
+    * The code below *does* use the unused pixels; see the assignments to 'sum'
+    * and notice that some heuritic ('setup') routines only get the byte-width,
+    * not the bit-width of the row.  The extra pixels will disrupt the
+    * heuristic, more for shorter rows.
+    *
+    * Likewise for 'png_write_filtered_row' and in that case the spurious pixels
+    * may disrupt the zlib compression, particularly if they are random.
+    *
+    * So clear the unused pixels from the row_buf at this point.  Note that this
+    * also clears 'prev_row' because 'row_buf' is simply moved to 'prev_row'.
+    *
+    * NOTE: the PNG filter algorithms do, in fact, use the 'undefined' bits.
+    * For example the SUB filter subtracts the last byte from the previous one
+    * and this may set the low bits of the last byte.  Thus the pixels must be
+    * cleared *before* filtering is considered.
+    */
+   if (row_info->pixel_depth < 8U)
+   {
+      /* Find the number of pixel-bits in the last partial byte; 1 to 7 or 0 if
+       * the last byte is complete.  Do this is a way that cannot overflow
+       * (although the overflow is harmless.)
+       */
+      unsigned int bits = (row_info->width % 8U) * row_info->pixel_depth;
+      bits %= 8U;
+
+      if (bits)
+      {
+         /* Pixels are stored from the high bit to the low, generate a mask for
+          * 'bits' pixel-bits in the high-order bits then invert it to get the
+          * 'mask' to clear from the last byte. The spurious set bits this
+          * generates "above" the last byte are irrelevant:
+          */
+         unsigned int mask = ~(0xFFU >> bits);
+         /* Use 'rowbytes' here to skip the filter byte: */
+         row_buf[row_info->rowbytes] &= mask;
+      }
+   }
+}
+
+#ifndef PNG_WRITE_FILTER_SUPPORTED
 void /* PRIVATE */
 png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
 {
-#ifndef PNG_WRITE_FILTER_SUPPORTED
+   clear_unused_pixels_at_row_end(png_ptr->row_buf, row_info);
    png_write_filtered_row(png_ptr, png_ptr->row_buf, row_info->rowbytes+1);
+}
 #else
+void /* PRIVATE */
+png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
+{
    unsigned int filter_to_do = png_ptr->do_filter;
    png_bytep row_buf;
    png_bytep best_row;
@@ -2559,6 +2616,8 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    size_t row_bytes = row_info->rowbytes;
 
    png_debug(1, "in png_write_find_filter");
+
+   clear_unused_pixels_at_row_end(png_ptr->row_buf, row_info);
 
    /* Find out how many bytes offset each pixel is */
    bpp = (row_info->pixel_depth + 7) >> 3;
@@ -2736,9 +2795,8 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
 
    /* Do the actual writing of the filtered row data from the chosen filter. */
    png_write_filtered_row(png_ptr, best_row, row_info->rowbytes+1);
-
-#endif /* WRITE_FILTER */
 }
+#endif /* WRITE_FILTER */
 
 
 /* Do the actual writing of a previously filtered row. */
