@@ -494,6 +494,9 @@ png_set_pCAL(const png_struct *png_ptr, png_info *info_ptr,
 {
    size_t length;
    int i;
+   char *new_purpose;
+   char *new_units;
+   char **new_params;
 
    png_debug1(1, "in %s storage function", "pCAL");
 
@@ -534,51 +537,51 @@ png_set_pCAL(const png_struct *png_ptr, png_info *info_ptr,
       }
    }
 
-   info_ptr->pcal_purpose = png_voidcast(char *,
+   /* Allocate new buffers before freeing the old ones, so that a
+    * getter-to-setter roundtrip (caller pointers aliasing info_ptr
+    * storage) stays valid during the copy, matching the iCCP/eXIf
+    * order (new -> memcpy -> png_free_data -> install).
+    */
+   new_purpose = png_voidcast(char *,
        png_malloc_warn(png_ptr, length));
 
-   if (info_ptr->pcal_purpose == NULL)
+   if (new_purpose == NULL)
    {
       png_chunk_report(png_ptr, "Insufficient memory for pCAL purpose",
             PNG_CHUNK_WRITE_ERROR);
       return;
    }
 
-   memcpy(info_ptr->pcal_purpose, purpose, length);
-
-   info_ptr->free_me |= PNG_FREE_PCAL;
-
-   png_debug(3, "storing X0, X1, type, and nparams in info");
-   info_ptr->pcal_X0 = X0;
-   info_ptr->pcal_X1 = X1;
-   info_ptr->pcal_type = (png_byte)type;
-   info_ptr->pcal_nparams = (png_byte)nparams;
+   memcpy(new_purpose, purpose, length);
 
    length = strlen(units) + 1;
    png_debug1(3, "allocating units for info (%lu bytes)",
        (unsigned long)length);
 
-   info_ptr->pcal_units = png_voidcast(char *,
+   new_units = png_voidcast(char *,
        png_malloc_warn(png_ptr, length));
 
-   if (info_ptr->pcal_units == NULL)
+   if (new_units == NULL)
    {
+      png_free(png_ptr, new_purpose);
       png_warning(png_ptr, "Insufficient memory for pCAL units");
       return;
    }
 
-   memcpy(info_ptr->pcal_units, units, length);
+   memcpy(new_units, units, length);
 
-   info_ptr->pcal_params = png_voidcast(char **, png_malloc_warn(png_ptr,
+   new_params = png_voidcast(char **, png_malloc_warn(png_ptr,
        (size_t)(((unsigned int)nparams + 1) * (sizeof (char *)))));
 
-   if (info_ptr->pcal_params == NULL)
+   if (new_params == NULL)
    {
+      png_free(png_ptr, new_purpose);
+      png_free(png_ptr, new_units);
       png_warning(png_ptr, "Insufficient memory for pCAL params");
       return;
    }
 
-   memset(info_ptr->pcal_params, 0, ((unsigned int)nparams + 1) *
+   memset(new_params, 0, ((unsigned int)nparams + 1) *
        (sizeof (char *)));
 
    for (i = 0; i < nparams; i++)
@@ -587,17 +590,38 @@ png_set_pCAL(const png_struct *png_ptr, png_info *info_ptr,
       png_debug2(3, "allocating parameter %d for info (%lu bytes)", i,
           (unsigned long)length);
 
-      info_ptr->pcal_params[i] = (char *)png_malloc_warn(png_ptr, length);
+      new_params[i] = (char *)png_malloc_warn(png_ptr, length);
 
-      if (info_ptr->pcal_params[i] == NULL)
+      if (new_params[i] == NULL)
       {
+         int j;
+
+         for (j = 0; j < i; j++)
+            png_free(png_ptr, new_params[j]);
+
+         png_free(png_ptr, new_params);
+         png_free(png_ptr, new_purpose);
+         png_free(png_ptr, new_units);
          png_warning(png_ptr, "Insufficient memory for pCAL parameter");
          return;
       }
 
-      memcpy(info_ptr->pcal_params[i], params[i], length);
+      memcpy(new_params[i], params[i], length);
    }
 
+   /* All new buffers are valid: free the old ones, then install. */
+   png_free_data(png_ptr, info_ptr, PNG_FREE_PCAL, 0);
+
+   png_debug(3, "storing X0, X1, type, and nparams in info");
+   info_ptr->pcal_purpose = new_purpose;
+   info_ptr->pcal_X0 = X0;
+   info_ptr->pcal_X1 = X1;
+   info_ptr->pcal_type = (png_byte)type;
+   info_ptr->pcal_nparams = (png_byte)nparams;
+   info_ptr->pcal_units = new_units;
+   info_ptr->pcal_params = new_params;
+
+   info_ptr->free_me |= PNG_FREE_PCAL;
    info_ptr->valid |= PNG_INFO_pCAL;
 }
 #endif
@@ -608,6 +632,8 @@ png_set_sCAL_s(const png_struct *png_ptr, png_info *info_ptr,
     int unit, const char *swidth, const char *sheight)
 {
    size_t lengthw = 0, lengthh = 0;
+   char *new_width;
+   char *new_height;
 
    png_debug1(1, "in %s storage function", "sCAL");
 
@@ -628,41 +654,50 @@ png_set_sCAL_s(const png_struct *png_ptr, png_info *info_ptr,
        sheight[0] == 45 /* '-' */ || !png_check_fp_string(sheight, lengthh))
       png_error(png_ptr, "Invalid sCAL height");
 
-   info_ptr->scal_unit = (png_byte)unit;
-
+   /* Allocate new buffers before freeing the old ones, so that a
+    * getter-to-setter roundtrip (caller pointers aliasing info_ptr
+    * storage) stays valid during the copy, matching the iCCP/eXIf
+    * order (new -> memcpy -> png_free_data -> install).
+    */
    ++lengthw;
 
    png_debug1(3, "allocating unit for info (%u bytes)", (unsigned int)lengthw);
 
-   info_ptr->scal_s_width = png_voidcast(char *,
+   new_width = png_voidcast(char *,
        png_malloc_warn(png_ptr, lengthw));
 
-   if (info_ptr->scal_s_width == NULL)
+   if (new_width == NULL)
    {
       png_warning(png_ptr, "Memory allocation failed while processing sCAL");
 
       return;
    }
 
-   memcpy(info_ptr->scal_s_width, swidth, lengthw);
+   memcpy(new_width, swidth, lengthw);
 
    ++lengthh;
 
    png_debug1(3, "allocating unit for info (%u bytes)", (unsigned int)lengthh);
 
-   info_ptr->scal_s_height = png_voidcast(char *,
+   new_height = png_voidcast(char *,
        png_malloc_warn(png_ptr, lengthh));
 
-   if (info_ptr->scal_s_height == NULL)
+   if (new_height == NULL)
    {
-      png_free(png_ptr, info_ptr->scal_s_width);
-      info_ptr->scal_s_width = NULL;
+      png_free(png_ptr, new_width);
 
       png_warning(png_ptr, "Memory allocation failed while processing sCAL");
       return;
    }
 
-   memcpy(info_ptr->scal_s_height, sheight, lengthh);
+   memcpy(new_height, sheight, lengthh);
+
+   /* Both new buffers are valid: free the old ones, then install. */
+   png_free_data(png_ptr, info_ptr, PNG_FREE_SCAL, 0);
+
+   info_ptr->scal_unit = (png_byte)unit;
+   info_ptr->scal_s_width = new_width;
+   info_ptr->scal_s_height = new_height;
 
    info_ptr->free_me |= PNG_FREE_SCAL;
    info_ptr->valid |= PNG_INFO_sCAL;
