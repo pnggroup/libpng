@@ -18,15 +18,17 @@
 # Revisions by Glenn Randers-Pehrson, 2017:
 # 1. Build only the library, not the tools (changed "make -j$(nproc) all" to
 #     "make -j$(nproc) libpng16.la").
-# 2. Disabled WARNING and WRITE options in pnglibconf.dfa.
+# 2. Disabled the STDIO and WRITE options in pnglibconf.dfa (until 2026; now
+#    only CONSOLE_IO is disabled).
 # 3. Build zlib alongside libpng
 ################################################################################
 
-# Disable logging via pnglibconf.
+# Disable logging via pnglibconf: without CONSOLE_IO, libpng's default error
+# and warning handlers print nothing.  STDIO and WRITE stay enabled, as in the
+# libpng that distributions ship, so that the write and stdio code is built.
 cat scripts/pnglibconf.dfa | \
-    sed -e "s/option STDIO/option STDIO disabled/" \
+    sed -e "s/option CONSOLE_IO requires STDIO/option CONSOLE_IO disabled/" \
         -e "s/option WARNING /option WARNING disabled/" \
-        -e "s/option WRITE enables WRITE_INT_FUNCTIONS/option WRITE disabled/" \
     > scripts/pnglibconf.dfa.temp
 mv scripts/pnglibconf.dfa.temp scripts/pnglibconf.dfa
 
