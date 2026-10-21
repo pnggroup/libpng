@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# pngreadend test:
+# Reading the end of a PNG without reading the image.
+exec ./pngreadend \
+     "${srcdir}/contrib/testpngs/crashers/stale_zTXt_input.png" \
+     "${srcdir}/contrib/testpngs/crashers/stale_iCCP_input.png"
