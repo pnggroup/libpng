@@ -103,10 +103,10 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @ENABLE_TESTS_TRUE@check_PROGRAMS = pngtest$(EXEEXT) \
-@ENABLE_TESTS_TRUE@	pnggetset$(EXEEXT) pngunknown$(EXEEXT) \
-@ENABLE_TESTS_TRUE@	pngstest$(EXEEXT) pngvalid$(EXEEXT) \
-@ENABLE_TESTS_TRUE@	pngimage$(EXEEXT) pngcp$(EXEEXT) \
-@ENABLE_TESTS_TRUE@	$(am__EXEEXT_1)
+@ENABLE_TESTS_TRUE@	pnggetset$(EXEEXT) pngreadend$(EXEEXT) \
+@ENABLE_TESTS_TRUE@	pngunknown$(EXEEXT) pngstest$(EXEEXT) \
+@ENABLE_TESTS_TRUE@	pngvalid$(EXEEXT) pngimage$(EXEEXT) \
+@ENABLE_TESTS_TRUE@	pngcp$(EXEEXT) $(am__EXEEXT_1)
 @ENABLE_TESTS_TRUE@@HAVE_CLOCK_GETTIME_TRUE@am__append_1 = timepng
 @ENABLE_TOOLS_TRUE@bin_PROGRAMS = pngfix$(EXEEXT) \
 @ENABLE_TOOLS_TRUE@	png-fix-itxt$(EXEEXT)
@@ -280,6 +280,12 @@ am__pngimage_SOURCES_DIST = contrib/libtests/pngimage.c
 pngimage_OBJECTS = $(am_pngimage_OBJECTS)
 @ENABLE_TESTS_TRUE@pngimage_DEPENDENCIES =  \
 @ENABLE_TESTS_TRUE@	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+am__pngreadend_SOURCES_DIST = contrib/libtests/pngreadend.c
+@ENABLE_TESTS_TRUE@am_pngreadend_OBJECTS =  \
+@ENABLE_TESTS_TRUE@	contrib/libtests/pngreadend.$(OBJEXT)
+pngreadend_OBJECTS = $(am_pngreadend_OBJECTS)
+@ENABLE_TESTS_TRUE@pngreadend_DEPENDENCIES =  \
+@ENABLE_TESTS_TRUE@	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 am__pngstest_SOURCES_DIST = contrib/libtests/pngstest.c
 @ENABLE_TESTS_TRUE@am_pngstest_OBJECTS =  \
 @ENABLE_TESTS_TRUE@	contrib/libtests/pngstest.$(OBJEXT)
@@ -338,6 +344,7 @@ am__depfiles_remade = ./$(DEPDIR)/png.Plo ./$(DEPDIR)/pngerror.Plo \
 	arm/$(DEPDIR)/palette_neon_intrinsics.Plo \
 	contrib/libtests/$(DEPDIR)/pnggetset.Po \
 	contrib/libtests/$(DEPDIR)/pngimage.Po \
+	contrib/libtests/$(DEPDIR)/pngreadend.Po \
 	contrib/libtests/$(DEPDIR)/pngstest.Po \
 	contrib/libtests/$(DEPDIR)/pngunknown.Po \
 	contrib/libtests/$(DEPDIR)/pngvalid.Po \
@@ -380,18 +387,19 @@ SOURCES = $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES) \
 	$(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@lsx_la_SOURCES) \
 	$(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@rvv_la_SOURCES) \
 	$(png_fix_itxt_SOURCES) $(pngcp_SOURCES) $(pngfix_SOURCES) \
-	$(pnggetset_SOURCES) $(pngimage_SOURCES) $(pngstest_SOURCES) \
-	$(pngtest_SOURCES) $(pngunknown_SOURCES) $(pngvalid_SOURCES) \
-	$(timepng_SOURCES)
+	$(pnggetset_SOURCES) $(pngimage_SOURCES) $(pngreadend_SOURCES) \
+	$(pngstest_SOURCES) $(pngtest_SOURCES) $(pngunknown_SOURCES) \
+	$(pngvalid_SOURCES) $(timepng_SOURCES)
 DIST_SOURCES =  \
 	$(am__libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES_DIST) \
 	$(am__libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@lsx_la_SOURCES_DIST) \
 	$(am__libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@rvv_la_SOURCES_DIST) \
 	$(am__png_fix_itxt_SOURCES_DIST) $(am__pngcp_SOURCES_DIST) \
 	$(am__pngfix_SOURCES_DIST) $(am__pnggetset_SOURCES_DIST) \
-	$(am__pngimage_SOURCES_DIST) $(am__pngstest_SOURCES_DIST) \
-	$(am__pngtest_SOURCES_DIST) $(am__pngunknown_SOURCES_DIST) \
-	$(am__pngvalid_SOURCES_DIST) $(am__timepng_SOURCES_DIST)
+	$(am__pngimage_SOURCES_DIST) $(am__pngreadend_SOURCES_DIST) \
+	$(am__pngstest_SOURCES_DIST) $(am__pngtest_SOURCES_DIST) \
+	$(am__pngunknown_SOURCES_DIST) $(am__pngvalid_SOURCES_DIST) \
+	$(am__timepng_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -811,6 +819,8 @@ BUILT_SOURCES = pnglibconf.h
 @ENABLE_TESTS_TRUE@pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 @ENABLE_TESTS_TRUE@pnggetset_SOURCES = contrib/libtests/pnggetset.c
 @ENABLE_TESTS_TRUE@pnggetset_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+@ENABLE_TESTS_TRUE@pngreadend_SOURCES = contrib/libtests/pngreadend.c
+@ENABLE_TESTS_TRUE@pngreadend_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 @ENABLE_TESTS_TRUE@pngvalid_SOURCES = contrib/libtests/pngvalid.c
 @ENABLE_TESTS_TRUE@pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 @ENABLE_TESTS_TRUE@pngstest_SOURCES = contrib/libtests/pngstest.c
@@ -832,6 +842,7 @@ BUILT_SOURCES = pnglibconf.h
 @ENABLE_TESTS_TRUE@TESTS = \
 @ENABLE_TESTS_TRUE@   tests/pngtest-all\
 @ENABLE_TESTS_TRUE@   tests/pnggetset\
+@ENABLE_TESTS_TRUE@   tests/pngreadend\
 @ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-16-to-8\
 @ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-alpha-mode\
 @ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-background\
@@ -1207,6 +1218,13 @@ contrib/libtests/pngimage.$(OBJEXT): contrib/libtests/$(am__dirstamp) \
 pngimage$(EXEEXT): $(pngimage_OBJECTS) $(pngimage_DEPENDENCIES) $(EXTRA_pngimage_DEPENDENCIES) 
 	@rm -f pngimage$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(pngimage_OBJECTS) $(pngimage_LDADD) $(LIBS)
+contrib/libtests/pngreadend.$(OBJEXT):  \
+	contrib/libtests/$(am__dirstamp) \
+	contrib/libtests/$(DEPDIR)/$(am__dirstamp)
+
+pngreadend$(EXEEXT): $(pngreadend_OBJECTS) $(pngreadend_DEPENDENCIES) $(EXTRA_pngreadend_DEPENDENCIES) 
+	@rm -f pngreadend$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(pngreadend_OBJECTS) $(pngreadend_LDADD) $(LIBS)
 contrib/libtests/pngstest.$(OBJEXT): contrib/libtests/$(am__dirstamp) \
 	contrib/libtests/$(DEPDIR)/$(am__dirstamp)
 
@@ -1313,6 +1331,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/palette_neon_intrinsics.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pnggetset.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngimage.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngreadend.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngstest.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngunknown.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngvalid.Po@am__quote@ # am--include-marker
@@ -1789,6 +1808,13 @@ tests/pngtest-all.log: tests/pngtest-all
 tests/pnggetset.log: tests/pnggetset
 	@p='tests/pnggetset'; \
 	b='tests/pnggetset'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+tests/pngreadend.log: tests/pngreadend
+	@p='tests/pngreadend'; \
+	b='tests/pngreadend'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -2372,6 +2398,7 @@ distclean: distclean-am
 	-rm -f arm/$(DEPDIR)/palette_neon_intrinsics.Plo
 	-rm -f contrib/libtests/$(DEPDIR)/pnggetset.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngimage.Po
+	-rm -f contrib/libtests/$(DEPDIR)/pngreadend.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngstest.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngunknown.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngvalid.Po
@@ -2462,6 +2489,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f arm/$(DEPDIR)/palette_neon_intrinsics.Plo
 	-rm -f contrib/libtests/$(DEPDIR)/pnggetset.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngimage.Po
+	-rm -f contrib/libtests/$(DEPDIR)/pngreadend.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngstest.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngunknown.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngvalid.Po
@@ -2598,6 +2626,7 @@ pngtest.o: pnglibconf.h
 contrib/libtests/makepng.o: pnglibconf.h
 contrib/libtests/pnggetset.o: pnglibconf.h
 contrib/libtests/pngimage.o: pnglibconf.h
+contrib/libtests/pngreadend.o: pnglibconf.h
 contrib/libtests/pngstest.o: pnglibconf.h
 contrib/libtests/pngunknown.o: pnglibconf.h
 contrib/libtests/pngvalid.o: pnglibconf.h
