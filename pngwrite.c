@@ -537,12 +537,23 @@ png_convert_from_time_t(png_time *ptime, time_t ttime)
    tbuf = gmtime(&ttime);
    if (tbuf == NULL)
    {
-      /* TODO: add a safe function which takes a png_ptr argument and raises
-       * a png_error if the ttime argument is invalid and the call to gmtime
-       * fails as a consequence.
-       */
       memset(ptime, 0, sizeof(*ptime));
       return;
+   }
+
+   png_convert_from_struct_tm(ptime, tbuf);
+}
+
+void
+png_convert_from_time_t_strict(png_struct *png_ptr, png_time *ptime,
+   time_t ttime)
+{
+   struct tm *tbuf;
+
+   tbuf = gmtime(&ttime);
+   if (tbuf == NULL)
+   {
+      png_error(png_ptr, "invalid time value");
    }
 
    png_convert_from_struct_tm(ptime, tbuf);
