@@ -30,6 +30,22 @@ cat scripts/pnglibconf.dfa | \
     > scripts/pnglibconf.dfa.temp
 mv scripts/pnglibconf.dfa.temp scripts/pnglibconf.dfa
 
+# Instrument zlib as well when its sources are provided by OSS-Fuzz.
+# In particular, MSan cannot track bytes produced by an uninstrumented zlib.
+# Keep the system-library fallback for integrations without a zlib checkout.
+ZLIB_LIBS="-lz"
+if test -f "$SRC/zlib/configure"
+then
+    (
+        cd "$SRC/zlib"
+        CFLAGS="$CFLAGS -fPIC" ./configure --static
+        make -j$(nproc)
+    )
+    export CPPFLAGS="${CPPFLAGS:-} -I$SRC/zlib"
+    export LDFLAGS="${LDFLAGS:-} -L$SRC/zlib"
+    ZLIB_LIBS="$SRC/zlib/libz.a"
+fi
+
 # Build the libpng library.
 autoreconf -f -i
 ./configure --with-libpng-prefix=OSS_FUZZ_
@@ -37,6 +53,7 @@ make -j$(nproc) clean
 make -j$(nproc) libpng16.la
 
 for f in libpng_read_fuzzer \
+         libpng_progressive_fuzzer \
          libpng_colormap_fuzzer \
          libpng_readapi_fuzzer \
          libpng_transformations_fuzzer;
@@ -45,7 +62,7 @@ do
     $CXX $CXXFLAGS -std=c++11 -I. \
          $SRC/libpng/contrib/oss-fuzz/${f}.cc \
          -o $OUT/${f} \
-         -lFuzzingEngine .libs/libpng16.a -lz
+         -lFuzzingEngine .libs/libpng16.a $ZLIB_LIBS
 
     # Only libfuzzer can run the nalloc targets.
     if test "x$FUZZING_ENGINE" == 'xlibfuzzer'
