@@ -1186,6 +1186,19 @@ png_set_tRNS(png_struct *png_ptr, png_info *info_ptr,
 
       return;
 
+   if (num_trans < 0 || num_trans > PNG_MAX_PALETTE_LENGTH)
+   {
+      /* num_trans outside the valid range would be truncated by the
+       * png_uint_16 assignment below, and the PNG_INFO_tRNS flag would be
+       * set while trans_alpha is NULL, which leads to a NULL dereference
+       * in png_write_info (PNG_INVERT_ALPHA) and to an inconsistent state
+       * visible through png_get_tRNS.
+       */
+      png_warning(png_ptr, "Invalid num_trans in png_set_tRNS");
+
+      return;
+   }
+
    if (trans_alpha != NULL)
    {
        /* Snapshot the caller's trans_alpha before freeing, in case it
