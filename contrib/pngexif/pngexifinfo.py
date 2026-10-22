@@ -51,6 +51,17 @@ def _check_png_crc(data, checksum, chunk_sig):
     raise RuntimeError("bad PNG checksum in '%s'" % chunk_sig)
 
 
+def _decompress_png_exif(data):
+    """Decompress a PNG EXIF payload within the existing read-size limit."""
+    decompressor = zlib.decompressobj()
+    probe = decompressor.decompress(data, _READ_DATA_SIZE_MAX + 1)
+    if len(probe) > _READ_DATA_SIZE_MAX or decompressor.unconsumed_tail:
+        raise RuntimeError("decompressed PNG EXIF data is too large")
+    # Preserve zlib.decompress() validation and error behavior. The bounded
+    # preflight proves that this second pass cannot exceed the limit.
+    return zlib.decompress(data)
+
+
 def _extract_png_exif(data, **kwargs):
     """Extract the EXIF header and data from a PNG chunk."""
     debug = kwargs.get("debug", False)
@@ -58,13 +69,15 @@ def _extract_png_exif(data, **kwargs):
         if debug:
             print_debug("found compressed EXIF, compression method 0")
         if (unpack_uint8(data, 1) & 0x0f) == 0x08:
-            data = zlib.decompress(data[1:])
+            data = _decompress_png_exif(data[1:])
         elif unpack_uint8(data, 1) == 0 \
                 and (unpack_uint8(data, 5) & 0x0f) == 0x08:
             if debug:
                 print_debug("found uncompressed-length EXIF field")
             data_len = unpack_uint32be(data, 1)
-            data = zlib.decompress(data[5:])
+            if data_len > _READ_DATA_SIZE_MAX:
+                raise RuntimeError("decompressed PNG EXIF data is too large")
+            data = _decompress_png_exif(data[5:])
             if data_len != len(data):
                 raise RuntimeError(
                     "incorrect uncompressed-length field in PNG EXIF")
