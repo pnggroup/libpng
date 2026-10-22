@@ -81,7 +81,8 @@ int main(int argc, char **argv)
             printf("/* ERROR: %s */\n", argv[i]);
          }
 
-         (void)fclose(ip);
+         if (ip != NULL)
+            (void)fclose(ip);
       }
    }
 
