@@ -1105,10 +1105,12 @@ png_set_text_2(const png_struct *png_ptr, png_info *info_ptr,
       if (text_ptr[i].compression > 0)
       {
          textp->lang = textp->key + key_len + 1;
-         memcpy(textp->lang, text_ptr[i].lang, lang_len);
+         if (lang_len != 0)
+            memcpy(textp->lang, text_ptr[i].lang, lang_len);
          *(textp->lang + lang_len) = '\0';
          textp->lang_key = textp->lang + lang_len + 1;
-         memcpy(textp->lang_key, text_ptr[i].lang_key, lang_key_len);
+         if (lang_key_len != 0)
+            memcpy(textp->lang_key, text_ptr[i].lang_key, lang_key_len);
          *(textp->lang_key + lang_key_len) = '\0';
          textp->text = textp->lang_key + lang_key_len + 1;
       }
