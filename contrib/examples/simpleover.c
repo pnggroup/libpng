@@ -186,8 +186,8 @@ sprite_op(const struct sprite *sprite, int x_offset, int y_offset,
                   out_pixel[3] = in_pixel[3];
                }
             }
-         } while (++x < image->width);
-      } while (++y < image->height);
+         } while (++x < image->width && x + x_offset < sprite->width);
+      } while (++y < image->height && y + y_offset < sprite->height);
    }
 }
 
