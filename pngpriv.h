@@ -82,7 +82,7 @@
 #include "pngtarget.h"
 
 /* Local renames may change non-exported API functions from png.h */
-#ifdef PNG_PREFIX
+#if defined(PNG_PREFIX) && !defined(PNGPREFIX_H)
 #  include "pngprefix.h"
 #endif
 
