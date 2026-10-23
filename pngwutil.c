@@ -1209,6 +1209,7 @@ png_write_sPLT(png_struct *png_ptr, const png_sPLT_t *spalette)
    png_byte entrybuf[10];
    size_t entry_size = (spalette->depth == 8 ? 6 : 10);
    size_t palette_size = entry_size * (size_t)spalette->nentries;
+   size_t chunk_size;
    png_sPLT_entry *ep;
 
    png_debug(1, "in png_write_sPLT");
@@ -1218,9 +1219,14 @@ png_write_sPLT(png_struct *png_ptr, const png_sPLT_t *spalette)
    if (name_len == 0)
       png_error(png_ptr, "sPLT: invalid keyword");
 
-   /* Make sure we include the NULL after the name */
-   png_write_chunk_header(png_ptr, png_sPLT,
-       (png_uint_32)(name_len + 2 + palette_size));
+   /* Make sure we include the NULL after the name.
+    * Check for overflow before casting to png_uint_32.
+    */
+   chunk_size = (size_t)name_len + 2 + palette_size;
+   if (chunk_size > PNG_UINT_31_MAX)
+      png_error(png_ptr, "sPLT chunk too large");
+
+   png_write_chunk_header(png_ptr, png_sPLT, (png_uint_32)chunk_size);
 
    png_write_chunk_data(png_ptr, (png_byte *)new_name, (size_t)(name_len + 1));
 
