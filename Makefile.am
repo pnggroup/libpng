@@ -13,7 +13,8 @@ ACLOCAL_AMFLAGS = -I scripts/autoconf
 
 # test programs - run on make check, make distcheck
 if ENABLE_TESTS
-check_PROGRAMS= pngtest pnggetset pngreadend pngunknown pngstest pngvalid pngimage pngcp
+check_PROGRAMS= pngtest pnggetset pngreadend pngunknown pngstest pngvalid pngimage pngcp \
+   pnginterlace
 if HAVE_CLOCK_GETTIME
 check_PROGRAMS += timepng
 endif
@@ -53,6 +54,9 @@ pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 pngstest_SOURCES = contrib/libtests/pngstest.c
 pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+
+pnginterlace_SOURCES = contrib/libtests/pnginterlace.c
+pnginterlace_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 pngunknown_SOURCES = contrib/libtests/pngunknown.c
 pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
@@ -95,6 +99,7 @@ TESTS =\
    tests/pngvalid-transform\
    tests/pngvalid-progressive-standard\
    tests/pngvalid-standard\
+   tests/pnginterlace\
    tests/pngstest-1.8\
    tests/pngstest-1.8-alpha\
    tests/pngstest-linear\
@@ -264,6 +269,7 @@ pngtest.o: pnglibconf.h
 contrib/libtests/makepng.o: pnglibconf.h
 contrib/libtests/pnggetset.o: pnglibconf.h
 contrib/libtests/pngimage.o: pnglibconf.h
+contrib/libtests/pnginterlace.o: pnglibconf.h
 contrib/libtests/pngreadend.o: pnglibconf.h
 contrib/libtests/pngstest.o: pnglibconf.h
 contrib/libtests/pngunknown.o: pnglibconf.h

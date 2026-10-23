@@ -164,6 +164,7 @@ pngprefix.h
 /pngfix
 /pnggetset
 /pngimage
+/pnginterlace
 /pngreadend
 /pngstest
 /pngtest

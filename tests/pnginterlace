@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# pnginterlace test:
+# Interlaced versus non-interlaced reads through the simplified API.
+exec ./pnginterlace
