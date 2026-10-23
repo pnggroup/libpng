@@ -2041,7 +2041,8 @@ png_image_write_main(png_voidp argument)
              * limits the whole image size to 32 bits for API compatibility with
              * the current, 32-bit, PNG_IMAGE_BUFFER_SIZE macro.
              */
-            if (image->height > 0xffffffffU/png_row_stride)
+            if (image->height >
+                0xffffffffU/PNG_IMAGE_PIXEL_COMPONENT_SIZE(image->format)/check)
                png_error(image->opaque->png_ptr, "memory image too large");
          }
 
