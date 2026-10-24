@@ -396,6 +396,9 @@ set(pnggetset_sources
 set(pngreadend_sources
     contrib/libtests/pngreadend.c
 )
+set(pngstride_sources
+    contrib/libtests/pngstride.c
+)
 set(pngunknown_sources
     contrib/libtests/pngunknown.c
 )
@@ -577,6 +580,15 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngreadend
                FILES "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/crashers/stale_zTXt_input.png"
                      "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/crashers/stale_iCCP_input.png")
+
+  # pngstride test:
+  # Validation of the image size and row stride in the simplified API.
+  add_executable(pngstride ${pngstride_sources})
+  target_link_libraries(pngstride
+                        PRIVATE png_shared)
+
+  png_add_test(NAME pngstride
+               COMMAND pngstride)
 
   # pngvalid tests:
   # Internal validation of standard and progressive reading,

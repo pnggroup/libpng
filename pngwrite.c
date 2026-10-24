@@ -2040,6 +2040,12 @@ png_image_write_main(void *argument)
    {
       unsigned int channels = PNG_IMAGE_PIXEL_CHANNELS(image->format);
 
+      /* A zero width would make both the default and the checked row stride
+       * zero, and the size check below would divide by zero.
+       */
+      if (image->width == 0)
+         png_error(image->opaque->png_ptr, "image width is zero");
+
       if (image->width <= 0x7fffffffU/channels) /* no overflow */
       {
          png_uint_32 check;
