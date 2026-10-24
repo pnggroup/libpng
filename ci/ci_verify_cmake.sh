@@ -164,6 +164,26 @@ function ci_build {
                              --config "$CI_CMAKE_BUILD_TYPE" \
                              --target install \
                              "${all_cmake_build_flags[@]}"
+
+        # Library-install suppression must also suppress both CMake exports.
+        ci_spawn "$CI_CMAKE" -B "$CI_BUILD_DIR" -S . \
+                             -DSKIP_INSTALL_LIBRARIES=ON \
+                             -DSKIP_INSTALL_ALL=OFF \
+                             -DSKIP_INSTALL_EXPORT=OFF \
+                             -DSKIP_INSTALL_CONFIG_FILE=OFF \
+                             -DCMAKE_INSTALL_PREFIX="$CI_BUILD_DIR/skip-libraries-install"
+        ci_spawn "$CI_CMAKE" --build "$CI_BUILD_DIR" \
+                             --config "$CI_CMAKE_BUILD_TYPE" \
+                             --target install \
+                             "${all_cmake_build_flags[@]}"
+        if grep -E -e '/[^/]*\.(a|lib|dll|so(\.[^/]*)?|dylib)$|\.framework/' \
+                   -e '/(libpng[^/]*|PNGConfig[^/]*|PNGTargets[^/]*)\.cmake$' \
+                   "$CI_BUILD_DIR/install_manifest.txt"
+        then
+            ci_err "libraries or CMake exports were installed with SKIP_INSTALL_LIBRARIES=ON"
+        else
+            [[ $? -eq 1 ]] || ci_err "failed to inspect the install manifest"
+        fi
     }
     ci_expr $((CI_NO_CLEAN)) || {
         # Spawn "make --build ... --target clean" if cleaning is not disabled.
