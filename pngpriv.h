@@ -2035,6 +2035,16 @@ PNG_INTERNAL_FUNCTION(int, png_image_error,
    (png_image *image, const char *error_message),
    PNG_EMPTY);
 
+/* Check the size of the image and the 'row_stride' of its buffer, as passed
+ * to png_image_finish_read or to the png_image_write_ APIs, and replace a zero
+ * '*row_stride' with the minimum row stride of the image.  The buffer size, as
+ * computed by PNG_IMAGE_BUFFER_SIZE, must not exceed 32 bits.  Returns NULL if
+ * the layout is valid, otherwise an error message.
+ */
+PNG_INTERNAL_FUNCTION(const char *, png_image_check_row_stride,
+   (const png_image *image, png_int_32 *row_stride),
+   PNG_EMPTY);
+
 #ifndef PNG_SIMPLIFIED_READ_SUPPORTED
 /* png_image_free is used by the write code but not exported */
 PNG_INTERNAL_FUNCTION(void, png_image_free,
