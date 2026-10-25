@@ -408,7 +408,7 @@ png_read_buffer(png_struct *png_ptr, png_alloc_size_t new_size)
 /* Detach the zstream from the input and output buffers left by
  * the current or a previous owner, and possibly deallocated since.
  */
-static void
+void /* PRIVATE */
 png_inflate_detach_buffers(png_struct *png_ptr)
 {
    png_ptr->zstream.next_in = NULL;

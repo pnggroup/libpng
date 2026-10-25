@@ -849,6 +849,13 @@ extern "C" {
  */
 /* Zlib support */
 #define PNG_UNEXPECTED_ZLIB_RETURN (-7)
+PNG_INTERNAL_FUNCTION(void, png_inflate_detach_buffers,
+   (png_struct *png_ptr),
+   PNG_EMPTY);
+   /* Clear stale zstream buffer pointers and counters when releasing the
+    * inflate stream.  Must be called at every site that sets zowner to 0.
+    */
+
 PNG_INTERNAL_FUNCTION(void, png_zstream_error,
    (png_struct *png_ptr, int ret),
    PNG_EMPTY);

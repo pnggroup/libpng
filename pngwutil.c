@@ -334,6 +334,7 @@ png_deflate_claim(png_struct *png_ptr, png_uint_32 owner,
             return Z_STREAM_ERROR;
          }
 
+         png_inflate_detach_buffers(png_ptr);
          png_ptr->zowner = 0;
 #else
          png_error(png_ptr, msg);
@@ -626,6 +627,7 @@ png_text_compress(png_struct *png_ptr, png_uint_32 chunk_name,
          png_zstream_error(png_ptr, ret);
 
       /* Reset zlib for another zTXt/iTXt or image data */
+      png_inflate_detach_buffers(png_ptr);
       png_ptr->zowner = 0;
 
       /* The only success case is Z_STREAM_END, input_len must be 0; if not this
@@ -1081,6 +1083,7 @@ png_compress_IDAT(png_struct *png_ptr, const png_byte *input,
          png_ptr->zstream.next_out = NULL;
          png_ptr->mode |= PNG_HAVE_IDAT | PNG_AFTER_IDAT;
 
+         png_inflate_detach_buffers(png_ptr);
          png_ptr->zowner = 0; /* Release the stream */
          return;
       }
