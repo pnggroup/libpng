@@ -61,7 +61,9 @@ set(PNG_LIBCONF_HEADER
     CACHE FILEPATH "C header file containing customized build configuration settings for libpng")
 set(PNG_LIBCONF_HEADER_PREBUILT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt")
 if(ANDROID OR IOS)
-  set(PNG_LIBCONF_HEADER "${PNG_LIBCONF_HEADER_PREBUILT}")
+  if((DFA_XTRA STREQUAL "") AND (PNG_PREFIX STREQUAL ""))
+    set(PNG_LIBCONF_HEADER "${PNG_LIBCONF_HEADER_PREBUILT}")
+  endif()
 endif()
 if((NOT DFA_XTRA STREQUAL "") AND (NOT PNG_LIBCONF_HEADER STREQUAL ""))
   message(SEND_ERROR "The options DFA_XTRA=\"${DFA_XTRA}\" "
