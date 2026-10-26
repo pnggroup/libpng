@@ -33,4 +33,37 @@ The files are
    png.dict and libpng_read_fuzzer.* are the actual files used by oss-fuzz,
    which retrieves them from the libpng repository at Github.
 
-To do: exercise the progressive reader and the png encoder.
+To do: exercise the png encoder.
+
+The progressive reader fuzzer feeds each input as one block and as one-byte
+blocks. It checks completion without reported errors or warnings; for such
+completed decodes it compares dimensions, row stride, row callback count and
+reconstructed pixels. Reported warning/error decodes are excluded from the
+completed-image comparison:
+reaching IEND after a damaged compressed stream does not establish valid pixels.
+Warnings can only be observed when libpng is built with warning support;
+the current OSS-Fuzz build disables that support. Errors are still observed.
+The target also checks row callback bounds and combines Adam7 rows through
+png_progressive_combine_row. Input, dimension and allocation limits bound cost.
+
+The build script instruments and statically links zlib when its source checkout
+is available at $SRC/zlib, as provided by the OSS-Fuzz libpng Dockerfile. This is
+needed for meaningful MemorySanitizer results. Other integrations retain the
+system-zlib fallback and must supply an instrumented dependency for MSan.
+
+The standalone libpng_progressive_fuzzer_test.cc driver checks that the existing
+badadler.png fixture is excluded from the completed-image oracle and that a
+clean PNG completes. In an OSS-Fuzz build environment it can be built separately
+from the fuzz targets (keep its executable outside $OUT):
+
+    $CXX $CXXFLAGS -std=c++11 -I. \
+        contrib/oss-fuzz/libpng_progressive_fuzzer_test.cc \
+        -lFuzzingEngine .libs/libpng16.a $SRC/zlib/libz.a \
+        -o $WORK/libpng_progressive_test
+    $WORK/libpng_progressive_test \
+        contrib/testpngs/crashers/badadler.png contrib/pngsuite/basn0g08.png
+
+Additional PNG paths are accepted after those two fixtures. The --invalid-row
+and --invalid-pass modes deliberately invoke invalid callbacks and must abort
+with PROGRESSIVE_CALLBACK_INVALID; they test that callback contract failures
+are not recovered as ordinary decode errors.
