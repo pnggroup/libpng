@@ -669,6 +669,13 @@ png_push_read_IDAT(png_struct *png_ptr)
       png_crc_finish(png_ptr, 0);
       png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
       png_ptr->mode |= PNG_AFTER_IDAT;
+
+      /* This is the end of an IDAT or fdAT chunk, but not necessarily
+       * the end of the zstream.  The next chunk may continue the zstream,
+       * with a partial row still pending in 'next_out' and 'avail_out'.
+       * Unlike at the release sites in pngrutil.c, the zstream buffers
+       * must not be detached here.
+       */
       png_ptr->zowner = 0;
    }
 }
