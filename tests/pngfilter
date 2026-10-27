@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# pngfilter test:
+# Row filter selection by png_set_filter.
+exec ./pngfilter
