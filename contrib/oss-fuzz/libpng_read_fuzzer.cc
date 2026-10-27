@@ -12,10 +12,13 @@
 // 4. adding read_end_info() and creating an end_info structure.
 // 5. adding calls to png_set_*() transforms commonly used by browsers.
 
+
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include <vector>
 
@@ -67,6 +70,9 @@ struct PngObjectHandler {
     delete buf_state;
   }
 };
+
+
+
 
 void user_read_data(png_structp png_ptr, png_bytep data, size_t length) {
   BufState* buf_state = static_cast<BufState*>(png_get_io_ptr(png_ptr));
@@ -156,8 +162,103 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     return 0;
   }
 
-  // Reading.
+  // Update.
+
   png_read_info(png_handler.png_ptr, png_handler.info_ptr);
+
+  unsigned seed = 0;
+  for (size_t i = 0; i < size; ++i) {
+    seed += data[i];
+  }
+  srand(seed);
+  png_color_16 background = {0};
+  background.red = 255; 
+  background.green = 100; 
+  background.blue = 50;   
+  background.gray = 200; 
+
+  if (rand() % 2) {
+    png_set_strip_alpha(png_handler.png_ptr);
+  } else {
+    if (rand() % 2) {
+      png_set_background(png_handler.png_ptr, &background, PNG_BACKGROUND_GAMMA_FILE, 0, 1.0);
+    } else {
+      png_set_background(png_handler.png_ptr, &background, PNG_BACKGROUND_GAMMA_SCREEN, 0,1.0);
+    }
+  }
+
+  if (rand() % 2) {
+      png_set_gamma(png_handler.png_ptr, 1.0, 1.0);
+  }
+
+  switch (rand() % 4) {
+    case 0:
+      // Set PNG_GAMMA 
+      png_set_gamma(png_handler.png_ptr, 2.2, 0.45455); 
+      break;
+    case 1:
+      // Set PNG_RGB_TO_GRAY
+      png_set_rgb_to_gray_fixed(png_handler.png_ptr, 1, -1, -1); 
+      png_set_gamma(png_handler.png_ptr, 2.2, 0.45455);
+      break;
+    case 2:
+      // Set PNG_COMPOSE 
+      // png_color_16 background = {0, 255, 255, 255, 0}; 
+      png_set_gamma(png_handler.png_ptr, 2.2, 0.45455); 
+      switch (rand() % 3) {
+        case 0:
+          png_set_background(
+            png_handler.png_ptr,
+            &background,
+            PNG_BACKGROUND_GAMMA_FILE,  
+            0,
+            1.0
+          );
+          break;
+        case 1:
+          png_set_background(
+            png_handler.png_ptr,
+            &background,
+            PNG_BACKGROUND_GAMMA_UNIQUE,  
+            0,
+            1.0
+          );
+          break;
+        case 2:
+          png_set_background(
+            png_handler.png_ptr,
+            &background,
+            PNG_BACKGROUND_GAMMA_SCREEN,  
+            0,
+            1.0
+          );
+          break;
+      } 
+      break;
+
+    case 3:
+      // Set PNG_ENCODE_ALPHA 
+      png_set_alpha_mode(png_handler.png_ptr, PNG_ALPHA_STANDARD, 1.0); 
+      png_set_gamma(png_handler.png_ptr, 2.2, 0.45455);
+      break;
+  }
+
+  if (rand() % 2) {
+    double gamma_value = 2.2;
+    png_set_gAMA(png_handler.png_ptr, png_handler.info_ptr, gamma_value);  
+  }
+
+  if (rand() % 2) {
+    png_set_IHDR(png_handler.png_ptr, png_handler.info_ptr,  
+      100, 100,            
+      8,                    
+      PNG_COLOR_TYPE_PALETTE, 
+      PNG_COLOR_TYPE_PALETTE,
+      PNG_COMPRESSION_TYPE_DEFAULT, 
+      PNG_FILTER_TYPE_DEFAULT 
+    );
+  }
+
 
   // reset error handler to put png_deleter into scope.
   if (setjmp(png_jmpbuf(png_handler.png_ptr))) {
@@ -225,3 +326,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 
   return 0;
 }
+
+
+
