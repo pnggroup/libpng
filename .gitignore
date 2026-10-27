@@ -147,6 +147,7 @@ pngprefix.h
 /tests/*.trs
 /png-fix-itxt
 /pngcp
+/pngfilter
 /pngfix
 /pnggetset
 /pngimage
