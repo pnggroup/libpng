@@ -1058,7 +1058,7 @@ png_read_png(png_structrp png_ptr, png_inforp info_ptr,
 
       for (iptr = 0; iptr < info_ptr->height; iptr++)
          info_ptr->row_pointers[iptr] = png_voidcast(png_bytep,
-             png_malloc(png_ptr, info_ptr->rowbytes));
+             png_calloc(png_ptr, info_ptr->rowbytes));
    }
 
    png_read_image(png_ptr, info_ptr->row_pointers);
