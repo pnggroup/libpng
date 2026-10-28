@@ -106,6 +106,7 @@ TESTS =\
    tests/pngstest-large-stride\
    tests/pngstest-negative-stride\
    tests/pngstest-negative-stride-extra\
+   tests/pngstest-badpal\
    tests/pngunknown-IDAT\
    tests/pngunknown-discard\
    tests/pngunknown-if-safe\
