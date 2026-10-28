@@ -176,20 +176,24 @@ png_do_shift(png_row_infop row_info, png_bytep row,
    if (row_info->color_type != PNG_COLOR_TYPE_PALETTE)
    {
       int shift_start[4], shift_dec[4];
+      unsigned int shift_mask[4];
       unsigned int channels = 0;
 
       if ((row_info->color_type & PNG_COLOR_MASK_COLOR) != 0)
       {
          shift_start[channels] = row_info->bit_depth - bit_depth->red;
          shift_dec[channels] = bit_depth->red;
+         shift_mask[channels] = (1U << bit_depth->red)-1U;
          channels++;
 
          shift_start[channels] = row_info->bit_depth - bit_depth->green;
          shift_dec[channels] = bit_depth->green;
+         shift_mask[channels] = (1U << bit_depth->green)-1U;
          channels++;
 
          shift_start[channels] = row_info->bit_depth - bit_depth->blue;
          shift_dec[channels] = bit_depth->blue;
+         shift_mask[channels] = (1U << bit_depth->blue)-1U;
          channels++;
       }
 
@@ -197,6 +201,7 @@ png_do_shift(png_row_infop row_info, png_bytep row,
       {
          shift_start[channels] = row_info->bit_depth - bit_depth->gray;
          shift_dec[channels] = bit_depth->gray;
+         shift_mask[channels] = (1U << bit_depth->gray)-1U;
          channels++;
       }
 
@@ -204,6 +209,7 @@ png_do_shift(png_row_infop row_info, png_bytep row,
       {
          shift_start[channels] = row_info->bit_depth - bit_depth->alpha;
          shift_dec[channels] = bit_depth->alpha;
+         shift_mask[channels] = (1U << bit_depth->alpha)-1U;
          channels++;
       }
 
@@ -212,36 +218,44 @@ png_do_shift(png_row_infop row_info, png_bytep row,
       {
          png_bytep bp = row;
          size_t i;
-         unsigned int mask;
+         unsigned int rshift_mask = 0;
+         unsigned int value_mask; /* Multi-pixel shift_mask */
          size_t row_bytes = row_info->rowbytes;
 
          if (bit_depth->gray == 1 && row_info->bit_depth == 2)
-            mask = 0x55;
+            value_mask = 0x55;
+
+         else if (row_info->bit_depth == 4 && bit_depth->gray == 1)
+            value_mask = 0x11;
+
+         else if (row_info->bit_depth == 4 && bit_depth->gray == 2)
+            value_mask = 0x33;
 
          else if (row_info->bit_depth == 4 && bit_depth->gray == 3)
-            mask = 0x11;
+            value_mask = 0x77, rshift_mask = 0x11;
 
-         else
-            mask = 0xff;
+         else /* 1/1, 2/2 or 4/4 - do nothing */
+            return;
 
          for (i = 0; i < row_bytes; i++, bp++)
          {
             int j;
             unsigned int v, out;
 
-            v = *bp;
+            v = *bp & value_mask;
             out = 0;
 
-            for (j = shift_start[0]; j > -shift_dec[0]; j -= shift_dec[0])
-            {
-               if (j > 0)
-                  out |= v << j;
+            for (j = shift_start[0]; j >= 0; j -= shift_dec[0])
+               out |= v << j;
 
-               else
-                  out |= (v >> (-j)) & mask;
-            }
+            /* For bit_depth 4, sBIT depth 3 a right shift is needed because
+             * the lowest bit (mask) has not been set yet.  All the other cases
+             * are exact (bit_depth%sBIT is zero) so all bits have been set.
+             */
+            if (rshift_mask)
+               out |= (v >> (-j)) & rshift_mask;
 
-            *bp = (png_byte)(out & 0xff);
+            *bp = (png_byte)out;
          }
       }
 
@@ -257,7 +271,7 @@ png_do_shift(png_row_infop row_info, png_bytep row,
             int j;
             unsigned int v, out;
 
-            v = *bp;
+            v = *bp & shift_mask[c];
             out = 0;
 
             for (j = shift_start[c]; j > -shift_dec[c]; j -= shift_dec[c])
@@ -285,7 +299,7 @@ png_do_shift(png_row_infop row_info, png_bytep row,
             int j;
             unsigned int value, v;
 
-            v = png_get_uint_16(bp);
+            v = png_get_uint_16(bp) & shift_mask[c];
             value = 0;
 
             for (j = shift_start[c]; j > -shift_dec[c]; j -= shift_dec[c])
