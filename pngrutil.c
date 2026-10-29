@@ -1,6 +1,6 @@
 /* pngrutil.c - utilities to read a PNG file
  *
- * Copyright (c) 2018-2025 Cosmin Truta
+ * Copyright (c) 2018-2026 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -3959,21 +3959,43 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 }
 #endif /* READ_INTERLACING */
 
+/* Portable PNG filter reconstruction (Sub/Up/Avg/Paeth).
+ *
+ * These helpers walk each filtered row with an explicit remaining-byte
+ * count instead of a raw pointer plus a separately maintained index or
+ * end pointer.  On a well-formed image the reconstructed bytes are
+ * identical to the previous open-coded loops.  If bpp and rowbytes are
+ * inconsistent (bpp == 0 or bpp > rowbytes), the helpers return without
+ * writing past the row buffer — defence in depth, not a functional
+ * change for valid PNG data.
+ *
+ * SIMD overrides under arm/, intel/, powerpc/, mips/, etc. are unchanged;
+ * png_read_filter_row() still dispatches through pp->read_filter[].
+ */
+
 static void
 png_read_filter_row_sub(png_row_infop row_info, png_bytep row,
     png_const_bytep prev_row)
 {
-   size_t i;
-   size_t istop = row_info->rowbytes;
+   size_t rowbytes = row_info->rowbytes;
    unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
-   png_bytep rp = row + bpp;
+   png_bytep rp;
+   size_t left;
 
    PNG_UNUSED(prev_row)
 
-   for (i = bpp; i < istop; i++)
+   /* Need at least one full pixel before Sub can reference rp-bpp. */
+   if (bpp == 0 || bpp > rowbytes)
+      return;
+
+   rp = row + bpp;
+   left = rowbytes - bpp;
+
+   while (left > 0)
    {
-      *rp = (png_byte)(((int)(*rp) + (int)(*(rp-bpp))) & 0xff);
+      *rp = (png_byte)(((int)(*rp) + (int)(*(rp - bpp))) & 0xff);
       rp++;
+      left--;
    }
 }
 
@@ -3981,15 +4003,16 @@ static void
 png_read_filter_row_up(png_row_infop row_info, png_bytep row,
     png_const_bytep prev_row)
 {
-   size_t i;
-   size_t istop = row_info->rowbytes;
+   size_t left = row_info->rowbytes;
    png_bytep rp = row;
    png_const_bytep pp = prev_row;
 
-   for (i = 0; i < istop; i++)
+   while (left > 0)
    {
-      *rp = (png_byte)(((int)(*rp) + (int)(*pp++)) & 0xff);
+      *rp = (png_byte)(((int)(*rp) + (int)(*pp)) & 0xff);
       rp++;
+      pp++;
+      left--;
    }
 }
 
@@ -3997,26 +4020,33 @@ static void
 png_read_filter_row_avg(png_row_infop row_info, png_bytep row,
     png_const_bytep prev_row)
 {
-   size_t i;
+   size_t rowbytes = row_info->rowbytes;
+   unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
    png_bytep rp = row;
    png_const_bytep pp = prev_row;
-   unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
-   size_t istop = row_info->rowbytes - bpp;
+   size_t left;
 
-   for (i = 0; i < bpp; i++)
+   /* Avoid size_t underflow of (rowbytes - bpp) when the values disagree. */
+   if (bpp == 0 || bpp > rowbytes)
+      return;
+
+   left = bpp;
+   while (left > 0)
    {
-      *rp = (png_byte)(((int)(*rp) +
-         ((int)(*pp++) / 2 )) & 0xff);
-
+      *rp = (png_byte)(((int)(*rp) + ((int)(*pp) / 2)) & 0xff);
       rp++;
+      pp++;
+      left--;
    }
 
-   for (i = 0; i < istop; i++)
+   left = rowbytes - bpp;
+   while (left > 0)
    {
       *rp = (png_byte)(((int)(*rp) +
-         (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
-
+         (int)(*pp + *(rp - bpp)) / 2) & 0xff);
       rp++;
+      pp++;
+      left--;
    }
 }
 
@@ -4024,16 +4054,20 @@ static void
 png_read_filter_row_paeth_1byte_pixel(png_row_infop row_info, png_bytep row,
     png_const_bytep prev_row)
 {
-   png_bytep rp_end = row + row_info->rowbytes;
+   size_t left = row_info->rowbytes;
    int a, c;
+
+   if (left == 0)
+      return;
 
    /* First pixel/byte */
    c = *prev_row++;
    a = *row + c;
    *row++ = (png_byte)a;
+   left--;
 
    /* Remainder */
-   while (row < rp_end)
+   while (left > 0)
    {
       int b, pa, pb, pc, p;
 
@@ -4068,6 +4102,7 @@ png_read_filter_row_paeth_1byte_pixel(png_row_infop row_info, png_bytep row,
       c = b;
       a += *row;
       *row++ = (png_byte)a;
+      left--;
    }
 }
 
@@ -4075,22 +4110,28 @@ static void
 png_read_filter_row_paeth_multibyte_pixel(png_row_infop row_info, png_bytep row,
     png_const_bytep prev_row)
 {
+   size_t rowbytes = row_info->rowbytes;
    unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
-   png_bytep rp_end = row + bpp;
+   size_t left;
+
+   /* Avoid size_t underflow of (rowbytes - bpp) when the values disagree. */
+   if (bpp == 0 || bpp > rowbytes)
+      return;
 
    /* Process the first pixel in the row completely (this is the same as 'up'
     * because there is only one candidate predictor for the first row).
     */
-   while (row < rp_end)
+   left = bpp;
+   while (left > 0)
    {
       int a = *row + *prev_row++;
       *row++ = (png_byte)a;
+      left--;
    }
 
    /* Remainder */
-   rp_end = rp_end + (row_info->rowbytes - bpp);
-
-   while (row < rp_end)
+   left = rowbytes - bpp;
+   while (left > 0)
    {
       int a, b, c, pa, pb, pc, p;
 
@@ -4119,6 +4160,7 @@ png_read_filter_row_paeth_multibyte_pixel(png_row_infop row_info, png_bytep row,
 
       a += *row;
       *row++ = (png_byte)a;
+      left--;
    }
 }
 
