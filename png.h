@@ -3143,24 +3143,56 @@ typedef struct
 
 /* Information about the whole row, or whole image */
 #define PNG_IMAGE_ROW_STRIDE(image)\
-   (PNG_IMAGE_PIXEL_CHANNELS((image).format) * (image).width)
+   ((png_alloc_size_t)PNG_IMAGE_PIXEL_CHANNELS((image).format) * (image).width)
    /* Return the total number of components in a single row of the image; this
     * is the minimum 'row stride', the minimum count of components between each
     * row.  For a color-mapped image this is the minimum number of bytes in a
     * row.
     *
-    * WARNING: this macro overflows for some images with more than one component
-    * and very large image widths.  libpng will refuse to process an image where
-    * this macro would overflow.
+    * The product is computed in png_alloc_size_t, which pngconf.h guarantees is
+    * no smaller than size_t and no smaller than png_uint_32.  It was previously
+    * computed in png_uint_32 and wrapped to a small value for large widths, so an
+    * application sizing a buffer with this macro could allocate far too little.
+    * Callers that cannot rely on png_alloc_size_t being wider than png_uint_32
+    * should reject the image when PNG_IMAGE_ROW_STRIDE_OVERFLOW() is non-zero.
     */
 
 #define PNG_IMAGE_BUFFER_SIZE(image, row_stride)\
-   (PNG_IMAGE_PIXEL_COMPONENT_SIZE((image).format)*(image).height*(row_stride))
+   ((png_alloc_size_t)PNG_IMAGE_PIXEL_COMPONENT_SIZE((image).format) * (image).height\
+       * (png_alloc_size_t)(row_stride))
+   /* 'row_stride' must be non-negative.  It is a count of components, and a
+    * negative value would be converted to a very large unsigned value here.
+    * PNG_IMAGE_SIZE() always passes a non-negative stride.
+    */
    /* Return the size, in bytes, of an image buffer given a png_image and a row
     * stride - the number of components to leave space for in each row.
     *
-    * WARNING: this macro overflows a 32-bit integer for some large PNG images,
-    * libpng will refuse to process an image where such an overflow would occur.
+    * The product is computed in png_alloc_size_t (see PNG_IMAGE_ROW_STRIDE).
+    * png_image_finish_read() long ago promised this change "in 1.7" so that
+    * bigger images could be accommodated on 64-bit systems; that is what this
+    * does.  On a platform where png_alloc_size_t is itself only 32 bits wide the
+    * product can still overflow, so such callers should reject the image when
+    * PNG_IMAGE_BUFFER_SIZE_OVERFLOW() is non-zero rather than trust the result.
+    */
+
+#define PNG_IMAGE_ROW_STRIDE_OVERFLOW(image)\
+   ((image).width != 0 &&\
+       (png_alloc_size_t)PNG_IMAGE_PIXEL_CHANNELS((image).format) >\
+          (~(png_alloc_size_t)0) / (image).width)
+   /* Return non-zero if PNG_IMAGE_ROW_STRIDE(image) would overflow.  The
+    * divisor is checked non-zero before it is used, and no product is formed
+    * on the left of the comparison, so this cannot itself overflow or divide
+    * by zero.
+    */
+
+#define PNG_IMAGE_BUFFER_SIZE_OVERFLOW(image, row_stride)\
+   ((row_stride) != 0 && (image).height != 0 &&\
+       (png_alloc_size_t)PNG_IMAGE_PIXEL_COMPONENT_SIZE((image).format) >\
+          (~(png_alloc_size_t)0) / (image).height / (png_alloc_size_t)(row_stride))
+   /* Return non-zero if PNG_IMAGE_BUFFER_SIZE(image, row_stride) would overflow.
+    * The two divisions are performed in sequence so that the intermediate
+    * product (component size x height) never has to be formed.  Use
+    * PNG_IMAGE_ROW_STRIDE(image) as 'row_stride' to check PNG_IMAGE_SIZE(image).
     */
 
 #define PNG_IMAGE_SIZE(image)\
