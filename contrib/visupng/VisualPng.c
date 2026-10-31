@@ -726,9 +726,16 @@ BOOL DisplayImage (HWND hwnd, BYTE **ppDib,
         pDib = NULL;
     }
 
-    if (cyWinSize > ((size_t)(-1))/wDIRowBytes) {
+    /* Guard against integer overflow in the DIB row-buffer allocation.
+     * wDIRowBytes is a WORD (at most 65535), so the division is safe.
+     */
+    if (wDIRowBytes != 0 &&
+        (size_t)cyWinSize > ((size_t)(-1) - sizeof(BITMAPINFOHEADER)) / wDIRowBytes)
     {
-        MessageBox (hwnd, TEXT ("Visual PNG: image is too big");
+        MessageBox (hwnd, TEXT ("Visual PNG: image is too big to display"),
+            szProgName, MB_ICONEXCLAMATION | MB_OK);
+        *ppDib = NULL;
+        return FALSE;
     }
     if (!(pDib = (BYTE *) malloc (sizeof(BITMAPINFOHEADER) +
         wDIRowBytes * cyWinSize)))
@@ -851,11 +858,19 @@ BOOL FillBitmap (
             cxImgPos = (cxWinSize - cxNewSize) / 2;
         }
 
-        if (cyNewSize > ((size_t)(-1))/(cImgChannels * cxNewSize)) {
+        /* Guard against integer overflow in the stretched-image allocation.
+         * Operands are cast to size_t before multiplication so the check
+         * and the malloc use the same type and width.
+         */
+        if (cxNewSize <= 0 || cyNewSize <= 0 || cImgChannels <= 0 ||
+            (size_t)cxNewSize > ((size_t)(-1) / (size_t)cImgChannels) ||
+            (size_t)cyNewSize > ((size_t)(-1) / ((size_t)cImgChannels * (size_t)cxNewSize)))
         {
-            MessageBox (hwnd, TEXT ("Visual PNG: stretched image is too big");
+            MessageBox (hwnd, TEXT ("Visual PNG: stretched image is too big to display"),
+                szProgName, MB_ICONEXCLAMATION | MB_OK);
+            return FALSE;
         }
-        pStretchedImage = malloc (cImgChannels * cxNewSize * cyNewSize);
+        pStretchedImage = malloc ((size_t)cImgChannels * (size_t)cxNewSize * (size_t)cyNewSize);
         pImg = pStretchedImage;
 
         for (yNew = 0; yNew < cyNewSize; yNew++)
