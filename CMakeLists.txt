@@ -257,13 +257,17 @@ else()
   generate_source(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/pnglibconf.c"
                   DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/options.awk"
                           "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf/pnglibconf.dfa"
-                          "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h")
+                          "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h"
+                          "${CMAKE_CURRENT_SOURCE_DIR}/pngusr.dfa"
+                          ${DFA_XTRA})
 
   # Generate pnglibconf.c
   generate_source(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.c"
                   DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/options.awk"
                           "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf/pnglibconf.dfa"
-                          "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h")
+                          "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h"
+                          "${CMAKE_CURRENT_SOURCE_DIR}/pngusr.dfa"
+                          ${DFA_XTRA})
 
   if(PNG_PREFIX)
     set(PNGLIBCONF_H_EXTRA_DEPENDS
