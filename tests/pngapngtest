@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# pngapngtest test:
+# Multi-frame APNG writing and reading with a tracked allocator, checking
+# that the per-frame row buffers are released.
+exec ./pngapngtest

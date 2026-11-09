@@ -396,6 +396,9 @@ set(pnggetset_sources
 set(pngreadend_sources
     contrib/libtests/pngreadend.c
 )
+set(pngapngtest_sources
+    contrib/libtests/pngapngtest.c
+)
 set(pngunknown_sources
     contrib/libtests/pngunknown.c
 )
@@ -577,6 +580,16 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngreadend
                FILES "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/crashers/stale_zTXt_input.png"
                      "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/crashers/stale_iCCP_input.png")
+
+  # pngapngtest test:
+  # Multi-frame APNG writing and reading with a tracked allocator, checking
+  # that the per-frame row buffers are released.
+  add_executable(pngapngtest ${pngapngtest_sources})
+  target_link_libraries(pngapngtest
+                        PRIVATE png_shared)
+
+  png_add_test(NAME pngapngtest
+               COMMAND pngapngtest)
 
   # pngvalid tests:
   # Internal validation of standard and progressive reading,
