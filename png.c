@@ -4000,6 +4000,86 @@ png_image_free(png_image *image)
    }
 }
 
+const char * /* PRIVATE */
+png_image_check_row_stride(const png_image *image, png_int_32 *row_stride)
+{
+   unsigned int channels = PNG_IMAGE_PIXEL_CHANNELS(image->format);
+   png_uint_32 min_row_stride, abs_row_stride;
+
+   if (image->width == 0)
+      return "image width is zero";
+
+   /* The row stride is a count of components that must be representable in
+    * the 'row_stride' argument.  Because components can be either 1 or 2 bytes
+    * in size, the length of a row can still overflow 31 bits; this is checked
+    * below, as part of the buffer size.
+    */
+   if (image->width > 0x7fffffffU/channels)
+      return "row stride too large";
+
+   min_row_stride = image->width * channels;
+
+   if (*row_stride == 0)
+      *row_stride = (png_int_32)/*SAFE*/min_row_stride;
+
+   if (*row_stride < 0)
+      abs_row_stride = 0U - (png_uint_32)*row_stride;
+
+   else
+      abs_row_stride = (png_uint_32)*row_stride;
+
+   if (abs_row_stride < min_row_stride)
+      return "row stride too small";
+
+   /* The step between rows, in bytes, is a ptrdiff_t.  This only limits the
+    * 16-bit formats on systems where ptrdiff_t has 32 bits.  PNG_SIZE_MAX/2 is
+    * the maximum ptrdiff_t wherever ptrdiff_t and size_t have the same size.
+    */
+   if (abs_row_stride >
+       (PNG_SIZE_MAX/2)/PNG_IMAGE_PIXEL_COMPONENT_SIZE(image->format))
+      return "row stride too large";
+
+   /* Limit the whole buffer to 32 bits, for API compatibility with the
+    * current, 32-bit, PNG_IMAGE_BUFFER_SIZE macro:
+    *
+    *    (PNG_IMAGE_PIXEL_COMPONENT_SIZE(fmt)*height*(row_stride))
+    *
+    * The component size is 1 or 2, and 'abs_row_stride' is not zero here,
+    * since it is at least 'min_row_stride'.
+    *
+    * NOTE: this will be changed in 1.7 because PNG_IMAGE_BUFFER_SIZE will be
+    * changed to use png_alloc_size_t; bigger images can be accommodated on
+    * 64-bit systems.
+    */
+   if (image->height >
+       0xffffffffU/PNG_IMAGE_PIXEL_COMPONENT_SIZE(image->format)/abs_row_stride)
+      return "image too large";
+
+   return NULL;
+}
+
+png_alloc_size_t /* PRIVATE */
+png_image_first_row(const png_image *image, png_int_32 row_stride,
+    ptrdiff_t *row_step)
+{
+   /* png_image_check_row_stride has verified that the step fits in ptrdiff_t
+    * and that the whole buffer fits in 32 bits.
+    */
+   ptrdiff_t step = (ptrdiff_t)row_stride *
+       (ptrdiff_t)PNG_IMAGE_PIXEL_COMPONENT_SIZE(image->format);
+
+   *row_step = step;
+
+   /* In a bottom-up layout, with a negative step, the first row of the image
+    * is the last row of the buffer.
+    */
+   if (step < 0 && image->height > 0)
+      return (png_alloc_size_t)(image->height - 1) *
+         ((png_alloc_size_t)0 - (png_alloc_size_t)step);
+
+   return 0;
+}
+
 int /* PRIVATE */
 png_image_error(png_image *image, const char *error_message)
 {

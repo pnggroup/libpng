@@ -2035,6 +2035,25 @@ PNG_INTERNAL_FUNCTION(int, png_image_error,
    (png_image *image, const char *error_message),
    PNG_EMPTY);
 
+/* Check the size of the image and the 'row_stride' of its buffer, as passed
+ * to png_image_finish_read or to the png_image_write_ APIs, and replace a zero
+ * '*row_stride' with the minimum row stride of the image.  The buffer size, as
+ * computed by PNG_IMAGE_BUFFER_SIZE, must not exceed 32 bits.  Returns NULL if
+ * the layout is valid, otherwise an error message.
+ */
+PNG_INTERNAL_FUNCTION(const char *, png_image_check_row_stride,
+   (const png_image *image, png_int_32 *row_stride),
+   PNG_EMPTY);
+
+/* Compute '*row_step', the step in bytes from one row of the image to the
+ * next in a buffer with the given 'row_stride', as checked by
+ * png_image_check_row_stride.  Returns the offset in bytes of the first row of
+ * the image in the buffer, which is not zero in a bottom-up layout.
+ */
+PNG_INTERNAL_FUNCTION(png_alloc_size_t, png_image_first_row,
+   (const png_image *image, png_int_32 row_stride, ptrdiff_t *row_step),
+   PNG_EMPTY);
+
 #ifndef PNG_SIMPLIFIED_READ_SUPPORTED
 /* png_image_free is used by the write code but not exported */
 PNG_INTERNAL_FUNCTION(void, png_image_free,

@@ -2038,39 +2038,11 @@ png_image_write_main(void *argument)
     * and total image size to ensure that they are within the system limits.
     */
    {
-      unsigned int channels = PNG_IMAGE_PIXEL_CHANNELS(image->format);
+      const char *error =
+         png_image_check_row_stride(image, &display->row_stride);
 
-      if (image->width <= 0x7fffffffU/channels) /* no overflow */
-      {
-         png_uint_32 check;
-         png_uint_32 png_row_stride = image->width * channels;
-
-         if (display->row_stride == 0)
-            display->row_stride = (png_int_32)/*SAFE*/png_row_stride;
-
-         if (display->row_stride < 0)
-            check = -(png_uint_32)display->row_stride;
-
-         else
-            check = (png_uint_32)display->row_stride;
-
-         if (check >= png_row_stride)
-         {
-            /* Now check for overflow of the image buffer calculation; this
-             * limits the whole image size to 32 bits for API compatibility with
-             * the current, 32-bit, PNG_IMAGE_BUFFER_SIZE macro.
-             */
-            if (image->height >
-                0xffffffffU/PNG_IMAGE_PIXEL_COMPONENT_SIZE(image->format)/check)
-               png_error(image->opaque->png_ptr, "memory image too large");
-         }
-
-         else
-            png_error(image->opaque->png_ptr, "supplied row stride too small");
-      }
-
-      else
-         png_error(image->opaque->png_ptr, "image row stride too large");
+      if (error != NULL)
+         png_error(png_ptr, error);
    }
 
    /* Set the required transforms then write the rows in the correct order. */
@@ -2177,16 +2149,10 @@ png_image_write_main(void *argument)
 
    {
       const png_byte *row = png_voidcast(const png_byte *, display->buffer);
-      ptrdiff_t row_step = display->row_stride;
 
-      if (linear != 0)
-         row_step *= 2;
-
-      if (row_step < 0)
-         row += (image->height-1) * (-row_step);
-
+      row += png_image_first_row(image, display->row_stride,
+          &display->row_step);
       display->first_row = row;
-      display->row_step = row_step;
    }
 
    /* Apply 'fast' options if the flag is set. */

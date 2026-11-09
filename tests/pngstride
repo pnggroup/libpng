@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# pngstride test:
+# Validation of the image size and row stride in the simplified API.
+exec ./pngstride

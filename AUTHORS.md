@@ -5,6 +5,7 @@ This is the list of PNG Reference Library ("libpng") Contributing
 Authors, for copyright and licensing purposes.
 
  * Adam Richter
+ * Akash Deshmukh
  * Alexander Smorkalov
  * Andreas Dilger
  * Anthony Hurtado
