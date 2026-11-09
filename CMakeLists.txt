@@ -86,26 +86,6 @@ endif()
 # at any time.
 option(PNG_TESTS "Build the libpng tests" ON)
 
-# Same as above, but for the third-party tools.
-# Although these tools are targeted at development environments only,
-# the users are allowed to override the option to build by default.
-if(ANDROID OR IOS)
-  option(PNG_TOOLS "Build the libpng tools" OFF)
-else()
-  option(PNG_TOOLS "Build the libpng tools" ON)
-endif()
-
-# Maintain backwards compatibility with the deprecated option PNG_EXECUTABLES.
-option(PNG_EXECUTABLES "[Deprecated; please use PNG_TOOLS]" ON)
-if(NOT PNG_EXECUTABLES)
-  message(DEPRECATION "The option PNG_EXECUTABLES has been deprecated in favour of PNG_TOOLS")
-  if(PNG_TOOLS)
-    message(AUTHOR_WARNING "Setting PNG_TOOLS to ${PNG_EXECUTABLES}, "
-                           "to stay compatible with PNG_EXECUTABLES")
-    set(PNG_TOOLS "${PNG_EXECUTABLES}")
-  endif()
-endif()
-
 # Allow the users to switch on/off the use of hardware (SIMD) optimized code.
 option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
 
@@ -401,12 +381,6 @@ set(pngunknown_sources
 )
 set(pngimage_sources
     contrib/libtests/pngimage.c
-)
-set(pngfix_sources
-    contrib/tools/pngfix.c
-)
-set(png_fix_itxt_sources
-    contrib/tools/png-fix-itxt.c
 )
 
 # Now build our targets.
@@ -779,18 +753,6 @@ if(PNG_TESTS AND PNG_SHARED)
                FILES ${PNGSUITE_PNGS})
 endif()
 
-if(PNG_SHARED AND PNG_TOOLS)
-  add_executable(pngfix ${pngfix_sources})
-  target_link_libraries(pngfix
-                        PRIVATE png_shared)
-  set(PNG_BIN_TARGETS pngfix)
-
-  add_executable(png-fix-itxt ${png_fix_itxt_sources})
-  target_link_libraries(png-fix-itxt
-                        PRIVATE ${PNG_LINK_LIBRARIES})
-  list(APPEND PNG_BIN_TARGETS png-fix-itxt)
-endif()
-
 # Create a symlink that points to a target file (if symlinking is possible),
 # or make a copy of the target file (if symlinking is not possible):
 # create_symlink(<destfile> [FILE <file> | TARGET <target>])
@@ -931,11 +893,6 @@ if(NOT SKIP_INSTALL_EXECUTABLES AND NOT SKIP_INSTALL_ALL)
     install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}-config"
             DESTINATION "${CMAKE_INSTALL_BINDIR}")
   endif()
-endif()
-
-if(NOT SKIP_INSTALL_PROGRAMS AND NOT SKIP_INSTALL_ALL)
-  install(TARGETS ${PNG_BIN_TARGETS}
-          RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
 endif()
 
 if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL)

@@ -13,19 +13,12 @@ ACLOCAL_AMFLAGS = -I scripts/autoconf
 
 # test programs - run on make check, make distcheck
 if ENABLE_TESTS
-check_PROGRAMS= pngtest pnggetset pngreadend pngunknown pngstest pngvalid pngimage pngcp
+check_PROGRAMS= pngtest pnggetset pngreadend pngunknown pngstest pngvalid pngimage
 if HAVE_CLOCK_GETTIME
 check_PROGRAMS += timepng
 endif
 else
 check_PROGRAMS=
-endif
-
-# Utilities - installed
-if ENABLE_TOOLS
-bin_PROGRAMS= pngfix png-fix-itxt
-else
-bin_PROGRAMS=
 endif
 
 # This ensures that pnglibconf.h gets built at the start of 'make all' or
@@ -62,16 +55,6 @@ pngimage_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 timepng_SOURCES = contrib/libtests/timepng.c
 timepng_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-
-pngcp_SOURCES = contrib/tools/pngcp.c
-pngcp_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-endif
-
-if ENABLE_TOOLS
-pngfix_SOURCES = contrib/tools/pngfix.c
-pngfix_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-
-png_fix_itxt_SOURCES = contrib/tools/png-fix-itxt.c
 endif
 
 # Generally these are single line shell scripts to run a test with a particular
@@ -271,8 +254,6 @@ contrib/libtests/pngvalid.o: pnglibconf.h
 contrib/libtests/readpng.o: pnglibconf.h
 contrib/libtests/tarith.o: pnglibconf.h
 contrib/libtests/timepng.o: pnglibconf.h
-contrib/tools/pngfix.o: pnglibconf.h
-contrib/tools/pngcp.o: pnglibconf.h
 scripts/generators/gensRGB.o: pnglibconf.h
 
 # We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually

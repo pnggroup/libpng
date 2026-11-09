@@ -159,9 +159,6 @@ pngprefix.h
 /test-suite.log
 /tests/*.log
 /tests/*.trs
-/png-fix-itxt
-/pngcp
-/pngfix
 /pnggetset
 /pngimage
 /pngreadend
