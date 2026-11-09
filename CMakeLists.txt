@@ -396,6 +396,9 @@ set(pnggetset_sources
 set(pngreadend_sources
     contrib/libtests/pngreadend.c
 )
+set(pngapngseq_sources
+    contrib/libtests/pngapngseq.c
+)
 set(pngunknown_sources
     contrib/libtests/pngunknown.c
 )
@@ -577,6 +580,15 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngreadend
                FILES "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/crashers/stale_zTXt_input.png"
                      "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/crashers/stale_iCCP_input.png")
+
+  # pngapngseq test:
+  # Per-frame state of the sequential APNG reader.
+  add_executable(pngapngseq ${pngapngseq_sources})
+  target_link_libraries(pngapngseq
+                        PRIVATE png_shared)
+
+  png_add_test(NAME pngapngseq
+               COMMAND pngapngseq)
 
   # pngvalid tests:
   # Internal validation of standard and progressive reading,

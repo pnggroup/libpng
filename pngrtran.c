@@ -2248,7 +2248,11 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
    info_ptr->pixel_depth = (png_byte)(info_ptr->channels *
        info_ptr->bit_depth);
 
-   info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth, info_ptr->width);
+   /* png_ptr->width is the width of the rows being read: the IHDR width, or
+    * the width of the current APNG frame (set by png_read_reinit).
+    * info_ptr->width stays the IHDR width.
+    */
+   info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth, png_ptr->width);
 
    /* Adding in 1.5.4: cache the above value in png_struct so that we can later
     * check in png_rowbytes that the user buffer won't get overwritten.  Note
