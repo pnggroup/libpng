@@ -37,11 +37,6 @@ If you downloaded a GIT clone, you will need to run ./autogen.sh before
 running ./configure, to create "configure" and "Makefile.in" which are
 not included in the GIT repository.
 
-Note that "configure" is only included in the "*.tar" distributions and not
-in the "*.zip" or "*.7z" distributions. If you downloaded one of those
-distributions, see "Building with project files" or "Building with makefiles",
-below.
-
 II. Rebuilding the configure scripts
 
 If configure does not work on your system, or if you have a need to
@@ -147,10 +142,6 @@ Your directory structure should look like this:
           etc.
       zlib
           README, *.h, *.c, contrib, etc.
-
-If the line endings in the files look funny, you may wish to get the other
-distribution of libpng.  It is available in both tar.gz (UNIX style line
-endings) and zip (DOS style line endings) formats.
 
 VI. Building with project files
 
