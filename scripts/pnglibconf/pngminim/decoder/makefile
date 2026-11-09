@@ -23,7 +23,7 @@ L=.a
 E=
 
 # Where to find the source code:
-PNGSRC =../../..
+PNGSRC =../../../..
 ZLIBSRC=$(PNGSRC)/../zlib
 PROGSRC=$(PNGSRC)/contrib/pngminus
 

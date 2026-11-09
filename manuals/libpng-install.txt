@@ -135,8 +135,8 @@ Your directory structure should look like this:
              libpng-config.in, aclocal.m4, config.h.in, config.sub,
              depcomp, install-sh, mkinstalldirs, test-pngtest.sh, etc.
           contrib
-             arm-neon, conftest, examples, gregbook, libtests, pngminim,
-             pngminus, pngsuite, tools, visupng, riscv-rvv
+             arm-neon, examples, gregbook, libtests, pngminus, pngsuite,
+             tools, visupng, riscv-rvv
           projects
              owatcom, visualc71, vstudio
           scripts
@@ -388,13 +388,13 @@ does not work; this may also apply to other systems that have a functioning
 awk called 'nawk'.
 
 Configuration options are now documented in scripts/pnglibconf/pnglibconf.dfa.
-This file also includes dependency information that ensures a configuration is
-consistent; that is, if a feature is switched off, dependent features are
+This file also includes dependency information that ensures a configuration
+is consistent; that is, if a feature is switched off, dependent features are
 also switched off.  As a recommended alternative to using feature macros in
 pngusr.h a system builder may also define equivalent options in pngusr.dfa
-(or, indeed, any file) and add that to the configuration by setting
-DFA_XTRA to the file name.  The makefiles in contrib/pngminim illustrate
-how to do this, and also illustrate a case where pngusr.h is still required.
+(or, indeed, any file) and add that to the configuration by setting DFA_XTRA
+to the file name.  The makefiles in scripts/pnglibconf/pngminim illustrate how
+to do this, and also illustrate a case where pngusr.h is still required.
 
 After you have built libpng, the definitions that were recorded in
 pnglibconf.h are available to your application (pnglibconf.h is included

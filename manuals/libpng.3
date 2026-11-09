@@ -780,8 +780,8 @@ but most of them have no visible effect on the API.  Some can also be overridden
 from the API.
 
 This method of building a customized pnglibconf.h is illustrated in
-contrib/pngminim/*.  See the "$(PNGCONF):" target in the makefile and
-pngusr.dfa in these directories.
+scripts/pnglibconf/pngminim/*.  See the "$(PNGCONF):" target in the makefile
+and pngusr.dfa in these directories.
 
 C. Configuration using PNG_USER_CONFIG
 
@@ -820,8 +820,8 @@ examine the intermediate file pnglibconf.dfn to find the full set of
 dependency information for each setting and option.  Simply locate the
 feature in the file and read the C comments that precede it.
 
-This method is also illustrated in the contrib/pngminim/* makefiles and
-pngusr.h.
+This method is also illustrated in the scripts/pnglibconf/pngminim/*
+makefiles and pngusr.h.
 
 .SH III. Reading
 

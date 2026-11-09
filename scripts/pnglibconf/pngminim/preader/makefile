@@ -1,4 +1,4 @@
-# Makefile for PngMinus (pnm2pngm)
+# Makefile for PngMinus (rpng2)
 # Linux / Unix
 
 #CC=cc
@@ -14,7 +14,23 @@ LD=$(CC)
 RM=rm -f
 COPY=cp
 
-CPPFLAGS=-I. -DPNG_USER_CONFIG -DNO_GZCOMPRESS -DZ_SOLO -DNO_GZIP
+#XINC = -I/usr/include			# old-style, stock X distributions
+#XLIB = -L/usr/lib/X11 -lX11		#  (including SGI IRIX)
+
+#XINC = -I/usr/openwin/include		# Sun workstations (OpenWindows)
+#XLIB = -L/usr/openwin/lib -lX11
+
+XINC = -I/usr/X11R6/include		# new X distributions (X.org, etc.)
+XLIB = -L/usr/X11R6/lib -lX11
+#XLIB = -L/usr/X11R6/lib64 -lX11	# e.g., Red Hat on AMD64
+
+#XINC = -I/usr/local/include   		# FreeBSD
+#XLIB = -L/usr/local/lib -lX11
+
+#LIBS = $(XLIB)
+LIBS = $(XLIB) -lm                      #platforms that need libm
+
+CPPFLAGS=-I. $(XINC) -DPNG_USER_CONFIG -DNO_GZCOMPRESS -DZ_SOLO -DNO_GZIP
 CFLAGS=-O1 -Wall
 
 C=.c
@@ -23,17 +39,19 @@ L=.a
 E=
 
 # Where to find the source code:
-PNGSRC =../../..
+PNGSRC =../../../..
 ZLIBSRC=$(PNGSRC)/../zlib
-PROGSRC=$(PNGSRC)/contrib/pngminus
+PROGSRC=$(PNGSRC)/contrib/gregbook
 
-# Zlib
-ZSRCS  = adler32$(C) compress$(C) crc32$(C) deflate$(C) \
-	 trees$(C) zutil$(C)
+# Zlib (minimal inflate requirements - crc32 is used by libpng)
+# zutil can be eliminated if you provide your own zcalloc and zcfree
+ZSRCS  = adler32$(C) crc32$(C) \
+	 inffast$(C) inflate$(C) inftrees$(C) \
+	 zutil$(C)
 
 # Standard headers
-#ZH     = zlib.h crc32.h deflate.h trees.h zutil.h
-ZH     = zlib.h crc32.h deflate.h trees.h zutil.h
+ZH     = zlib.h crc32.h inffast.h inffixed.h \
+	 inflate.h inftrees.h zutil.h
 
 # Machine generated headers
 ZCONF  = zconf.h
@@ -44,16 +62,14 @@ ZINC   = zlib.h $(ZCONF)
 # Headers the Zlib source uses
 ZHDRS  = $(ZH) $(ZCONF)
 
-# compress is not required; it is needed to link the zlib
-# code because deflate defines an unused API function deflateBound
-# which itself calls compressBound from compress.
-ZOBJS  = adler32$(O) compress$(O) crc32$(O) deflate$(O) \
-	 trees$(O) zutil$(O)
+ZOBJS  = adler32$(O) crc32$(O) \
+	 inffast$(O) inflate$(O) inftrees$(O) \
+	 zutil$(O)
 
 # libpng
 PNGSRCS=png$(C) pngerror$(C) pngget$(C) pngmem$(C) \
-	pngset$(C) pngtrans$(C) pngwio$(C) pngwrite$(C) \
-	pngwtran$(C) pngwutil$(C)
+	pngpread$(C) pngread$(C) pngrio$(C) pngrtran$(C) pngrutil$(C) \
+	pngset$(C) pngtrans$(C)
 
 # Standard headers
 PNGH   =png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h
@@ -68,13 +84,13 @@ PNGINC= png.h pngconf.h pngusr.h $(PNGCONF)
 PNGHDRS=$(PNGH) $(PNGCONF) pngusr.h
 
 PNGOBJS=png$(O) pngerror$(O) pngget$(O) pngmem$(O) \
-	pngset$(O) pngtrans$(O) pngwio$(O) pngwrite$(O) \
-	pngwtran$(O) pngwutil$(O)
+	pngpread$(O) pngread$(O) pngrio$(O) pngrtran$(O) pngrutil$(O) \
+	pngset$(O) pngtrans$(O)
 
-PROGSRCS= pnm2pngm$(C)
-PROGHDRS=
-PROGDOCS=
-PROGOBJS= pnm2pngm$(O)
+PROGSRCS= rpng2-x$(C) readpng2$(C)
+PROGHDRS= readpng2.h
+PROGDOCS= COPYING LICENSE
+PROGOBJS= rpng2-x$(O) readpng2$(O)
 
 OBJS    = $(PROGOBJS) $(PNGOBJS) $(ZOBJS)
 
@@ -85,10 +101,10 @@ OBJS    = $(PROGOBJS) $(PNGOBJS) $(ZOBJS)
 
 # dependencies
 
-all: pnm2pngm$(E)
+all: $(PROGDOCS) rpng2-x$(E)
 
-pnm2pngm$(E): $(OBJS)
-	$(LD) -o pnm2pngm$(E) $(OBJS)
+rpng2-x$(E): $(OBJS)
+	$(LD) -o rpng2-x$(E) $(OBJS) $(LIBS)
 
 # The DFA_XTRA setting turns all libpng options off then
 # turns on those required for this minimal build.
@@ -106,8 +122,8 @@ $(PNGCONF): $(PNGSRC)/scripts/pnglibconf/pnglibconf.mak $(ZH) \
 clean:
 	$(MAKE) -f $(PNGSRC)/scripts/pnglibconf/pnglibconf.mak $(MAKEFLAGS)\
 	    srcdir=$(PNGSRC) clean
-	$(RM) pnm2pngm$(O)
-	$(RM) pnm2pngm$(E)
+	$(RM) rpng2-x$(O)
+	$(RM) rpng2-x$(E)
 	$(RM) $(OBJS)
 
 # distclean also removes the copied source and headers
@@ -143,8 +159,8 @@ $(ZCONF):
 	    $(COPY) $(ZLIBSRC)/$$f $@ && exit 0;\
 	done; echo copy: $(ZLIBSRC)/zconf.h not found; exit 1
 
-pnm2pngm.c: $(PROGSRC)/pnm2png.c
+$(PROGSRCS) $(PROGHDRS) $(PROGDOCS): $(PROGSRC)/$@
 	$(RM) $@
-	$(COPY) $(PROGSRC)/pnm2png.c $@
+	$(COPY) $(PROGSRC)/$@ $@
 
-# End of makefile for pnm2pngm
+# End of makefile for rpng2-x

@@ -100,8 +100,8 @@ file pnglibconf.h scripts/pnglibconf/pnglibconf.dfa PNGLCONF_H
 # Then add this file to the options.awk command line (the *first*
 # one) after this file.  The make macro DFA_XTRA is provided to make
 # this easier (set it like CPPFLAGS prior to running ./configure).
-# Look at the builds below contrib/pngminim for some extreme examples
-# of how this can be used.
+# Look at the builds below scripts/pnglibconf/pngminim for some extreme
+# examples of how this can be used.
 #
 # Don't edit this file unless you are contributing a patch to
 # libpng and need new or modified options/settings.

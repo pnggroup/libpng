@@ -24,7 +24,7 @@ DOCUMENTATION
 
 Examples:
    ${srcdir}/pngusr.dfa
-   ${srcdir}/contrib/pngminim/*/pngusr.dfa
+   ${srcdir}/scripts/pnglibconf/pngminim/*/pngusr.dfa
 
 Documentation of the options:
    ${srcdir}/scripts/pnglibconf/pnglibconf.dfa

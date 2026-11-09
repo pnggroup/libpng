@@ -154,8 +154,6 @@ Files included in this distribution
                           O'Reilly, 1999
         libtests/     =>  Test programs
         pngexif/      =>  Program to inspect the EXIF information in PNG files
-        pngminim/     =>  Minimal decoder, encoder, and progressive decoder
-                          programs demonstrating the use of pngusr.dfa
         pngminus/     =>  Simple pnm2png and png2pnm programs
         pngsuite/     =>  Test images
         riscv-rvv/    =>  Optimized code for the RISC-V Vector platform
