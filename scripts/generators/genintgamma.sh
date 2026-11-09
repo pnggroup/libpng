@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# intgamma.sh
+# genintgamma.sh
 #
 # COPYRIGHT: Written by John Cunningham Bowler, 2013.
 # To the extent possible under law, the author has waived all copyright and

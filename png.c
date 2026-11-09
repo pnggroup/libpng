@@ -2954,8 +2954,8 @@ png_reciprocal2(png_fixed_point a, png_fixed_point b)
 #ifndef PNG_FLOATING_ARITHMETIC_SUPPORTED
 /* Fixed point gamma.
  *
- * The code to calculate the tables used below can be found in the shell script
- * contrib/tools/intgamma.sh
+ * The code to calculate the tables used below can be found in
+ * scripts/generators/genintgamma.sh.
  *
  * To calculate gamma this code implements fast log() and exp() calls using only
  * fixed point arithmetic.  This code has sufficient precision for either 8-bit
@@ -3758,8 +3758,8 @@ png_set_option(png_struct *png_ptr, int option, int onoff)
 #if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
    defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
 /* sRGB conversion tables; these are machine generated with the code in
- * contrib/tools/makesRGB.c.  The actual sRGB transfer curve defined in the
- * specification (see the article at https://en.wikipedia.org/wiki/SRGB)
+ * scripts/generators/gensRGB.c.  The actual sRGB transfer curve defined in
+ * the specification (see the article at https://en.wikipedia.org/wiki/SRGB)
  * is used, not the gamma=1/2.2 approximation use elsewhere in libpng.
  * The sRGB to linear table is exact (to the nearest 16-bit linear fraction).
  * The inverse (linear to sRGB) table has accuracies as follows:

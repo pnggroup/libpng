@@ -1,4 +1,4 @@
-/* genpng
+/* genpng.c
  *
  * COPYRIGHT: Written by John Cunningham Bowler, 2015.
  * Revised by Glenn Randers-Pehrson, 2017, to add buffer-size check.

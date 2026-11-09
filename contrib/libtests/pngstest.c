@@ -44,7 +44,7 @@
 #endif
 
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED /* Else nothing can be done */
-#include "../tools/sRGB.h"
+#include "../../scripts/generators/sRGB.h"
 
 /* KNOWN ISSUES
  *

@@ -1,4 +1,4 @@
-/* makesRGB.c -- build sRGB-to-linear and linear-to-sRGB conversion tables
+/* gensRGB.c -- generate sRGB-to-linear and linear-to-sRGB conversion tables
  *
  * COPYRIGHT: Written by John Cunningham Bowler, 2013.
  * To the extent possible under law, the author has waived all copyright and
@@ -263,7 +263,7 @@ main(int argc, char **argv)
             }
             else
             {
-               fprintf(stderr, "makesRGB: impossible\n");
+               fprintf(stderr, "impossible\n");
                exit(1);
             }
             ecbase = error_count16;

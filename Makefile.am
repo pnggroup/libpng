@@ -271,10 +271,9 @@ contrib/libtests/pngvalid.o: pnglibconf.h
 contrib/libtests/readpng.o: pnglibconf.h
 contrib/libtests/tarith.o: pnglibconf.h
 contrib/libtests/timepng.o: pnglibconf.h
-
-contrib/tools/makesRGB.o: pnglibconf.h
 contrib/tools/pngfix.o: pnglibconf.h
 contrib/tools/pngcp.o: pnglibconf.h
+scripts/generators/gensRGB.o: pnglibconf.h
 
 # We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually
 # be built with PNG_USE_READ_MACROS; this prevents the read macros from
