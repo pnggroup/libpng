@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Out-of-range palette index test:
+# Palette images with indices beyond the end of PLTE, through all read/write
+# paths; every index must have an entry in the color-map.
+exec ./pngstest \
+     --tmpfile "badpal-" \
+     --log \
+     "${srcdir}"/contrib/testpngs/badpal/*.png
