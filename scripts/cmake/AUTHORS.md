@@ -24,6 +24,7 @@ Author List
  * David Callu
  * Eric Riff
  * Erik Scholz
+ * fhgffy
  * Gianfranco Costamagna
  * Gleb Mazovetskiy
  * Glenn Randers-Pehrson

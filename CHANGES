@@ -6400,6 +6400,7 @@ Version 1.6.59 [September 28, 2026]
   Adopted the REUSE Specification for licensing the CI files.
 
 Version 1.8.0 [TODO]
+  Fixed CMake installation with SKIP_INSTALL_LIBRARIES enabled.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
