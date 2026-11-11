@@ -50,9 +50,6 @@ Other supporting scripts
 
     README.txt        =>  This file
     descrip.mms       =>  VMS makefile for MMS or MMK
-    libpng-config-body.in  =>  used by several makefiles to create libpng-config
-    libpng-config-head.in  =>  used by several makefiles to create libpng-config
-    libpng.pc.in      =>  Used by several makefiles to create libpng.pc
     macro.lst         =>  Used by GNU Autotools
     pngwin.rc         =>  Used by the visualc71 project
     pngwin.def        =>  Used by makefile.os2
