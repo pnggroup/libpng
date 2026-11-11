@@ -21,9 +21,6 @@ Makefiles for libpng
 Other supporting files and scripts
 ----------------------------------
 
-    libpng-config-body.in  =>  Used by several makefiles to create libpng-config
-    libpng-config-head.in  =>  Used by several makefiles to create libpng-config
-    libpng.pc.in       =>  Used by several makefiles to create libpng.pc
     macro.lst          =>  Used by GNU Autotools
     README.txt         =>  This file
 
