@@ -3495,8 +3495,8 @@ PNG_EXPORT(void, png_write_frame_tail,
 #endif /* PNG_WRITE_APNG_SUPPORTED */
 #endif /* PNG_APNG_SUPPORTED */
 
-/* Maintainer: Put new public prototypes here ^, in libpng.3, in project
- * defs, and in scripts/symbols.def.
+/* Maintainer: Put new public prototypes here ^, in libpng.3, and in
+ * scripts/symbols.def.
  */
 
 #ifdef __cplusplus

@@ -70,9 +70,9 @@ Authors, for copyright and licensing purposes.
  * SpacemiT Hangzhou Technology, Co.
     - Liang Junzhao (梁俊钊)
 
-The build projects, the build scripts, the test scripts, and other
-files in the "projects", "scripts" and "tests" directories, have
-other copyright owners, but are released under the libpng license.
+The build scripts and other files in the "scripts" and "tests"
+directories have other copyright owners, but are released under the
+libpng license.
 
 Some files in the "ci" and "contrib" directories, as well as some
 of the tools-generated files that are distributed with libpng, have

@@ -25,7 +25,6 @@ Other supporting files and scripts
     libpng-config-head.in  =>  Used by several makefiles to create libpng-config
     libpng.pc.in       =>  Used by several makefiles to create libpng.pc
     macro.lst          =>  Used by GNU Autotools
-    pngwin.rc          =>  Used by the Visual Studio project
     README.txt         =>  This file
 
 Further information can be found in comments in the individual scripts and

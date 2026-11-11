@@ -7,7 +7,7 @@ Contents
      III. Using scripts/makefile*
       IV. Using cmake
        V. Directory structure
-      VI. Building with project files
+      VI. Building with Microsoft Visual Studio
      VII. Building with makefiles
     VIII. Configuring libpng for 16-bit platforms
       IX. Configuring for DOS
@@ -68,8 +68,6 @@ Instead, you can use one of the custom-built makefiles in the
 
 The files that are presently available in the scripts directory
 are listed and described in scripts/README.txt.
-
-Or you can use one of the "projects" in the "projects" directory.
 
 Before installing libpng, you must first install zlib, if it
 is not already on your system.  zlib can usually be found
@@ -132,8 +130,6 @@ Your directory structure should look like this:
           contrib
              arm-neon, examples, gregbook, libtests, pngminus, pngsuite,
              tools, visupng, riscv-rvv
-          projects
-             owatcom, visualc71, vstudio
           scripts
              makefile.*
              *.def (module definition files)
@@ -143,15 +139,10 @@ Your directory structure should look like this:
       zlib
           README, *.h, *.c, contrib, etc.
 
-VI. Building with project files
+VI. Building with Microsoft Visual Studio
 
-If you are building libpng with Microsoft Visual Studio, you can enter
-the directory projects\visualc71 or projects\vstudio and follow the
-instructions in README.txt.
-
-Otherwise, enter the zlib directory and follow the instructions in
-zlib/README, then come back here and run "configure" or choose the
-appropriate makefile in the scripts directory.
+If you are building libpng with Microsoft Visual Studio, use CMake,
+as described in section IV.
 
 VII. Building with makefiles
 
@@ -421,16 +412,13 @@ If your application fails to find libpng or zlib entries while linking:
   Be sure you have built libpng, zlib, and your application for the
   same platform (e.g., 32-bit or 64-bit).
 
-  If you are using the vstudio project, observe the WARNING in
-  project/vstudio/README.txt.
-
 XVI. Other sources of information about libpng:
 
 Further information can be found in the README and libpng-manual.txt
 files, in the individual makefiles, in png.h, and the manual pages
 libpng.3 and png.5.
 
-Copyright (c) 2022 Cosmin Truta
+Copyright (c) 2022-2026 Cosmin Truta
 Copyright (c) 1998-2002,2006-2016 Glenn Randers-Pehrson
 This document is released under the libpng license.
 For conditions of distribution and use, see the disclaimer

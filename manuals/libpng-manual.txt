@@ -200,8 +200,7 @@ is always included by png.h.
 If you don't need to change the library configuration from the default, skip to
 the next section ("Reading").
 
-Notice that some of the makefiles in the 'scripts' directory and (in 1.5.0) all
-of the build project files in the 'projects' directory simply copy
+Notice that some of the makefiles in the 'scripts' directory simply copy
 pnglibconf.h.prebuilt to pnglibconf.h.  This means that these build
 systems do not permit easy auto-configuration of the library - they only
 support the default configuration.

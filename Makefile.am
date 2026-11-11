@@ -153,7 +153,7 @@ pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 EXTRA_DIST= \
 	ANNOUNCE AUTHORS CHANGES INSTALL LICENSE README TODO TRADEMARK \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
-	${srcdir}/ci ${srcdir}/contrib ${srcdir}/projects ${srcdir}/scripts \
+	${srcdir}/ci ${srcdir}/contrib ${srcdir}/scripts \
 	$(TESTS) $(XFAIL_TESTS) tests/pngstest \
 	CMakeLists.txt example.c libpng-manual.txt
 

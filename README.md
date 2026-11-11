@@ -161,10 +161,6 @@ Files included in this distribution
         libpng-manual.txt   =>  Description of libpng and its functions
         libpng.3      =>  Manual page for libpng (includes libpng-manual.txt)
         png.5         =>  Manual page for the PNG format
-    projects/     =>  Project files and workspaces for various IDEs
-        owatcom/      =>  OpenWatcom project
-        visualc71/    =>  Microsoft Visual C++ 7.1 workspace
-        vstudio/      =>  Microsoft Visual Studio workspace
     scripts/      =>  Scripts and makefiles for building libpng
                       (see scripts/README.txt for the complete list)
     tests/        =>  Test scripts
