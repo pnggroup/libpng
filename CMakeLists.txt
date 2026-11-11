@@ -382,6 +382,9 @@ set(pngunknown_sources
 set(pngimage_sources
     contrib/libtests/pngimage.c
 )
+set(pnginterlace_sources
+    contrib/libtests/pnginterlace.c
+)
 
 # Now build our targets.
 
@@ -601,6 +604,15 @@ if(PNG_TESTS AND PNG_SHARED)
   png_add_test(NAME pngvalid-transform
                COMMAND pngvalid
                OPTIONS --transform)
+
+  # pnginterlace test:
+  # Interlaced versus non-interlaced reads through the simplified API.
+  add_executable(pnginterlace ${pnginterlace_sources})
+  target_link_libraries(pnginterlace
+                        PRIVATE png_shared)
+
+  png_add_test(NAME pnginterlace
+               COMMAND pnginterlace)
 
   # pngstest tests:
   # Format conversions through the simplified API,
