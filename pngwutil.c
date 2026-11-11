@@ -2886,6 +2886,21 @@ png_write_reset(png_struct *png_ptr)
    png_ptr->row_number = 0;
    png_ptr->pass = 0;
    png_ptr->mode &= ~PNG_HAVE_IDAT;
+
+   /* APNG frames may have different dimensions, so the row and filter
+    * buffers are frame-local and must be recreated for each new frame.
+    */
+   png_free(png_ptr, png_ptr->row_buf);
+   png_ptr->row_buf = NULL;
+
+#ifdef PNG_WRITE_FILTER_SUPPORTED
+   png_free(png_ptr, png_ptr->prev_row);
+   png_free(png_ptr, png_ptr->try_row);
+   png_free(png_ptr, png_ptr->tst_row);
+   png_ptr->prev_row = NULL;
+   png_ptr->try_row = NULL;
+   png_ptr->tst_row = NULL;
+#endif
 }
 
 void /* PRIVATE */
