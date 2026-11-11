@@ -1,5 +1,6 @@
 /* symbols.c - find all exported symbols
  *
+ * Copyright (c) 2026 Cosmin Truta
  * Copyright (c) 2011-2014 Glenn Randers-Pehrson
  *
  * This code is released under the libpng license.
@@ -9,9 +10,9 @@
 
 /* NOTE: making 'symbols.chk' checks both that the exported
  * symbols in the library don't change and (implicitly) that
- * scripts/pnglibconf.h.prebuilt is as expected.
- * If scripts/pnglibconf.h.prebuilt is remade using
- * scripts/pnglibconf.dfa then this checks the .dfa file too.
+ * pnglibconf.h.prebuilt is as expected. If the prebuilt file
+ * is remade using pnglibconf.dfa, this checks the .dfa file,
+ * too.
  */
 
 #define PNG_EXPORTA(type, name, args, attributes)\
@@ -28,10 +29,10 @@
 /* Some things are turned off by default.  Turn these things
  * on here (by hand) to get the APIs they expose and validate
  * that no harm is done.  This list is the set of options
- * defaulted to 'off' in scripts/pnglibconf/pnglibconf.dfa
+ * defaulted to 'off' in pnglibconf.dfa.
  *
- * Maintenance: if scripts/pnglibconf.dfa options are changed
- * from, or to, 'disabled' this needs updating!
+ * If pnglibconf.dfa options are changed from or to 'disabled',
+ * this needs updating.
  */
 #define PNG_BENIGN_ERRORS_SUPPORTED
 #define PNG_READ_BIG_ENDIAN_SUPPORTED  /* should do nothing! */

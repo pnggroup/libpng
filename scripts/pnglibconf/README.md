@@ -4,7 +4,7 @@ pnglibconf - libpng configuration utilities
 Copyright Notice
 ----------------
 
- * Copyright (c) 2025 Cosmin Truta.
+ * Copyright (c) 2025-2026 Cosmin Truta.
  * Copyright (c) 2010-2014 Glenn Randers-Pehrson.
  * Originally written by John Bowler, 2010.
 

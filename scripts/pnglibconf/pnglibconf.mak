@@ -36,7 +36,8 @@ pnglibconf.h: pnglibconf.dfn
 	echo '#include "pnglibconf.dfn"' >pnglibconf.c
 	@echo "## If '$(CC) -E' fails, try /lib/cpp (e.g. CPP='/lib/cpp')" >&2
 	$(CPP) $(DFNFLAGS) pnglibconf.c >pnglibconf.out
-	$(AWK) -f $(srcdir)/scripts/dfn.awk out=pnglibconf.tmp pnglibconf.out >&2
+	$(AWK) -f $(srcdir)/scripts/pnglibconf/dfn.awk\
+	    out=pnglibconf.tmp pnglibconf.out >&2
 	$(MOVE) pnglibconf.tmp $@
 
 pnglibconf.dfn: $(srcdir)/scripts/pnglibconf/pnglibconf.dfa \
@@ -45,11 +46,12 @@ pnglibconf.dfn: $(srcdir)/scripts/pnglibconf/pnglibconf.dfa \
 	$(DELETE) $@ pnglibconf.pre pnglibconf.tmp
 	@echo "## Calling $(AWK) from scripts/pnglibconf/pnglibconf.mak" >&2
 	@echo "## If 'awk' fails, try a better awk (e.g. AWK='nawk')" >&2
-	$(AWK) -f $(srcdir)/scripts/options.awk\
+	$(AWK) -f $(srcdir)/scripts/pnglibconf/options.awk\
 	    out=pnglibconf.pre version=search\
 	    $(srcdir)/pngconf.h $(srcdir)/scripts/pnglibconf/pnglibconf.dfa\
 	    $(srcdir)/pngusr.dfa $(DFA_XTRA) >&2
-	$(AWK) -f $(srcdir)/scripts/options.awk out=pnglibconf.tmp pnglibconf.pre >&2
+	$(AWK) -f $(srcdir)/scripts/pnglibconf/options.awk\
+	    out=pnglibconf.tmp pnglibconf.pre >&2
 	$(MOVE) pnglibconf.tmp $@
 
 clean-pnglibconf:

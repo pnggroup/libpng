@@ -294,9 +294,9 @@ option BENIGN_READ_ERRORS requires BENIGN_ERRORS
 # option were turned on.
 option DISABLE_ADLER32_CHECK requires READ disabled
 
-# ZLIB_VERNUM must be used here, not PNG_ZLIB_VERNUM, because
-# scripts/options.awk ends up putting this test adhead of the setting of
-# PNG_ZLIB_VERNUM (apparently above, but not because of the two-pass processing)
+# ZLIB_VERNUM must be used here, not PNG_ZLIB_VERNUM, because options.awk
+# ends up putting this test ahead of the setting of PNG_ZLIB_VERNUM
+# (apparently above, but not because of the two-pass processing)
 @#if ZLIB_VERNUM < 0x1290
 @#   define PNG_NO_DISABLE_ADLER32_CHECK
 @#endif

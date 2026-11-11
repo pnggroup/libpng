@@ -40,9 +40,9 @@ Test: @.pngtest
 .c.o:
 	cc $(ccflags) -o $@ $<
 
-# See scripts.pnglibconf/mak for how to generate this:
-@.h.pnglibconf: @.scripts.pnglibconf/h/prebuilt
-	Copy @.scripts.pnglibconf/h/prebuilt $@ ~CF~V
+# See scripts.pnglibconf.pnglibconf/mak for how to generate this:
+@.h.pnglibconf: @.pnglibconf/h/prebuilt
+	Copy @.pnglibconf/h/prebuilt $@ ~CF~V
 
 # Static dependencies:
 @.o.png @.o.pngerror @.o.pngrio @.o.pngwio @.o.pngmem \
