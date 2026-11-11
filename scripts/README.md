@@ -1,3 +1,11 @@
+Build files and scripts for libpng
+----------------------------------
+
+    autoconf/          =>  Build files for Autoconf (placeholder)
+    cmake/             =>  Build files for CMake
+    generators/        =>  Generator programs
+    pnglibconf/        =>  Automation for library feature configurations
+
 Makefiles for libpng
 --------------------
 
@@ -18,11 +26,9 @@ Makefiles for libpng
                            (Requires SCOPTIONS, copied from SCOPTIONS.ppc)
     SCOPTIONS.ppc      =>  Used with smakefile.ppc
 
-Other supporting files and scripts
-----------------------------------
+Other supporting files
+----------------------
 
-    macro.lst          =>  Used by GNU Autotools
-    README.txt         =>  This file
-
-Further information can be found in comments in the individual scripts and
-makefiles.
+    macro.lst          =>  List of function-like macros renamed by PNG_PREFIX
+    symbols.def        =>  List of exported symbols
+    README.md          =>  This file

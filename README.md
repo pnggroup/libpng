@@ -162,7 +162,7 @@ Files included in this distribution
         libpng.3      =>  Manual page for libpng (includes libpng-manual.txt)
         png.5         =>  Manual page for the PNG format
     scripts/      =>  Scripts and makefiles for building libpng
-                      (see scripts/README.txt for the complete list)
+                      (see scripts/README.md for the complete list)
     tests/        =>  Test scripts
 
 Good luck, and happy coding!

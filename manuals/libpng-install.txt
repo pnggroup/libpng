@@ -67,7 +67,7 @@ Instead, you can use one of the custom-built makefiles in the
     make install
 
 The files that are presently available in the scripts directory
-are listed and described in scripts/README.txt.
+are listed and described in scripts/README.md.
 
 Before installing libpng, you must first install zlib, if it
 is not already on your system.  zlib can usually be found
