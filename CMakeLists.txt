@@ -633,6 +633,9 @@ set(pnggetset_sources
 set(pngreadend_sources
     contrib/libtests/pngreadend.c
 )
+set(pngbigrow_sources
+    contrib/libtests/pngbigrow.c
+)
 set(pngunknown_sources
     contrib/libtests/pngunknown.c
 )
@@ -814,6 +817,15 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngreadend
                FILES "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/crashers/stale_zTXt_input.png"
                      "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/crashers/stale_iCCP_input.png")
+
+  # pngbigrow test:
+  # Row transforms on rows whose width*channels exceeds 2^32-1.
+  add_executable(pngbigrow ${pngbigrow_sources})
+  target_link_libraries(pngbigrow
+                        PRIVATE png_shared)
+
+  png_add_test(NAME pngbigrow
+               COMMAND pngbigrow)
 
   # pngvalid tests:
   # Internal validation of standard and progressive reading,

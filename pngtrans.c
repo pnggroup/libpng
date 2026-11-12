@@ -351,8 +351,8 @@ png_do_swap(png_row_infop row_info, png_bytep row)
    if (row_info->bit_depth == 16)
    {
       png_bytep rp = row;
-      png_uint_32 i;
-      png_uint_32 istop= row_info->width * row_info->channels;
+      size_t i;
+      size_t istop = (size_t)row_info->width * row_info->channels;
 
       for (i = 0; i < istop; i++, rp += 2)
       {

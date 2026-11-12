@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# pngbigrow test:
+# Row transforms on rows whose width*channels exceeds 2^32-1.
+exec ./pngbigrow

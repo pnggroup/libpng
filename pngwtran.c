@@ -248,8 +248,8 @@ png_do_shift(png_row_infop row_info, png_bytep row,
       else if (row_info->bit_depth == 8)
       {
          png_bytep bp = row;
-         png_uint_32 i;
-         png_uint_32 istop = channels * row_info->width;
+         size_t i;
+         size_t istop = (size_t)channels * row_info->width;
 
          for (i = 0; i < istop; i++, bp++)
          {
@@ -276,8 +276,8 @@ png_do_shift(png_row_infop row_info, png_bytep row,
       else
       {
          png_bytep bp;
-         png_uint_32 i;
-         png_uint_32 istop = channels * row_info->width;
+         size_t i;
+         size_t istop = (size_t)channels * row_info->width;
 
          for (bp = row, i = 0; i < istop; i++)
          {
