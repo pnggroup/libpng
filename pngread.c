@@ -4136,9 +4136,13 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
              * number of *bytes* that the application is saying are available
              * does actually fit into a 32-bit number.
              *
-             * NOTE: this will be changed in 1.7 because PNG_IMAGE_BUFFER_SIZE
-             * will be changed to use png_alloc_size_t; bigger images can be
-             * accommodated on 64-bit systems.
+             * NOTE: PNG_IMAGE_BUFFER_SIZE now uses png_alloc_size_t, which is
+             * the change promised here "in 1.7" and not made until now.  This
+             * check is deliberately kept: it is the documented API contract
+             * that keeps a single image within 32 bits, and widening the sizing
+             * macros does not widen that contract.  Applications that need
+             * bigger images require a png_alloc_size_t entry point, which is a
+             * separate change.
              */
             if (image->height <=
                 0xffffffffU/PNG_IMAGE_PIXEL_COMPONENT_SIZE(image->format)/check)
