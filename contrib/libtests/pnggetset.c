@@ -773,6 +773,102 @@ test_plte_palette_sync(void)
    return 0;
 }
 
+/* Test: the palette expansion output offsets must not wrap in 32 bits.
+ *
+ * The NEON expand path (arm/arm_init.c:png_target_do_expand_palette_neon and
+ * arm/palette_neon_intrinsics.c) computes the destination offset of each
+ * expanded pixel as "pixels x 4" (RGBA) or "pixels x 3" (RGB).  Those products
+ * used to be evaluated in png_uint_32, which wraps at row_width > 0x3FFFFFFF;
+ * such widths are legal (png_set_user_limits accepts up to PNG_UINT_31_MAX)
+ * and the wrap sent the NEON row stores to the wrong offset.  The offsets are
+ * now computed in size_t.  Because the NEON code is not compiled on non-ARM
+ * hosts (and the wrap is unreachable on 32-bit hosts, where the multi-gigabyte
+ * row buffer cannot be allocated), this test pins the arithmetic at the exact
+ * trigger inputs instead: the spellings used by the fixed source must match
+ * the true offsets, while the historical png_uint_32 products are shown to
+ * wrap there. */
+static int
+check_offset(const char *what, png_uint_32 n, int multiplier, unsigned long long truth,
+    unsigned long long got)
+{
+   if (got != truth)
+   {
+      fprintf(stderr, "pnggetset: %s(%lu) x%d: got %llu, expected %llu\n",
+          what, (unsigned long)n, multiplier, (unsigned long long)got,
+          (unsigned long long)truth);
+      return 1;
+   }
+   return 0;
+}
+
+static int
+test_palette_expand_offsets(void)
+{
+   /* Below the wrap, at its exact boundary (4*0x40000000-1 fits in 32 bits by
+    * one's-complement arithmetic), just above it, at a chunk remainder, and at
+    * PNG_UINT_31_MAX. */
+   static const png_uint_32 widths[] =
+   {
+      1U, 4U, 1000U, 0x3FFFFFFFU, 0x40000000U, 0x40000001U, 0x40000004U,
+      0x7FFFFFFFU
+   };
+   unsigned int k, j;
+   int result = 0;
+
+   if (sizeof(size_t) < 8)
+   {
+      /* On a 32-bit size_t the cast does not widen anything, but a row of
+       * more than 2^30 pixels needs a >4 GiB row buffer, which cannot be
+       * allocated there either: the wrapped code is unreachable. */
+      printf("(32-bit size_t, large-width cells skipped) ");
+      return 0;
+   }
+
+   for (k = 0; k < sizeof widths / sizeof widths[0]; ++k)
+   {
+      png_uint_32 w = widths[k];
+      png_uint_32 i;
+      unsigned long long truth;
+
+      /* arm/arm_init.c: the RGBA row end, "4 * row_width - 1" */
+      truth = (unsigned long long)4U * w - 1U;
+      result |= check_offset("rgba-row-end", w, 4, truth,
+          (unsigned long long)(4U * (size_t)w - 1U));
+
+      /* arm/palette_neon_intrinsics.c: the per-chunk back-step, "i * 4"
+       * (RGBA) at the first and the last full-chunk index. */
+      {
+         png_uint_32 chunk[2];
+         chunk[0] = 0U;
+         chunk[1] = w >= 4U ? (w - 4U) & ~3U : 0U;
+         for (j = 0; j < 2; ++j)
+         {
+            i = chunk[j];
+            truth = (unsigned long long)4U * i;
+            result |= check_offset("rgba-chunk", i, 4, truth,
+                (unsigned long long)((size_t)i * 4U));
+            /* arm/palette_neon_intrinsics.c: "i * 3" (RGB) */
+            truth = (unsigned long long)3U * i;
+            result |= check_offset("rgb-chunk", i, 3, truth,
+                (unsigned long long)((size_t)i * 3U));
+         }
+      }
+
+      /* The historical png_uint_32 spellings wrap at the trigger widths; make
+       * sure this test still describes the defect it guards against.  (Not at
+       * 0x40000000: 4*w-1 is 0xFFFFFFFF there, which fits in 32 bits.) */
+      if (w == 0x40000001U &&
+          (unsigned long long)(png_uint_32)(4U * w - 1U) == (unsigned long long)4U * w - 1U)
+      {
+         fprintf(stderr, "pnggetset: rgba-row-end(%lu) did not wrap in 32"
+             " bits; test is stale\n", (unsigned long)w);
+         result = 1;
+      }
+   }
+
+   return result;
+}
+
 int
 main(void)
 {
@@ -851,6 +947,16 @@ main(void)
    printf("Testing PLTE sync after gamma correction... ");
    fflush(stdout);
    if (test_plte_palette_sync() != 0)
+   {
+      printf("FAIL\n");
+      result = 1;
+   }
+   else
+      printf("PASS\n");
+
+   printf("Testing palette expansion offset arithmetic... ");
+   fflush(stdout);
+   if (test_palette_expand_offsets() != 0)
    {
       printf("FAIL\n");
       result = 1;
