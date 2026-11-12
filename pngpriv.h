@@ -1688,6 +1688,24 @@ PNG_INTERNAL_FUNCTION(void, png_read_filter_row_paeth3_rvv,
 PNG_INTERNAL_FUNCTION(void, png_read_filter_row_paeth4_rvv,
    (png_row_infop row_info, png_bytep row, png_const_bytep prev_row),
    PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void, png_read_filter_row_sub6_rvv,
+   (png_row_infop row_info, png_bytep row, png_const_bytep prev_row),
+   PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void, png_read_filter_row_sub8_rvv,
+   (png_row_infop row_info, png_bytep row, png_const_bytep prev_row),
+   PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void, png_read_filter_row_avg6_rvv,
+   (png_row_infop row_info, png_bytep row, png_const_bytep prev_row),
+   PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void, png_read_filter_row_avg8_rvv,
+   (png_row_infop row_info, png_bytep row, png_const_bytep prev_row),
+   PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void, png_read_filter_row_paeth6_rvv,
+   (png_row_infop row_info, png_bytep row, png_const_bytep prev_row),
+   PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void, png_read_filter_row_paeth8_rvv,
+   (png_row_infop row_info, png_bytep row, png_const_bytep prev_row),
+   PNG_EMPTY);
 #endif
 
 /* Choose the best filter to use and filter the row data */

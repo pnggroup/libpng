@@ -39,6 +39,18 @@ png_init_filter_functions_rvv(png_structp pp, unsigned int bpp)
       pp->read_filter[PNG_FILTER_VALUE_PAETH-1] = png_read_filter_row_paeth4_rvv;
       pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub4_rvv;
    }
+   else if (bpp == 6)
+   {
+      pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg6_rvv;
+      pp->read_filter[PNG_FILTER_VALUE_PAETH-1] = png_read_filter_row_paeth6_rvv;
+      pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub6_rvv;
+   }
+   else if (bpp == 8)
+   {
+      pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg8_rvv;
+      pp->read_filter[PNG_FILTER_VALUE_PAETH-1] = png_read_filter_row_paeth8_rvv;
+      pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub8_rvv;
+   }
 }
 
 #endif /* PNG_RISCV_RVV_IMPLEMENTATION == 1 */

@@ -96,6 +96,28 @@ png_read_filter_row_sub4_rvv(png_row_infop row_info, png_bytep row,
    PNG_UNUSED(prev_row)
 }
 
+void
+png_read_filter_row_sub6_rvv(png_row_info *row_info, png_byte *row,
+    const png_byte *prev_row)
+{
+   size_t len = row_info->rowbytes;
+
+   png_read_filter_row_sub_rvv(len, 6, row);
+
+   PNG_UNUSED(prev_row)
+}
+
+void
+png_read_filter_row_sub8_rvv(png_row_info *row_info, png_byte *row,
+    const png_byte *prev_row)
+{
+   size_t len = row_info->rowbytes;
+
+   png_read_filter_row_sub_rvv(len, 8, row);
+
+   PNG_UNUSED(prev_row)
+}
+
 static inline void
 png_read_filter_row_avg_rvv(size_t len, size_t bpp, unsigned char *row,
     const unsigned char *prev_row)
@@ -175,6 +197,24 @@ png_read_filter_row_avg4_rvv(png_row_infop row_info, png_bytep row,
    png_read_filter_row_avg_rvv(len, 4, row, prev_row);
 
    PNG_UNUSED(prev_row)
+}
+
+void
+png_read_filter_row_avg6_rvv(png_row_info *row_info, png_byte *row,
+    const png_byte *prev_row)
+{
+   size_t len = row_info->rowbytes;
+
+   png_read_filter_row_avg_rvv(len, 6, row, prev_row);
+}
+
+void
+png_read_filter_row_avg8_rvv(png_row_info *row_info, png_byte *row,
+    const png_byte *prev_row)
+{
+   size_t len = row_info->rowbytes;
+
+   png_read_filter_row_avg_rvv(len, 8, row, prev_row);
 }
 
 static inline void
@@ -284,6 +324,24 @@ png_read_filter_row_paeth4_rvv(png_row_infop row_info, png_bytep row,
    size_t len = row_info->rowbytes;
 
    png_read_filter_row_paeth_rvv(len, 4, row, prev_row);
+}
+
+void
+png_read_filter_row_paeth6_rvv(png_row_info *row_info, png_byte *row,
+    const png_byte *prev_row)
+{
+   size_t len = row_info->rowbytes;
+
+   png_read_filter_row_paeth_rvv(len, 6, row, prev_row);
+}
+
+void
+png_read_filter_row_paeth8_rvv(png_row_info *row_info, png_byte *row,
+    const png_byte *prev_row)
+{
+   size_t len = row_info->rowbytes;
+
+   png_read_filter_row_paeth_rvv(len, 8, row, prev_row);
 }
 
 #endif /* PNG_RISCV_RVV_IMPLEMENTATION == 1 */
