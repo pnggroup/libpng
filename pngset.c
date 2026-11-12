@@ -1234,6 +1234,7 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
        {
           png_free(png_ptr, png_ptr->trans_alpha);
           png_ptr->trans_alpha = NULL;
+          png_ptr->num_trans = 0;
        }
    }
 
