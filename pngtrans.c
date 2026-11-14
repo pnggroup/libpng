@@ -848,6 +848,22 @@ png_set_user_transform_info(png_struct *png_ptr, void *user_transform_ptr,
    }
 #endif
 
+   /* The depth is stored in a png_byte and later replaces row_info->bit_depth
+    * and info_ptr->bit_depth, where only 0 and the PNG sample depths are
+    * meaningful: png_combine_row() iterates on it and the row buffer sizing
+    * uses it (issue #867).  Reject anything else rather than let a
+    * nonstandard depth, or a value that silently truncates in the png_byte
+    * cast below (e.g. 256), drive that arithmetic. */
+   if (user_transform_depth != 0 &&
+       user_transform_depth != 1 && user_transform_depth != 2 &&
+       user_transform_depth != 4 && user_transform_depth != 8 &&
+       user_transform_depth != 16)
+   {
+      png_app_error(png_ptr,
+          "png_set_user_transform_info: invalid user_transform_depth");
+      return;
+   }
+
    png_ptr->user_transform_ptr = user_transform_ptr;
    png_ptr->user_transform_depth = (png_byte)user_transform_depth;
    png_ptr->user_transform_channels = (png_byte)user_transform_channels;
