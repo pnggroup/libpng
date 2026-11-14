@@ -800,6 +800,8 @@ if(PNG_TESTS AND PNG_SHARED)
   add_executable(pnggetset ${pnggetset_sources})
   target_link_libraries(pnggetset
                         PRIVATE png_shared)
+  target_compile_definitions(pnggetset
+                             PRIVATE PNG_SRCDIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
   png_add_test(NAME pnggetset
                COMMAND pnggetset)

@@ -773,6 +773,207 @@ test_plte_palette_sync(void)
    return 0;
 }
 
+/* Test: the palette expansion output offsets must not wrap in 32 bits.
+ *
+ * The NEON expand path (arm/palette_neon_intrinsics.c) computes the
+ * destination offset of each expanded pixel as "pixels x 4" (RGBA) or
+ * "pixels x 3" (RGB).  Those products used to be evaluated in png_uint_32,
+ * which wraps at row_width > 0x3FFFFFFF (RGBA) / 0x55555555 (RGB); such
+ * widths are legal (png_set_user_limits accepts up to PNG_UINT_31_MAX) and
+ * the wrap sent the NEON chunk stores and the scalar hand-off to the wrong
+ * offset, corrupting the expanded row.  (The row-end offsets themselves are
+ * computed in size_t in pngrtran.c and never wrapped on this branch.)  The
+ * offsets are now computed in size_t.  Because the NEON code is not compiled
+ * on non-ARM hosts (and the wrap is unreachable on 32-bit hosts, where the
+ * multi-gigabyte row buffer cannot be allocated), this test pins the
+ * arithmetic at the exact trigger inputs instead: the spellings used by the
+ * fixed source must match the true offsets, while the historical png_uint_32
+ * products are shown to wrap there. */
+static int
+check_offset(const char *what, png_uint_32 n, int multiplier, unsigned long long truth,
+    unsigned long long got)
+{
+   if (got != truth)
+   {
+      fprintf(stderr, "pnggetset: %s(%lu) x%d: got %llu, expected %llu\n",
+          what, (unsigned long)n, multiplier, (unsigned long long)got,
+          (unsigned long long)truth);
+      return 1;
+   }
+   return 0;
+}
+
+/* Portable regression guard for an ARM-only fix: verify that the offset
+ * products in arm/palette_neon_intrinsics.c are spelled in size_t.  Without
+ * this, `make check` on a non-ARM host cannot observe the defect at all.
+ * The source file is located relative to this test file's own compile-time
+ * path (contrib/libtests/pnggetset.c), so the check reads the tree the test
+ * was built from; PNG_SRCDIR, where a build system prefers to pass it
+ * explicitly, takes precedence.  Skipped (not failed) where the file cannot
+ * be located, e.g. when running the binary from an unrelated directory. */
+static int
+check_neon_offset_spellings(void)
+{
+   static const char *const good[] = { "(size_t)i * 4", "(size_t)i * 3", NULL };
+   static const char *const bad[] =
+   {
+      "*ddp - i * 4", "*ddp - i * 3", "riffled_palette + i * 4",
+      "riffled_palette[i * 4", NULL
+   };
+   char path[1024];
+   const char *srcfile = __FILE__;
+   const char *tail;
+   FILE *fp = NULL;
+   long len = 0;
+   char *src;
+   int k, result = 0;
+
+#ifdef PNG_SRCDIR
+   snprintf(path, sizeof path, "%s/arm/palette_neon_intrinsics.c", PNG_SRCDIR);
+#else
+   /* __FILE__ is <root>/contrib/libtests/pnggetset.c as spelled at compile
+    * time (relative to the build directory in a normal build). */
+   tail = strstr(srcfile, "contrib/libtests/pnggetset.c");
+   if (tail == NULL)
+   {
+      printf("(cannot derive source dir from __FILE__, spelling check skipped) ");
+      return 0;
+   }
+   if ((size_t)(tail - srcfile) + sizeof "arm/palette_neon_intrinsics.c" > sizeof path)
+   {
+      printf("(source path too long, spelling check skipped) ");
+      return 0;
+   }
+   memcpy(path, srcfile, (size_t)(tail - srcfile));
+   strcpy(path + (tail - srcfile), "arm/palette_neon_intrinsics.c");
+#endif
+
+   fp = fopen(path, "rb");
+   if (fp == NULL)
+   {
+      printf("(arm/palette_neon_intrinsics.c not found, spelling check skipped) ");
+      return 0;
+   }
+
+   fseek(fp, 0, SEEK_END);
+   len = ftell(fp);
+   fseek(fp, 0, SEEK_SET);
+   src = (char *)malloc((size_t)len + 1);
+   if (src == NULL)
+   {
+      fclose(fp);
+      fprintf(stderr, "pnggetset: out of memory\n");
+      return 1;
+   }
+   len = (long)fread(src, 1, (size_t)len, fp);
+   src[len] = '\0';
+   fclose(fp);
+
+   for (k = 0; good[k] != NULL; ++k)
+      if (strstr(src, good[k]) == NULL)
+      {
+         fprintf(stderr, "pnggetset: %s does not contain \"%s\"; the"
+             " offsets are not computed in size_t\n", path, good[k]);
+         result = 1;
+      }
+   for (k = 0; bad[k] != NULL; ++k)
+      if (strstr(src, bad[k]) != NULL)
+      {
+         fprintf(stderr, "pnggetset: %s still contains the wrapping"
+             " spelling \"%s\"\n", path, bad[k]);
+         result = 1;
+      }
+
+   free(src);
+   return result;
+}
+
+static int
+test_palette_expand_offsets(void)
+{
+   /* Below the wrap, at its exact boundary (4*0x40000000 fits in 32 bits by
+    * unsigned arithmetic), just above it, at chunk remainders, at the RGB
+    * wrap, and at PNG_UINT_31_MAX. */
+   static const png_uint_32 widths[] =
+   {
+      1U, 4U, 1000U, 0x3FFFFFFFU, 0x40000000U, 0x40000001U, 0x40000004U,
+      0x55555558U, 0x5555555EU, 0x7FFFFFFFU
+   };
+   unsigned int k, j;
+   int result = 0;
+
+   if (sizeof(size_t) < 8)
+   {
+      /* On a 32-bit size_t the cast does not widen anything, but a row of
+       * more than 2^30 pixels needs a >4 GiB row buffer, which cannot be
+       * allocated there either: the wrapped code is unreachable. */
+      printf("(32-bit size_t, large-width cells skipped) ");
+      return 0;
+   }
+
+   for (k = 0; k < sizeof widths / sizeof widths[0]; ++k)
+   {
+      png_uint_32 w = widths[k];
+      png_uint_32 i;
+      unsigned long long truth;
+
+      /* pngrtran.c:png_do_expand_palette: the RGBA row end,
+       * "((size_t)row_width << 2) - 1" */
+      truth = (unsigned long long)4U * w - 1U;
+      result |= check_offset("rgba-row-end", w, 4, truth,
+          (unsigned long long)(((size_t)w << 2) - 1U));
+
+      /* pngrtran.c:png_do_expand_palette: the RGB row end,
+       * "(size_t)row_width * 3 - 1" */
+      truth = (unsigned long long)3U * w - 1U;
+      result |= check_offset("rgb-row-end", w, 3, truth,
+          (unsigned long long)((size_t)w * 3U - 1U));
+
+      /* arm/palette_neon_intrinsics.c: the per-chunk back-step and the
+       * hand-off to the scalar fallback, "i * 4" (RGBA) at the first and the
+       * last full-chunk index. */
+      {
+         png_uint_32 chunk[2];
+         chunk[0] = 0U;
+         chunk[1] = w >= 4U ? (w - 4U) & ~3U : 0U;
+         for (j = 0; j < 2; ++j)
+         {
+            i = chunk[j];
+            truth = (unsigned long long)4U * i;
+            result |= check_offset("rgba-chunk", i, 4, truth,
+                (unsigned long long)((size_t)i * 4U));
+            /* arm/palette_neon_intrinsics.c: "i * 3" (RGB) */
+            truth = (unsigned long long)3U * i;
+            result |= check_offset("rgb-chunk", i, 3, truth,
+                (unsigned long long)((size_t)i * 3U));
+         }
+      }
+
+      /* The historical png_uint_32 spellings wrap at the trigger widths; make
+       * sure this test still describes the defect it guards against. */
+      if (w == 0x40000001U &&
+          (unsigned long long)(png_uint_32)(4U * (w - 1U)) ==
+          (unsigned long long)4U * (w - 1U))
+      {
+         fprintf(stderr, "pnggetset: rgba-chunk(%lu) did not wrap in 32"
+             " bits; test is stale\n", (unsigned long)(w - 1U));
+         result = 1;
+      }
+      if (w == 0x5555555EU &&
+          (unsigned long long)(png_uint_32)(3U * (w - 8U)) ==
+          (unsigned long long)3U * (w - 8U))
+      {
+         fprintf(stderr, "pnggetset: rgb-chunk(%lu) did not wrap in 32"
+             " bits; test is stale\n", (unsigned long)(w - 8U));
+         result = 1;
+      }
+   }
+
+   result |= check_neon_offset_spellings();
+
+   return result;
+}
+
 int
 main(void)
 {
@@ -851,6 +1052,16 @@ main(void)
    printf("Testing PLTE sync after gamma correction... ");
    fflush(stdout);
    if (test_plte_palette_sync() != 0)
+   {
+      printf("FAIL\n");
+      result = 1;
+   }
+   else
+      printf("PASS\n");
+
+   printf("Testing palette expansion offset arithmetic... ");
+   fflush(stdout);
+   if (test_palette_expand_offsets() != 0)
    {
       printf("FAIL\n");
       result = 1;

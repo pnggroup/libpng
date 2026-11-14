@@ -269,8 +269,7 @@ pngfix_OBJECTS = $(am_pngfix_OBJECTS)
 @ENABLE_TOOLS_TRUE@pngfix_DEPENDENCIES =  \
 @ENABLE_TOOLS_TRUE@	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 am__pnggetset_SOURCES_DIST = contrib/libtests/pnggetset.c
-@ENABLE_TESTS_TRUE@am_pnggetset_OBJECTS =  \
-@ENABLE_TESTS_TRUE@	contrib/libtests/pnggetset.$(OBJEXT)
+@ENABLE_TESTS_TRUE@am_pnggetset_OBJECTS = contrib/libtests/pnggetset-pnggetset.$(OBJEXT)
 pnggetset_OBJECTS = $(am_pnggetset_OBJECTS)
 @ENABLE_TESTS_TRUE@pnggetset_DEPENDENCIES =  \
 @ENABLE_TESTS_TRUE@	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
@@ -342,7 +341,7 @@ am__depfiles_remade = ./$(DEPDIR)/png.Plo ./$(DEPDIR)/pngerror.Plo \
 	arm/$(DEPDIR)/arm_init.Plo \
 	arm/$(DEPDIR)/filter_neon_intrinsics.Plo \
 	arm/$(DEPDIR)/palette_neon_intrinsics.Plo \
-	contrib/libtests/$(DEPDIR)/pnggetset.Po \
+	contrib/libtests/$(DEPDIR)/pnggetset-pnggetset.Po \
 	contrib/libtests/$(DEPDIR)/pngimage.Po \
 	contrib/libtests/$(DEPDIR)/pngreadend.Po \
 	contrib/libtests/$(DEPDIR)/pngstest.Po \
@@ -818,6 +817,7 @@ BUILT_SOURCES = pnglibconf.h
 @ENABLE_TESTS_TRUE@pngtest_SOURCES = pngtest.c
 @ENABLE_TESTS_TRUE@pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 @ENABLE_TESTS_TRUE@pnggetset_SOURCES = contrib/libtests/pnggetset.c
+@ENABLE_TESTS_TRUE@pnggetset_CPPFLAGS = -DPNG_SRCDIR=\"$(abs_srcdir)\"
 @ENABLE_TESTS_TRUE@pnggetset_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 @ENABLE_TESTS_TRUE@pngreadend_SOURCES = contrib/libtests/pngreadend.c
 @ENABLE_TESTS_TRUE@pngreadend_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
@@ -1205,7 +1205,7 @@ contrib/libtests/$(am__dirstamp):
 contrib/libtests/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) contrib/libtests/$(DEPDIR)
 	@: >>contrib/libtests/$(DEPDIR)/$(am__dirstamp)
-contrib/libtests/pnggetset.$(OBJEXT):  \
+contrib/libtests/pnggetset-pnggetset.$(OBJEXT):  \
 	contrib/libtests/$(am__dirstamp) \
 	contrib/libtests/$(DEPDIR)/$(am__dirstamp)
 
@@ -1329,7 +1329,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_init.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/filter_neon_intrinsics.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/palette_neon_intrinsics.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pnggetset.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pnggetset-pnggetset.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngimage.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngreadend.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngstest.Po@am__quote@ # am--include-marker
@@ -1408,6 +1408,20 @@ riscv/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@rvv_la-filter_rvv_intrinsics.lo: riscv/f
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/filter_rvv_intrinsics.c' object='riscv/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@rvv_la-filter_rvv_intrinsics.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@rvv_la_CFLAGS) $(CFLAGS) -c -o riscv/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@rvv_la-filter_rvv_intrinsics.lo `test -f 'riscv/filter_rvv_intrinsics.c' || echo '$(srcdir)/'`riscv/filter_rvv_intrinsics.c
+
+contrib/libtests/pnggetset-pnggetset.o: contrib/libtests/pnggetset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(pnggetset_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT contrib/libtests/pnggetset-pnggetset.o -MD -MP -MF contrib/libtests/$(DEPDIR)/pnggetset-pnggetset.Tpo -c -o contrib/libtests/pnggetset-pnggetset.o `test -f 'contrib/libtests/pnggetset.c' || echo '$(srcdir)/'`contrib/libtests/pnggetset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) contrib/libtests/$(DEPDIR)/pnggetset-pnggetset.Tpo contrib/libtests/$(DEPDIR)/pnggetset-pnggetset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='contrib/libtests/pnggetset.c' object='contrib/libtests/pnggetset-pnggetset.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(pnggetset_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o contrib/libtests/pnggetset-pnggetset.o `test -f 'contrib/libtests/pnggetset.c' || echo '$(srcdir)/'`contrib/libtests/pnggetset.c
+
+contrib/libtests/pnggetset-pnggetset.obj: contrib/libtests/pnggetset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(pnggetset_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT contrib/libtests/pnggetset-pnggetset.obj -MD -MP -MF contrib/libtests/$(DEPDIR)/pnggetset-pnggetset.Tpo -c -o contrib/libtests/pnggetset-pnggetset.obj `if test -f 'contrib/libtests/pnggetset.c'; then $(CYGPATH_W) 'contrib/libtests/pnggetset.c'; else $(CYGPATH_W) '$(srcdir)/contrib/libtests/pnggetset.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) contrib/libtests/$(DEPDIR)/pnggetset-pnggetset.Tpo contrib/libtests/$(DEPDIR)/pnggetset-pnggetset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='contrib/libtests/pnggetset.c' object='contrib/libtests/pnggetset-pnggetset.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(pnggetset_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o contrib/libtests/pnggetset-pnggetset.obj `if test -f 'contrib/libtests/pnggetset.c'; then $(CYGPATH_W) 'contrib/libtests/pnggetset.c'; else $(CYGPATH_W) '$(srcdir)/contrib/libtests/pnggetset.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -2396,7 +2410,7 @@ distclean: distclean-am
 	-rm -f arm/$(DEPDIR)/arm_init.Plo
 	-rm -f arm/$(DEPDIR)/filter_neon_intrinsics.Plo
 	-rm -f arm/$(DEPDIR)/palette_neon_intrinsics.Plo
-	-rm -f contrib/libtests/$(DEPDIR)/pnggetset.Po
+	-rm -f contrib/libtests/$(DEPDIR)/pnggetset-pnggetset.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngimage.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngreadend.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngstest.Po
@@ -2487,7 +2501,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f arm/$(DEPDIR)/arm_init.Plo
 	-rm -f arm/$(DEPDIR)/filter_neon_intrinsics.Plo
 	-rm -f arm/$(DEPDIR)/palette_neon_intrinsics.Plo
-	-rm -f contrib/libtests/$(DEPDIR)/pnggetset.Po
+	-rm -f contrib/libtests/$(DEPDIR)/pnggetset-pnggetset.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngimage.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngreadend.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngstest.Po

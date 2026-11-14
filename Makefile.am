@@ -43,6 +43,7 @@ pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 pnggetset_SOURCES = contrib/libtests/pnggetset.c
+pnggetset_CPPFLAGS = -DPNG_SRCDIR=\"$(abs_srcdir)\"
 pnggetset_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 pngreadend_SOURCES = contrib/libtests/pngreadend.c
