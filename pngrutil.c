@@ -962,7 +962,6 @@ png_handle_IHDR(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
        color_type, interlace_type, compression_type, filter_type);
 
    return handled_ok;
-   PNG_UNUSED(length)
 }
 
 /* Read and check the palette */
@@ -1123,7 +1122,6 @@ png_handle_gAMA(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 #endif /*READ_GAMMA*/
 
    return handled_ok;
-   PNG_UNUSED(length)
 }
 #else
 #  define png_handle_gAMA NULL
@@ -1264,7 +1262,6 @@ png_handle_cHRM(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 #  endif /* READ_RGB_TO_GRAY */
 
    return handled_ok;
-   PNG_UNUSED(length)
 }
 #else
 #  define png_handle_cHRM NULL
@@ -1309,7 +1306,6 @@ png_handle_sRGB(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 #endif /*READ_GAMMA*/
 
    return handled_ok;
-   PNG_UNUSED(length)
 }
 #else
 #  define png_handle_sRGB NULL
@@ -1906,7 +1902,6 @@ png_handle_cICP(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 #endif /*READ_GAMMA*/
 
    return handled_ok;
-   PNG_UNUSED(length)
 }
 #else
 #  define png_handle_cICP NULL
@@ -1929,7 +1924,6 @@ png_handle_cLLI(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
    png_set_cLLI_fixed(png_ptr, info_ptr, png_get_uint_32(buf),
          png_get_uint_32(buf+4));
    return handled_ok;
-   PNG_UNUSED(length)
 }
 #else
 #  define png_handle_cLLI NULL
@@ -1983,7 +1977,6 @@ png_handle_mDCV(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 #  endif /* READ_RGB_TO_GRAY */
 
    return handled_ok;
-   PNG_UNUSED(length)
 }
 #else
 #  define png_handle_mDCV NULL
@@ -2097,7 +2090,6 @@ png_handle_pHYs(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
    unit_type = buf[8];
    png_set_pHYs(png_ptr, info_ptr, res_x, res_y, unit_type);
    return handled_ok;
-   PNG_UNUSED(length)
 }
 #else
 #  define png_handle_pHYs NULL
@@ -2123,7 +2115,6 @@ png_handle_oFFs(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
    unit_type = buf[8];
    png_set_oFFs(png_ptr, info_ptr, offset_x, offset_y, unit_type);
    return handled_ok;
-   PNG_UNUSED(length)
 }
 #else
 #  define png_handle_oFFs NULL
@@ -2337,6 +2328,18 @@ png_handle_tIME(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_tIME");
 
+   /* Validate chunk length before reading. All other fixed-size chunk handlers
+    * (tRNS, bKGD, gAMA, etc.) guard against wrong lengths here. png_handle_tIME
+    * previously called png_crc_read unconditionally, relying solely on the
+    * dispatch layer to reject wrong-length chunks. Add the explicit check for
+    * defence-in-depth and consistency with every other handler. */
+   if (length != 7)
+   {
+      if (png_crc_finish(png_ptr, length) != 0)
+         return handled_error;
+      png_chunk_benign_error(png_ptr, "invalid chunk length");
+      return handled_error;
+   }
    /* TODO: what is this doing here?  It should be happened in pngread.c and
     * pngpread.c, although it could be moved to png_handle_chunk below and
     * thereby avoid some code duplication.
@@ -2358,7 +2361,6 @@ png_handle_tIME(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 
    png_set_tIME(png_ptr, info_ptr, &mod_time);
    return handled_ok;
-   PNG_UNUSED(length)
 }
 #else
 #  define png_handle_tIME NULL
