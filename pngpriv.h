@@ -908,6 +908,23 @@ PNG_INTERNAL_FUNCTION(int, png_user_version_check,
 #else                               /* modern system limit SIZE_MAX (C99) */
 #  define png_chunk_max(png_ptr) ((void)png_ptr, PNG_SIZE_MAX)
 #endif
+
+/* The corresponding limit for the decompression of text chunks (zTXt and
+ * iTXt) alone; the png_chunk_max limit above applies as well, so the
+ * effective limit is the smaller of the two.
+ */
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED /* run-time limit */
+#  define png_chunk_text_max(png_ptr) ((png_ptr)->user_chunk_text_max)
+
+#elif PNG_USER_CHUNK_TEXT_MAX > 0 /* compile-time limit */
+#  define png_chunk_text_max(png_ptr) ((void)png_ptr, PNG_USER_CHUNK_TEXT_MAX)
+
+#elif (defined PNG_MAX_MALLOC_64K)  /* legacy system limit */
+#  define png_chunk_text_max(png_ptr) ((void)png_ptr, 65536U)
+
+#else                               /* modern system limit SIZE_MAX (C99) */
+#  define png_chunk_text_max(png_ptr) ((void)png_ptr, PNG_SIZE_MAX)
+#endif
 #endif /* READ */
 
 /* Internal base allocator - no messages, NULL on failure to allocate.  This

@@ -194,6 +194,8 @@ EXPORTS
  png_get_chunk_cache_max
  png_set_chunk_malloc_max
  png_get_chunk_malloc_max
+ png_set_chunk_text_max
+ png_get_chunk_text_max
  png_get_pixels_per_inch
  png_get_x_pixels_per_inch
  png_get_y_pixels_per_inch

@@ -1326,6 +1326,13 @@ png_get_chunk_malloc_max(const png_struct *png_ptr)
 {
    return (png_ptr ? png_ptr->user_chunk_malloc_max : 0);
 }
+
+/* This function was added to libpng 1.8.0 */
+png_alloc_size_t
+png_get_chunk_text_max(const png_struct *png_ptr)
+{
+   return (png_ptr ? png_ptr->user_chunk_text_max : 0);
+}
 #endif /* SET_USER_LIMITS */
 
 /* These functions were added to libpng 1.4.0 */
