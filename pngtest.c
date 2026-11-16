@@ -17,7 +17,7 @@
  *
  * The program will report "FAIL" in certain legitimate cases:
  * 1) when the compression level or filter selection method is changed.
- * 2) when the maximum IDAT size (PNG_ZBUF_SIZE in pngconf.h) is not 8192.
+ * 2) when the maximum IDAT size (PNG_ZBUF_SIZE in png.h) is not 8192.
  * 3) unknown unsafe-to-copy ancillary chunks or unknown critical chunks
  *    exist in the input file.
  * 4) others not listed here...
@@ -95,11 +95,6 @@
     defined PNG_READ_tIME_SUPPORTED && \
     defined PNG_READ_zTXt_SUPPORTED && \
     (defined PNG_WRITE_INTERLACING_SUPPORTED || PNG_LIBPNG_VER >= 10700)
-
-/* Copied from pngpriv.h but only used in error messages below. */
-#ifndef PNG_ZBUF_SIZE
-#  define PNG_ZBUF_SIZE 8192
-#endif
 
 #ifndef PNG_DEBUG
 #  define PNG_DEBUG 0

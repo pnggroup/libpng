@@ -233,8 +233,8 @@ endif
 $(srcdir)/pnglibconf.h.prebuilt:
 	@echo "Attempting to build $@" >&2
 	@echo "This is a machine generated file, but if you want to make" >&2
-	@echo "a new one simply make 'scripts/pnglibconf/pnglibconf.out'," >&2
-	@echo "copy that AND set PNG_ZLIB_VERNUM to 0 (you MUST do this)" >&2
+	@echo "a new one simply make 'scripts/pnglibconf/pnglibconf.out'" >&2
+	@echo "and copy that to pnglibconf.h.prebuilt" >&2
 	@exit 1
 
 # The following is necessary to ensure that the local pnglibconf.h is used, not

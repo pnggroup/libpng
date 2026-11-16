@@ -246,6 +246,32 @@
 #ifndef PNG_VERSION_INFO_ONLY
 /* Machine specific configuration. */
 #  include "pngconf.h"
+
+/* Library settings. */
+
+/* The zlib compression level and strategy used for IDAT and for compressed
+ * text, given as the values of the zlib.h constants named in the comments.
+ * PNG_Z_DEFAULT_NOFILTER_STRATEGY applies when no row filters are used.
+ */
+#  define PNG_Z_DEFAULT_COMPRESSION       (-1) /* Z_DEFAULT_COMPRESSION */
+#  define PNG_Z_DEFAULT_STRATEGY          1    /* Z_FILTERED */
+#  define PNG_Z_DEFAULT_NOFILTER_STRATEGY 0    /* Z_DEFAULT_STRATEGY */
+#  define PNG_TEXT_Z_DEFAULT_COMPRESSION  (-1) /* Z_DEFAULT_COMPRESSION */
+#  define PNG_TEXT_Z_DEFAULT_STRATEGY     0    /* Z_DEFAULT_STRATEGY */
+
+/* The default compression buffer sizes.
+ * Applications can change them with png_set_compression_buffer_size, which
+ * sets the write size or the read size, depending on the png_struct given.
+ */
+
+/* The maximum size of the IDAT chunks written by libpng. */
+#  define PNG_ZBUF_SIZE 8192
+
+/* The maximum amount of IDAT data that the sequential reader processes at once.
+ * It does not limit the size of the IDAT chunks read, and a value larger than
+ * the IDAT chunks typically encountered only wastes memory.
+ */
+#  define PNG_IDAT_READ_SIZE PNG_ZBUF_SIZE
 #endif
 
 /*

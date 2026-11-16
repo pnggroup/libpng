@@ -195,26 +195,6 @@ setting API_RULE default 0
 
 setting PREFIX
 
-# These settings configure the default compression level (0-9) and 'strategy';
-# strategy is as defined by the implementors of zlib. It describes the input
-# data and modifies the zlib parameters in an attempt to optimize the balance
-# between search and huffman encoding in the zlib algorithms.  The defaults are
-# the zlib.h defaults - the apparently recursive definition does not arise
-# because the name of the setting is prefixed by PNG_
-#
-# The TEXT values are the defaults when writing compressed text (all forms)
-
-# Include the zlib header so that the defaults below are known
-@#  include <zlib.h>
-
-# The '@' here means to substitute the value when pnglibconf.h is built
-setting Z_DEFAULT_COMPRESSION default @Z_DEFAULT_COMPRESSION
-# TODO: why aren't these Z_RLE; zlib.h says that Z_RLE, specifically, is
-# appropriate for PNG images, maybe it doesn't exist in all versions?
-setting Z_DEFAULT_STRATEGY default @Z_FILTERED
-setting Z_DEFAULT_NOFILTER_STRATEGY default @Z_DEFAULT_STRATEGY
-setting ZLIB_VERNUM default @ZLIB_VERNUM
-
 # Linkage of:
 #
 #  API:      libpng API functions
@@ -225,9 +205,6 @@ setting LINKAGE_API default extern
 setting LINKAGE_CALLBACK default extern
 setting LINKAGE_FUNCTION default extern
 setting LINKAGE_DATA default extern
-
-setting TEXT_Z_DEFAULT_COMPRESSION default @Z_DEFAULT_COMPRESSION
-setting TEXT_Z_DEFAULT_STRATEGY default @Z_DEFAULT_STRATEGY
 
 # Default to using the read macros
 
@@ -280,26 +257,16 @@ option BENIGN_READ_ERRORS requires BENIGN_ERRORS
 # stream will result in a decompression (inflate) failure on read even though
 # the entire image might have been read successfully.
 #
-# This option relies on an undocumented function 'inflateValidate' which is
-# present in only some versions of zlib.  If the function is not present in the
-# zlib used with libpng code which uses -lpng is likely to fail to link or to
+# This option relies on the undocumented function inflateValidate, introduced
+# in zlib 1.2.9.  libpng refuses to compile with this option turned on if the
+# zlib.h version is below 1.2.9.  If the function is not present in the zlib
+# used with libpng, code which uses -lpng is likely to fail to link, or to
 # launch in the case of a DLL.
 #
-# Therefore this option is currently disabled by default; it has to be turned on
-# in pngusr.dfa and then the application program has to explicitly turn the
+# Therefore, this option is currently disabled by default; it has to be turned
+# on in pngusr.dfa and then the application program has to explicitly turn the
 # functionality on by calling png_set_option.
-#
-# Furthermore the option is explicitly turned off here if the zlib version
-# number is below that required - libpng wouldn't compile in that case if the
-# option were turned on.
 option DISABLE_ADLER32_CHECK requires READ disabled
-
-# ZLIB_VERNUM must be used here, not PNG_ZLIB_VERNUM, because options.awk
-# ends up putting this test ahead of the setting of PNG_ZLIB_VERNUM
-# (apparently above, but not because of the two-pass processing)
-@#if ZLIB_VERNUM < 0x1290
-@#   define PNG_NO_DISABLE_ADLER32_CHECK
-@#endif
 
 # Generic options - affect both read and write.
 
@@ -650,44 +617,6 @@ setting GAMMA_THRESHOLD_FIXED default 5000
 # floating point API is enabled)
 
 setting sCAL_PRECISION default 5
-
-# This is the size of the compression buffer, and thus the size of
-# an IDAT chunk.  Make this whatever size you feel is best for your
-# machine.  One of these will be allocated per png_struct.  When this
-# is full, it writes the data to the disk, and does some other
-# calculations.  Making this an extremely small size may slow
-# the library down, but you may want to experiment to determine
-# where it becomes significant, if you are concerned with memory
-# usage.  Note that zlib allocates at least 32Kb also.  For readers,
-# this describes the size of the buffer available to read the data in.
-# Unless this gets smaller than the size of a row (compressed),
-# it should not make much difference how big this is.
-
-setting ZBUF_SIZE default 8192
-
-# This is the size of the decompression buffer used when counting or checking
-# the decompressed size of an LZ stream from a compressed ancillary chunk; the
-# decompressed data is never used so a different size may be optimal.  This size
-# was determined using contrib/libtests/timepng.c with compressed zTXt data
-# around 11MByte in size.  Slight speed improvements (up to about 14% in
-# timepng) can be achieved by very large increases (to 32kbyte) on regular data,
-# but highly compressible data shows only around 2% improvement.   The size is
-# chosen to minimize the effects of DoS attacks based on using very large
-# amounts of highly compressible data.
-
-setting INFLATE_BUF_SIZE default 1024
-
-# This is the maximum amount of IDAT data that the sequential reader will
-# process at one time.  The setting does not affect the size of IDAT chunks
-# read, just the amount read at once.  Neither does it affect the progressive
-# reader, which processes just the amount of data the application gives it.
-# The sequential reader is currently unable to process more than one IDAT at
-# once - it has to read and process each one in turn.  There is no point setting
-# this to a value larger than the IDAT chunks typically encountered (it would
-# just waste memory) but there may be some point in reducing it below the value
-# of ZBUF_SIZE (the size of IDAT chunks written by libpng.)
-
-setting IDAT_READ_SIZE default PNG_ZBUF_SIZE
 
 # Target specific code.  By default libpng will use "target specific" code if
 # available.  This means code that depends on particular capabilities of a CPU

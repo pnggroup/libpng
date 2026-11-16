@@ -796,24 +796,43 @@
  */
 #ifndef PNG_VERSION_INFO_ONLY
 
+/* zlib.h defines the structure z_stream, an instance of which is included
+ * in png_struct and is required for decompressing the LZ compressed
+ * data in PNG files.
+ */
+#ifndef ZLIB_CONST
+   /* Ensure that zlib uses 'const' in declarations. */
+#  define ZLIB_CONST
+#endif
+#include <zlib.h>
+#ifdef const
+   /* zlib.h sometimes #defines const to nothing, undo this. */
+#  undef const
+#endif
+
+/* The Adler-32 option relies on inflateValidate, added in zlib 1.2.9. */
+#if defined(PNG_DISABLE_ADLER32_CHECK_SUPPORTED) && ZLIB_VERNUM < 0x1290
+#  error DISABLE_ADLER32_CHECK requires zlib version 1.2.9 or newer
+#endif
+
+/* zlib.h declares a magic type 'uInt' that limits the amount of data that zlib
+ * can handle at once.  This type need be no larger than 16 bits (so maximum of
+ * 65535), this define allows us to discover how big it is, but limited by the
+ * maximum for size_t.
+ */
+#define ZLIB_IO_MAX ((uInt)-1)
+
+/* The size of the scratch buffers that the reader allocates on the stack:
+ * for chunk data that is skipped, for the compressed data of iCCP, and for
+ * decompressed data that is only counted or checked, then discarded.  Larger
+ * buffers speed up regular data a little, but the size is kept small to limit
+ * the effect of denial-of-service attacks that use large amounts of highly
+ * compressible data.
+ */
+#define PNG_INFLATE_BUF_SIZE 1024
+
 #include "pngstruct.h"
 #include "pnginfo.h"
-
-/* Validate the include paths - the include path used to generate pnglibconf.h
- * must match that used in the build, or we must be using pnglibconf.h.prebuilt:
- */
-#if PNG_ZLIB_VERNUM != 0 && PNG_ZLIB_VERNUM != ZLIB_VERNUM
-#  error The include path of <zlib.h> is incorrect
-   /* When pnglibconf.h was built, the copy of zlib.h that it used was not the
-    * same as the one being used here.  Considering how libpng makes decisions
-    * to use the zlib API based on the zlib version number, the -I options must
-    * match.
-    *
-    * A possible cause of this mismatch is that you passed an -I option in
-    * CFLAGS, which is unlikely to work.  All the preprocessor options, and all
-    * the -I options in particular, should be in CPPFLAGS.
-    */
-#endif
 
 /* Added to libpng-1.5.7: sRGB conversion tables */
 #if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\

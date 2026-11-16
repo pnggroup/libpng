@@ -16,31 +16,6 @@
 
 #ifndef PNGSTRUCT_H
 #define PNGSTRUCT_H
-/* zlib.h defines the structure z_stream, an instance of which is included
- * in this structure and is required for decompressing the LZ compressed
- * data in PNG files.
- */
-#ifndef ZLIB_CONST
-   /* We must ensure that zlib uses 'const' in declarations. */
-#  define ZLIB_CONST
-#endif
-#include "zlib.h"
-#ifdef const
-   /* zlib.h sometimes #defines const to nothing, undo this. */
-#  undef const
-#endif
-
-/* zlib.h declares a magic type 'uInt' that limits the amount of data that zlib
- * can handle at once.  This type need be no larger than 16 bits (so maximum of
- * 65535), this define allows us to discover how big it is, but limited by the
- * maximum for size_t.  The value can be overridden in a library build
- * (pngusr.h, or set it in CPPFLAGS) and it works to set it to a considerably
- * lower value (e.g. 255 works).  A lower value may help memory usage (slightly)
- * and may even improve performance on some systems (and degrade it on others.)
- */
-#ifndef ZLIB_IO_MAX
-#  define ZLIB_IO_MAX ((uInt)-1)
-#endif
 
 #ifdef PNG_WRITE_SUPPORTED
 /* The type of a compression buffer list used by the write code. */
