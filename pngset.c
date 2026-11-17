@@ -2057,6 +2057,33 @@ png_set_chunk_malloc_max(png_struct *png_ptr,
          png_ptr->user_chunk_malloc_max = user_chunk_malloc_max;
    }
 }
+
+/* This function was added to libpng 1.8.0 */
+void
+png_set_chunk_text_max(png_struct *png_ptr,
+    png_alloc_size_t user_chunk_text_max)
+{
+   png_debug(1, "in png_set_chunk_text_max");
+
+   /* As with png_set_chunk_malloc_max, '0' means unlimited: store the
+    * system limit so that the checks in png_decompress_chunk do not need
+    * to special-case 0.  The png_set_chunk_malloc_max limit still applies
+    * to text chunks, so an unlimited text limit simply defers to it.
+    */
+   if (png_ptr != NULL)
+   {
+      if (user_chunk_text_max == 0U) /* unlimited */
+      {
+#        ifdef PNG_MAX_MALLOC_64K
+            png_ptr->user_chunk_text_max = 65536U;
+#        else
+            png_ptr->user_chunk_text_max = PNG_SIZE_MAX;
+#        endif
+      }
+      else
+         png_ptr->user_chunk_text_max = user_chunk_text_max;
+   }
+}
 #endif /* ?SET_USER_LIMITS */
 
 

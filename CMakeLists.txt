@@ -376,6 +376,9 @@ set(pnggetset_sources
 set(pngreadend_sources
     contrib/libtests/pngreadend.c
 )
+set(pngtextlimit_sources
+    contrib/libtests/pngtextlimit.c
+)
 set(pngunknown_sources
     contrib/libtests/pngunknown.c
 )
@@ -551,6 +554,18 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngreadend
                FILES "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/crashers/stale_zTXt_input.png"
                      "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/crashers/stale_iCCP_input.png")
+
+  # pngtextlimit test:
+  # Per-chunk-type decompression limits for text chunks.
+  add_executable(pngtextlimit ${pngtextlimit_sources})
+  target_link_libraries(pngtextlimit
+                        PRIVATE png_shared)
+
+  png_add_test(NAME pngtextlimit
+               COMMAND pngtextlimit
+               FILES "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/textlimit/text-amplify.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/textlimit/iccp-large.png"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/textlimit/normal.png")
 
   # pngvalid tests:
   # Internal validation of standard and progressive reading,

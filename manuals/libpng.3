@@ -71,6 +71,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.8.0.git
 
 \fBpng_alloc_size_t png_get_chunk_malloc_max (const png_struct \fI*png_ptr\fP\fB);\fP
 
+\fBpng_alloc_size_t png_get_chunk_text_max (const png_struct \fI*png_ptr\fP\fB);\fP
+
 \fBpng_byte png_get_color_type (const png_struct \fP\fI*png_ptr\fP\fB, const png_info \fI*info_ptr\fP\fB);\fP
 
 \fBpng_uint_32 png_get_compression_buffer_size (const png_struct \fI*png_ptr\fP\fB);\fP
@@ -364,6 +366,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.8.0.git
 \fBjmp_buf* png_set_longjmp_fn (png_struct \fP\fI*png_ptr\fP\fB, png_longjmp_ptr \fP\fIlongjmp_fn\fP\fB, size_t \fIjmp_buf_size\fP\fB);\fP
 
 \fBvoid png_set_chunk_malloc_max (png_struct \fP\fI*png_ptr\fP\fB, png_alloc_size_t \fIuser_chunk_cache_max\fP\fB);\fP
+
+\fBvoid png_set_chunk_text_max (png_struct \fP\fI*png_ptr\fP\fB, png_alloc_size_t \fIuser_chunk_text_max\fP\fB);\fP
 
 \fBvoid png_set_compression_buffer_size (png_struct \fP\fI*png_ptr\fP\fB, png_uint_32 \fIsize\fP\fB);\fP
 
@@ -1206,6 +1210,24 @@ and you can retrieve the limit with
 
 Any chunks that would cause either of these limits to be exceeded will
 be ignored.
+
+Since libpng-1.8.0, the decompression of text chunks (zTXt and iTXt) is
+also subject to a separate limit, of 1 Megabyte (1,000,000 bytes) by
+default.  An ICC profile in an iCCP chunk may legitimately occupy
+megabytes, but a text chunk of a comparable decompressed size is almost
+invariably hostile: a compressed text chunk of a few kilobytes can
+otherwise expand to the full chunk_malloc_max limit.  You can change
+the text chunk limit with
+
+   png_set_chunk_text_max(png_ptr, user_chunk_text_max);
+
+and you can retrieve the limit with
+
+   chunk_text_max = png_get_chunk_text_max(png_ptr);
+
+Passing 0 to png_set_chunk_text_max removes the text-specific limit;
+the chunk_malloc_max limit still applies.  The two limits combine: the
+effective limit on a decompressed text chunk is the smaller of the two.
 
 .SS Information about your system
 

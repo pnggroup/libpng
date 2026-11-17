@@ -394,6 +394,12 @@ struct png_struct_def
     * can occupy when decompressed.  0 means unlimited.
     */
    png_alloc_size_t user_chunk_malloc_max;
+
+   /* Added in libpng-1.8.0: Total memory that a zTXt or iTXt chunk
+    * can occupy when decompressed, in addition to the limit above.
+    * 0 means unlimited.
+    */
+   png_alloc_size_t user_chunk_text_max;
 #endif
 
 /* New member added in libpng-1.0.25 and 1.2.17 */

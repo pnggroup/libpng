@@ -2550,6 +2550,11 @@ PNG_EXPORT(void, png_set_chunk_malloc_max,
    (png_struct *png_ptr, png_alloc_size_t user_chunk_cache_max));
 PNG_EXPORT(png_alloc_size_t, png_get_chunk_malloc_max,
    (const png_struct *png_ptr));
+/* Added in libpng-1.8.0 */
+PNG_EXPORT(void, png_set_chunk_text_max,
+   (png_struct *png_ptr, png_alloc_size_t user_chunk_text_max));
+PNG_EXPORT(png_alloc_size_t, png_get_chunk_text_max,
+   (const png_struct *png_ptr));
 #endif
 
 #if defined(PNG_INCH_CONVERSIONS_SUPPORTED)

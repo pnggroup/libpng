@@ -670,14 +670,25 @@ png_decompress_chunk(png_struct *png_ptr,
     png_alloc_size_t *newlength /* must be initialized to the maximum! */,
     int terminate /*add a '\0' to the end of the uncompressed data*/)
 {
-   /* TODO: implement different limits for different types of chunk.
-    *
-    * The caller supplies *newlength set to the maximum length of the
+   /* The caller supplies *newlength set to the maximum length of the
     * uncompressed data, but this routine allocates space for the prefix and
     * maybe a '\0' terminator too.  We have to assume that 'prefix_size' is
     * limited only by the maximum chunk size.
+    *
+    * This routine is only used for text chunks (zTXt and iTXt), and the
+    * limit applied here is the text chunk limit, png_chunk_text_max, which
+    * is separate from (and, by default, much smaller than) the general
+    * chunk limit, png_chunk_max, that applies to the other decompressed
+    * chunks, in particular iCCP.  ICC profiles legitimately occupy
+    * megabytes, whereas a text chunk that expands to a comparable size is
+    * almost invariably hostile.  Both limits apply: the effective limit
+    * is the smaller of the two, so the text limit can only tighten, never
+    * loosen, the general limit.
     */
    png_alloc_size_t limit = png_chunk_max(png_ptr);
+
+   if (limit > png_chunk_text_max(png_ptr))
+      limit = png_chunk_text_max(png_ptr);
 
    if (limit >= prefix_size + (terminate != 0))
    {
@@ -2506,10 +2517,6 @@ png_handle_zTXt(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
    {
       png_alloc_size_t uncompressed_length = PNG_SIZE_MAX;
 
-      /* TODO: at present png_decompress_chunk imposes a single application
-       * level memory limit, this should be split to different values for iCCP
-       * and text chunks.
-       */
       if (png_decompress_chunk(png_ptr, length, keyword_length+2,
           &uncompressed_length, 1/*terminate*/) == Z_STREAM_END)
       {
@@ -2649,10 +2656,6 @@ png_handle_iTXt(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
       {
          uncompressed_length = PNG_SIZE_MAX;
 
-         /* TODO: at present png_decompress_chunk imposes a single application
-          * level memory limit, this should be split to different values for
-          * iCCP and text chunks.
-          */
          if (png_decompress_chunk(png_ptr, length, prefix_length,
              &uncompressed_length, 1/*terminate*/) == Z_STREAM_END)
             buffer = png_ptr->read_buffer;

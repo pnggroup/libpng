@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# pngtextlimit test:
+# Per-chunk-type decompression limits for text chunks.
+exec ./pngtextlimit \
+     "${srcdir}/contrib/testpngs/textlimit/text-amplify.png" \
+     "${srcdir}/contrib/testpngs/textlimit/iccp-large.png" \
+     "${srcdir}/contrib/testpngs/textlimit/normal.png"
