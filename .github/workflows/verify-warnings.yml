@@ -1,0 +1,64 @@
+# Copyright (C) 2026 inverteum
+# SPDX-License-Identifier: MIT-0
+
+name: Verifying libpng warning levels
+
+on:
+  push:
+    branches:
+      - libpng16
+      - libpng18
+      - develop
+  pull_request:
+    branches:
+      - libpng16
+      - libpng18
+      - develop
+
+permissions:
+  contents: read
+
+# Flags are CFLAGS=-O2 plus STDC, WARN, and WARNMORE from
+# scripts/makefile.gcc and scripts/makefile.clang. Those makefiles do
+# not pass -Werror. -pedantic-errors is the only diagnostic promoted
+# to a build failure. See https://github.com/pnggroup/libpng/issues/677
+jobs:
+  verify-warnings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: configure
+            script: ./ci/ci_verify_configure.sh
+          - name: cmake
+            script: ./ci/ci_verify_cmake.sh
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential zlib1g-dev
+      - name: Check out the code
+        uses: actions/checkout@v4
+      - name: Run the verification script
+        run: bash "${{ matrix.script }}"
+        env:
+          CI_CC: gcc
+          CI_MAKE_FLAGS: -j2
+          CI_CMAKE_BUILD_FLAGS: -j2
+          CI_CTEST_FLAGS: -j2
+          CI_CC_FLAGS: >-
+            -O2
+            -pedantic-errors
+            -Wall
+            -Wextra
+            -Wundef
+            -Wcast-align
+            -Wconversion
+            -Wshadow
+            -Wpointer-arith
+            -Wwrite-strings
+            -Wmissing-declarations
+            -Wmissing-prototypes
+            -Wstrict-prototypes
