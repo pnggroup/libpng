@@ -1319,9 +1319,15 @@ png_set_sPLT(const png_struct *png_ptr,
       size_t length;
 
       /* Skip invalid input entries */
-      if (entries->name == NULL || entries->entries == NULL)
+      if (entries->name == NULL || entries->entries == NULL ||
+          entries->nentries <= 0 ||
+          (size_t)entries->nentries > PNG_SIZE_MAX / sizeof (png_sPLT_entry))
       {
-         /* png_handle_sPLT doesn't do this, so this is an app error */
+         /* png_handle_sPLT doesn't do this, so this is an app error.  A
+          * zero or negative nentries would reach png_malloc_array, which
+          * treats it as an internal error and aborts (issue #872), and a
+          * count whose byte size overflows size_t cannot be a real
+          * palette; skip such entries instead. */
          png_app_error(png_ptr, "png_set_sPLT: invalid sPLT");
          /* Just skip the invalid entry */
          continue;
@@ -1355,11 +1361,12 @@ png_set_sPLT(const png_struct *png_ptr,
       }
 
       np->nentries = entries->nentries;
-      /* This multiply can't overflow because png_malloc_array has already
-       * checked it when doing the allocation.
+      /* This multiply can't overflow because the skip check above and
+       * png_malloc_array have both ruled it out; keep the copy length in
+       * size_t so it cannot truncate either.
        */
       memcpy(np->entries, entries->entries,
-          (unsigned int)entries->nentries * sizeof (png_sPLT_entry));
+          (size_t)entries->nentries * sizeof (png_sPLT_entry));
 
       /* Note that 'continue' skips the advance of the out pointer and out
        * count, so an invalid entry is not added.
@@ -1633,6 +1640,16 @@ png_set_unknown_chunks(const png_struct *png_ptr,
 
       else
       {
+         if (unknowns->data == NULL && unknowns->size != 0)
+         {
+            /* The memcpy below would read from NULL; there is nothing to
+             * store. */
+            png_chunk_report(png_ptr,
+                "unknown chunk: NULL data with nonzero size",
+                PNG_CHUNK_WRITE_ERROR);
+            continue;
+         }
+
          np->data = png_voidcast(png_byte *,
              png_malloc_base(png_ptr, unknowns->size));
 

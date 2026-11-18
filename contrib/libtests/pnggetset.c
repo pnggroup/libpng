@@ -773,6 +773,110 @@ test_plte_palette_sync(void)
    return 0;
 }
 
+#ifdef PNG_sPLT_SUPPORTED
+static int
+try_splt_count(int nentries, int want_stored)
+{
+   png_structp png_ptr;
+   png_infop info_ptr;
+   png_sPLT_t entry;
+   png_sPLT_entry entries[1];
+   png_sPLT_tp got = NULL;
+   int stored;
+
+   png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+       NULL, NULL, NULL);
+   if (png_ptr == NULL)
+   {
+      fprintf(stderr, "pnggetset: png_create_write_struct failed\n");
+      return 1;
+   }
+   info_ptr = png_create_info_struct(png_ptr);
+   if (info_ptr == NULL)
+   {
+      fprintf(stderr, "pnggetset: png_create_info_struct failed\n");
+      png_destroy_write_struct(&png_ptr, NULL);
+      return 1;
+   }
+
+   /* Invalid entries are skipped via png_app_error; allow that to be
+    * non-fatal so the skip path can be observed. */
+   png_set_benign_errors(png_ptr, 1);
+
+   entry.name = "test_palette";
+   entry.entries = entries;
+   entry.nentries = nentries;
+   entry.depth = 8;
+   entries[0].red = entries[0].green = entries[0].blue = 0;
+   entries[0].alpha = 0xffff;
+   entries[0].frequency = 1;
+
+   png_set_sPLT(png_ptr, info_ptr, &entry, 1);
+   stored = png_get_sPLT(png_ptr, info_ptr, &got) == 1;
+
+   png_destroy_write_struct(&png_ptr, &info_ptr);
+
+   if (stored != want_stored)
+   {
+      fprintf(stderr,
+          "pnggetset: sPLT nentries %d: stored %d, expected %d\n",
+          nentries, stored, want_stored);
+      return 1;
+   }
+   return 0;
+}
+#endif
+
+#ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
+static int
+try_unknown_null_data(png_uint_32 size, int want_stored)
+{
+   png_structp png_ptr;
+   png_infop info_ptr;
+   png_unknown_chunk chunk;
+   int stored;
+
+   png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+       NULL, NULL, NULL);
+   if (png_ptr == NULL)
+   {
+      fprintf(stderr, "pnggetset: png_create_write_struct failed\n");
+      return 1;
+   }
+   info_ptr = png_create_info_struct(png_ptr);
+   if (info_ptr == NULL)
+   {
+      fprintf(stderr, "pnggetset: png_create_info_struct failed\n");
+      png_destroy_write_struct(&png_ptr, NULL);
+      return 1;
+   }
+
+   png_set_benign_errors(png_ptr, 1);
+
+   memcpy(chunk.name, "prVt", 5); /* private, safe-to-copy */
+   chunk.data = NULL;
+   chunk.size = size;
+   chunk.location = PNG_HAVE_IHDR;
+
+   png_set_unknown_chunks(png_ptr, info_ptr, &chunk, 1);
+   {
+      png_unknown_chunkp list = NULL;
+      stored = png_get_unknown_chunks(png_ptr, info_ptr, &list) > 0;
+   }
+
+   png_destroy_write_struct(&png_ptr, &info_ptr);
+
+   if (stored != want_stored)
+   {
+      fprintf(stderr,
+          "pnggetset: unknown NULL data size %lu: stored %d, expected %d\n",
+          (unsigned long)size, stored, want_stored);
+      return 1;
+   }
+   return 0;
+}
+#endif
+
 int
 main(void)
 {
@@ -857,6 +961,33 @@ main(void)
    }
    else
       printf("PASS\n");
+
+#ifdef PNG_sPLT_SUPPORTED
+   printf("Testing sPLT entry count validation... ");
+   fflush(stdout);
+   if (try_splt_count(1, 1) != 0 ||
+       try_splt_count(0, 0) != 0 ||
+       try_splt_count(-1, 0) != 0)
+   {
+      printf("FAIL\n");
+      result = 1;
+   }
+   else
+      printf("PASS\n");
+#endif
+
+#ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
+   printf("Testing unknown chunk NULL data validation... ");
+   fflush(stdout);
+   if (try_unknown_null_data(0, 1) != 0 ||
+       try_unknown_null_data(2048, 0) != 0)
+   {
+      printf("FAIL\n");
+      result = 1;
+   }
+   else
+      printf("PASS\n");
+#endif
 
    return result;
 }
