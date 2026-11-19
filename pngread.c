@@ -207,6 +207,10 @@ png_read_frame_head(png_struct *png_ptr, png_info *info_ptr)
 
    png_read_reset(png_ptr);
    png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+   /* The new frame's deflate stream has not ended yet, so that
+    * png_read_finish_IDAT reads the end of it after the last row.
+    */
+   png_ptr->flags &= ~PNG_FLAG_ZSTREAM_ENDED;
    png_ptr->mode &= ~PNG_HAVE_fcTL;
 
    have_chunk_after_DAT = 0;

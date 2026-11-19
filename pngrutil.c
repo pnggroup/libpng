@@ -4463,9 +4463,6 @@ png_read_IDAT_data(png_struct *png_ptr, png_byte *output,
 
          png_ptr->mode |= PNG_AFTER_IDAT;
          png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
-#ifdef PNG_READ_APNG_SUPPORTED
-         png_ptr->num_frames_read++;
-#endif
 
          if (png_ptr->zstream.avail_in > 0 || png_ptr->idat_size > 0)
             png_chunk_benign_error(png_ptr, "Extra compressed data");
@@ -4541,6 +4538,13 @@ png_read_finish_IDAT(png_struct *png_ptr)
        * spurious bytes at the end of the chunk now.
        */
       (void)png_crc_finish(png_ptr, png_ptr->idat_size);
+#ifdef PNG_READ_APNG_SUPPORTED
+      /* Advance once per finished frame, whether or not Z_STREAM_END was seen.
+       * png_read_end calls this function again after the last frame, when
+       * zowner is already 0, so the last frame is not counted twice.
+       */
+      png_ptr->num_frames_read++;
+#endif
    }
 }
 
@@ -4893,8 +4897,12 @@ png_read_reinit(png_struct *png_ptr, png_info *info_ptr)
    png_ptr->width = info_ptr->next_frame_width;
    png_ptr->height = info_ptr->next_frame_height;
    png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth,png_ptr->width);
+   /* Keep the public IHDR row size unchanged. If update_info initialized the
+    * internal output-size check, adjust it for this frame using the transformed
+    * pixel depth. Without update_info the check remains disabled.
+    */
    if (png_ptr->info_rowbytes != 0)
-      png_ptr->info_rowbytes = info_ptr->rowbytes =
+      png_ptr->info_rowbytes =
          PNG_ROWBYTES(info_ptr->pixel_depth, png_ptr->width);
    if (png_ptr->prev_row)
       memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);

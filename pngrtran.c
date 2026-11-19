@@ -2248,15 +2248,19 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
    info_ptr->pixel_depth = (png_byte)(info_ptr->channels *
        info_ptr->bit_depth);
 
+   /* The public info structure continues to describe the IHDR canvas. */
    info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth, info_ptr->width);
 
-   /* Adding in 1.5.4: cache the above value in png_struct so that we can later
-    * check in png_rowbytes that the user buffer won't get overwritten.  Note
+   /* Adding in 1.5.4: cache the output row size in png_struct so that we can
+    * check in png_combine_row that the user buffer won't get overwritten. Note
     * that the field is not always set - if png_read_update_info isn't called
     * the application has to either not do any transforms or get the calculation
     * right itself.
     */
-   png_ptr->info_rowbytes = info_ptr->rowbytes;
+   /* The internal check follows the current frame width, using the output
+    * pixel depth computed above. png_ptr->rowbytes is the untransformed size.
+    */
+   png_ptr->info_rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth, png_ptr->width);
 
 #ifndef PNG_READ_EXPAND_SUPPORTED
    if (png_ptr != NULL)

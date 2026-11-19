@@ -31,6 +31,7 @@ Authors, for copyright and licensing purposes.
  * Matt Sarett
  * Mike Klein
  * Mohammad Seet
+ * Nathan Keys
  * Pascal Massimino
  * Paul Schmidt
  * Petr Simecek

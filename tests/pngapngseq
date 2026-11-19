@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# pngapngseq test:
+# Per-frame state of the sequential APNG reader.
+exec ./pngapngseq
