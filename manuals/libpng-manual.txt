@@ -2593,9 +2593,7 @@ png_info *info_ptr;
 
     /* This one's new also.  Simply give it a chunk
        of data from the file stream (in order, of
-       course).  On machines with segmented memory
-       models machines, don't give it any more than
-       64K.  The library seems to run fine with sizes
+       course).  The library seems to run fine with sizes
        of 4K. Although you can give it much less if
        necessary (I assume you can give it chunks of
        1 byte, I haven't tried less than 256 bytes
@@ -4182,13 +4180,10 @@ and png_free().  The png_malloc() and png_free() functions currently just
 call the standard C functions and png_calloc() calls png_malloc() and then
 clears the newly allocated memory to zero; note that png_calloc(png_ptr, size)
 is not the same as the calloc(number, size) function provided by stdlib.h.
-There is limited support for certain systems with segmented memory
-architectures and the types of pointers declared by png.h match this; you
-will have to use appropriate pointers in your application.  If you prefer
-to use a different method of allocating and freeing data, you can use
-png_create_read_struct_2() or png_create_write_struct_2() to register your
-own functions as described above.  These functions also provide a void
-pointer that can be retrieved via
+If you prefer to use a different method of allocating and freeing data,
+you can use png_create_read_struct_2() or png_create_write_struct_2() to
+register your own functions as described above.  These functions also
+provide a void pointer that can be retrieved via
 
     mem_ptr = png_get_mem_ptr(png_ptr);
 

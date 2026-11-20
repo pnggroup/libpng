@@ -1,6 +1,6 @@
 /* pngrio.c - functions for data input
  *
- * Copyright (c) 2018-2025 Cosmin Truta
+ * Copyright (c) 2018-2026 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2016,2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -24,8 +24,7 @@
 /* Read the data from whatever input you are using.  The default routine
  * reads from a file pointer.  Note that this routine sometimes gets called
  * with very small lengths, so you should implement some kind of simple
- * buffering if you are using unbuffered reads.  This should never be asked
- * to read more than 64K on a 16-bit machine.
+ * buffering if you are using unbuffered reads.
  */
 void /* PRIVATE */
 png_read_data(png_struct *png_ptr, png_byte *data, size_t length)

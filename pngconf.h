@@ -413,50 +413,8 @@
 typedef size_t png_size_t;
 typedef ptrdiff_t png_ptrdiff_t;
 
-/* libpng needs to know the maximum value of 'size_t' and this controls the
- * definition of png_alloc_size_t, below.  This maximum value of size_t limits
- * but does not control the maximum allocations the library makes - there is
- * direct application control of this through png_set_user_limits().
- */
-#ifndef PNG_SMALL_SIZE_T
-   /* Compiler specific tests for systems where size_t is known to be less than
-    * 32 bits (some of these systems may no longer work because of the lack of
-    * 'far' support; see above.)
-    */
-#  if (defined(__TURBOC__) && !defined(__FLAT__)) ||\
-   (defined(_MSC_VER) && defined(MAXSEG_64K))
-#     define PNG_SMALL_SIZE_T
-#  endif
-#endif
-
-/* png_alloc_size_t is guaranteed to be no smaller than size_t, and no smaller
- * than png_uint_32.  Casts from size_t or png_uint_32 to png_alloc_size_t are
- * not necessary; in fact, it is recommended not to use them at all, so that
- * the compiler can complain when something turns out to be problematic.
- *
- * Casts in the other direction (from png_alloc_size_t to size_t or
- * png_uint_32) should be explicitly applied; however, we do not expect to
- * encounter practical situations that require such conversions.
- *
- * PNG_SMALL_SIZE_T must be defined if the maximum value of size_t is less than
- * 4294967295 - i.e. less than the maximum value of png_uint_32.
- */
-#ifdef PNG_SMALL_SIZE_T
-   typedef png_uint_32 png_alloc_size_t;
-#else
-   typedef size_t png_alloc_size_t;
-#endif
-
-/* Prior to 1.6.0 libpng offered limited support for Microsoft C compiler
- * implementations of Intel CPU specific support of user-mode segmented address
- * spaces, where 16-bit pointers address more than 65536 bytes of memory using
- * separate 'segment' registers.  The implementation requires two different
- * types of pointer (only one of which includes the segment value.)
- *
- * If required this support is available in version 1.2 of libpng and may be
- * available in versions through 1.5, although the correctness of the code has
- * not been verified recently.
- */
+/* TODO: Deprecate this. */
+typedef size_t png_alloc_size_t;
 
 /* Typedef for floating-point numbers that are converted to fixed-point with a
  * multiple of 100,000, e.g., gamma

@@ -1,6 +1,6 @@
 /* pngrutil.c - utilities to read a PNG file
  *
- * Copyright (c) 2018-2025 Cosmin Truta
+ * Copyright (c) 2018-2026 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -711,9 +711,8 @@ png_decompress_chunk(png_struct *png_ptr,
             if (inflateReset(&png_ptr->zstream) == Z_OK)
             {
                /* Because of the limit checks above we know that the new,
-                * expanded, size will fit in a size_t (let alone an
-                * png_alloc_size_t).  Use png_malloc_base here to avoid an
-                * extra OOM message.
+                * expanded, size will fit in a size_t.  Use png_malloc_base
+                * here to avoid an extra OOM message.
                 */
                png_alloc_size_t new_size = *newlength;
                png_alloc_size_t buffer_size = prefix_size + new_size +
@@ -1318,7 +1317,6 @@ png_handle_sRGB(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 #ifdef PNG_READ_iCCP_SUPPORTED
 static png_handle_result_code /* PRIVATE */
 png_handle_iCCP(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
-/* Note: this does not properly handle profiles that are > 64K under DOS */
 {
    const char *errmsg = NULL; /* error message output, or no error */
    int finished = 0; /* crc checked */
@@ -1544,7 +1542,6 @@ png_handle_iCCP(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 #ifdef PNG_READ_sPLT_SUPPORTED
 static png_handle_result_code /* PRIVATE */
 png_handle_sPLT(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
-/* Note: this does not properly handle chunks that are > 64K under DOS */
 {
    png_byte *buffer;
    png_byte *entry_start;
@@ -1584,11 +1581,6 @@ png_handle_sPLT(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
       return handled_error;
    }
 
-
-   /* WARNING: this may break if size_t is less than 32 bits; it is assumed
-    * that the PNG_MAX_MALLOC_64K test is enabled in this case, but this is a
-    * potential breakage point if the types in pngconf.h aren't exactly right.
-    */
    png_crc_read(png_ptr, buffer, length);
 
    if (png_crc_finish(png_ptr, skip) != 0)
@@ -2365,7 +2357,6 @@ png_handle_tIME(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 #endif
 
 #ifdef PNG_READ_tEXt_SUPPORTED
-/* Note: this does not properly handle chunks that are > 64K under DOS */
 static png_handle_result_code /* PRIVATE */
 png_handle_tEXt(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 {
@@ -2437,7 +2428,6 @@ png_handle_tEXt(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 #endif
 
 #ifdef PNG_READ_zTXt_SUPPORTED
-/* Note: this does not correctly handle chunks that are > 64K under DOS */
 static png_handle_result_code /* PRIVATE */
 png_handle_zTXt(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 {
@@ -2553,7 +2543,6 @@ png_handle_zTXt(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 #endif
 
 #ifdef PNG_READ_iTXt_SUPPORTED
-/* Note: this does not correctly handle chunks that are > 64K under DOS */
 static png_handle_result_code /* PRIVATE */
 png_handle_iTXt(png_struct *png_ptr, png_info *info_ptr, png_uint_32 length)
 {
@@ -4790,11 +4779,6 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    row_bytes = PNG_ROWBYTES(max_pixel_depth, row_bytes) +
        1 + ((max_pixel_depth + 7) >> 3U);
 
-#ifdef PNG_MAX_MALLOC_64K
-   if (row_bytes > (png_uint_32)65536L)
-      png_error(png_ptr, "This image requires a row greater than 64KB");
-#endif
-
    if (row_bytes + 48 > png_ptr->old_big_row_buf_size)
    {
       png_free(png_ptr, png_ptr->big_row_buf);
@@ -4835,11 +4819,6 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
       png_ptr->old_big_row_buf_size = row_bytes + 48;
    }
 
-#ifdef PNG_MAX_MALLOC_64K
-   if (png_ptr->rowbytes > 65535)
-      png_error(png_ptr, "This image requires a row greater than 64KB");
-
-#endif
    if (png_ptr->rowbytes > (PNG_SIZE_MAX - 1))
       png_error(png_ptr, "Row has too many bytes to allocate in memory");
 

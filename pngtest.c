@@ -483,15 +483,6 @@ pngtest_error(png_struct *png_ptr, const char *message)
 /* START of code to validate memory allocation and deallocation */
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
 
-/* Allocate memory.  For reasonable files, size should never exceed
- * 64K.  However, zlib may allocate more than 64K if you don't tell
- * it not to.  See zconf.h and png.h for more information.  zlib does
- * need to allocate exactly 64K, so whatever you call here must
- * have the ability to do that.
- *
- * This piece of code can be compiled to validate max 64K allocations
- * by setting MAXSEG_64K in zlib zconf.h *or* PNG_MAX_MALLOC_64K.
- */
 typedef struct memory_information
 {
    png_alloc_size_t size;
@@ -1972,19 +1963,6 @@ main(int argc, char *argv[])
    /* Show the version of libpng used in building the application */
    fprintf(STDERR, " pngtest (%lu):%s", (unsigned long)PNG_LIBPNG_VER,
        PNG_HEADER_VERSION_STRING);
-
-   /* Do some consistency checking on the memory allocation settings, I'm
-    * not sure this matters, but it is nice to know, the first of these
-    * tests should be impossible because of the way the macros are set
-    * in pngconf.h
-    */
-#if defined(MAXSEG_64K) && !defined(PNG_MAX_MALLOC_64K)
-      fprintf(STDERR, " NOTE: Zlib compiled for max 64k, libpng not\n");
-#endif
-   /* I think the following can happen. */
-#if !defined(MAXSEG_64K) && defined(PNG_MAX_MALLOC_64K)
-      fprintf(STDERR, " NOTE: libpng compiled for max 64k, zlib not\n");
-#endif
 
    if (strcmp(png_libpng_ver, PNG_LIBPNG_VER_STRING) != 0)
    {

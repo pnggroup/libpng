@@ -192,13 +192,6 @@ but all the smaller models ("small", "compact" and "medium") are known
 to be unworkable.  For DOS users who have access beyond the lower 640K,
 a "flat" 32-bit DOS model (such as DJGPP) is strongly recommended.
 
-For DOS users who only have access to the lower 640K, you will have to
-limit zlib's memory usage via a png_set_compression_mem_level() call.
-You will also have to look into zconf.h to tell zlib (and thus libpng)
-that it cannot allocate more than 64K at a time.  Even if you can, the
-memory won't be accessible.  Therefore, you should limit zlib and libpng
-to 64K by defining MAXSEG_64K.
-
 IX. Prepending a prefix to exported symbols
 
 Starting with libpng-1.6.0, you can configure libpng (when using the

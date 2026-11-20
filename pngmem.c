@@ -1,6 +1,6 @@
 /* pngmem.c - stub functions for memory allocation
  *
- * Copyright (c) 2018-2025 Cosmin Truta
+ * Copyright (c) 2018-2026 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2014,2016 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -39,12 +39,7 @@ png_destroy_png_struct(png_struct *png_ptr)
    }
 }
 
-/* Allocate memory.  For reasonable files, size should never exceed
- * 64K.  However, zlib may allocate more than 64K if you don't tell
- * it not to.  See zconf.h and png.h for more information.  zlib does
- * need to allocate exactly 64K, so whatever you call here must
- * have the ability to do that.
- */
+/* Allocate memory and set it to zero. */
 PNG_FUNCTION(void *,
 png_calloc,(const png_struct *png_ptr, png_alloc_size_t size),
     PNG_ALLOCATED)
@@ -60,7 +55,7 @@ png_calloc,(const png_struct *png_ptr, png_alloc_size_t size),
 }
 
 /* png_malloc_base, an internal function added at libpng 1.6.0, does the work of
- * allocating memory, taking into account limits and PNG_USER_MEM_SUPPORTED.
+ * allocating memory, taking into account PNG_USER_MEM_SUPPORTED.
  * Checking and error handling must happen outside this routine; it returns NULL
  * if the allocation cannot be done (for any reason.)
  */
@@ -68,25 +63,6 @@ PNG_FUNCTION(void * /* PRIVATE */,
 png_malloc_base,(const png_struct *png_ptr, png_alloc_size_t size),
     PNG_ALLOCATED)
 {
-   /* Moved to png_malloc_base from png_malloc_default in 1.6.0; the DOS
-    * allocators have also been removed in 1.6.0, so any 16-bit system now has
-    * to implement a user memory handler.  This checks to be sure it isn't
-    * called with big numbers.
-    */
-#  ifdef PNG_MAX_MALLOC_64K
-      /* This is support for legacy systems which had segmented addressing
-       * limiting the maximum allocation size to 65536.  It takes precedence
-       * over PNG_SIZE_MAX which is set to 65535 on true 16-bit systems.
-       *
-       * TODO: libpng-1.8: finally remove both cases.
-       */
-      if (size > 65536U) return NULL;
-#  endif
-
-   /* This is checked too because the system malloc call below takes a (size_t).
-    */
-   if (size > PNG_SIZE_MAX) return NULL;
-
 #  ifdef PNG_USER_MEM_SUPPORTED
       if (png_ptr != NULL && png_ptr->malloc_fn != NULL)
          return png_ptr->malloc_fn(png_constcast(png_struct *,png_ptr), size);
@@ -95,7 +71,7 @@ png_malloc_base,(const png_struct *png_ptr, png_alloc_size_t size),
 #  endif
 
    /* Use the system malloc */
-   return malloc((size_t)/*SAFE*/size); /* checked for truncation above */
+   return malloc(size);
 }
 
 #if defined(PNG_TEXT_SUPPORTED) || defined(PNG_sPLT_SUPPORTED) ||\

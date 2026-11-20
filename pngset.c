@@ -2046,13 +2046,7 @@ png_set_chunk_malloc_max(png_struct *png_ptr,
    if (png_ptr != NULL)
    {
       if (user_chunk_malloc_max == 0U) /* unlimited */
-      {
-#        ifdef PNG_MAX_MALLOC_64K
-            png_ptr->user_chunk_malloc_max = 65536U;
-#        else
-            png_ptr->user_chunk_malloc_max = PNG_SIZE_MAX;
-#        endif
-      }
+         png_ptr->user_chunk_malloc_max = PNG_SIZE_MAX;
       else
          png_ptr->user_chunk_malloc_max = user_chunk_malloc_max;
    }

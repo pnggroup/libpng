@@ -232,21 +232,6 @@
  * the source and recorded in the machine generated header file pnglibconf.h.
  */
 
-/* If you are running on a machine where you cannot allocate more
- * than 64K of memory at once, uncomment this.  While libpng will not
- * normally need that much memory in a chunk (unless you load up a very
- * large file), zlib needs to know how big of a chunk it can use, and
- * libpng thus makes sure to check any memory allocation to verify it
- * will fit into memory.
- *
- * zlib provides 'MAXSEG_64K' which, if defined, indicates the
- * same limit and pngconf.h (already included) sets the limit
- * if certain operating systems are detected.
- */
-#if defined(MAXSEG_64K) && !defined(PNG_MAX_MALLOC_64K)
-#  define PNG_MAX_MALLOC_64K
-#endif
-
 #ifndef PNG_UNUSED
 /* Unused formal parameter warnings are silenced using the following macro
  * which is expected to have no bad effects on performance (optimizing
@@ -255,14 +240,6 @@
  * semicolon.
  */
 #  define PNG_UNUSED(param) (void)param;
-#endif
-
-/* Just a little check that someone hasn't tried to define something
- * contradictory.
- */
-#if (PNG_ZBUF_SIZE > 65536L) && defined(PNG_MAX_MALLOC_64K)
-#  undef PNG_ZBUF_SIZE
-#  define PNG_ZBUF_SIZE 65536L
 #endif
 
 /* If warnings or errors are turned off the code is disabled or redirected here.
@@ -327,21 +304,10 @@
 #  endif
 #endif
 
-/* This provides the non-ANSI (far) memory allocation routines. */
-#if defined(__TURBOC__) && defined(__MSDOS__)
-#  include <mem.h>
-#  include <alloc.h>
-#endif
-
 #if defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 #  include <windows.h>
 #endif
 #endif /* PNG_VERSION_INFO_ONLY */
-
-/* Moved here around 1.5.0beta36 from pngconf.h */
-/* Users may want to use these so they are not private.  Any library
- * functions that are passed far data must be model-independent.
- */
 
 /* Platform-independent functions */
 #ifndef PNG_ABORT
@@ -921,10 +887,7 @@ PNG_INTERNAL_FUNCTION(int, png_user_version_check,
 #elif PNG_USER_CHUNK_MALLOC_MAX > 0 /* compile-time limit */
 #  define png_chunk_max(png_ptr) ((void)png_ptr, PNG_USER_CHUNK_MALLOC_MAX)
 
-#elif (defined PNG_MAX_MALLOC_64K)  /* legacy system limit */
-#  define png_chunk_max(png_ptr) ((void)png_ptr, 65536U)
-
-#else                               /* modern system limit SIZE_MAX (C99) */
+#else                               /* system limit */
 #  define png_chunk_max(png_ptr) ((void)png_ptr, PNG_SIZE_MAX)
 #endif
 #endif /* READ */
@@ -1050,10 +1013,7 @@ PNG_INTERNAL_FUNCTION(int, png_crc_finish,
    (png_struct *png_ptr, png_uint_32 skip),
    PNG_EMPTY);
 
-/* Calculate the CRC over a section of data.  Note that we are only
- * passing a maximum of 64K on systems that have this as a memory limit,
- * since this is the maximum buffer size we can specify.
- */
+/* Calculate the CRC over a section of data. */
 PNG_INTERNAL_FUNCTION(void, png_calculate_crc,
    (png_struct *png_ptr, const png_byte *ptr, size_t length),
    PNG_EMPTY);

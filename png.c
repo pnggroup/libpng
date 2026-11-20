@@ -279,12 +279,7 @@ png_create_png_struct,(const char *user_png_ver, void *error_ptr,
 
 #     if PNG_USER_CHUNK_MALLOC_MAX > 0 /* default to compile-time limit */
       create_struct.user_chunk_malloc_max = PNG_USER_CHUNK_MALLOC_MAX;
-
-      /* No compile-time limit, so initialize to the system limit: */
-#     elif defined PNG_MAX_MALLOC_64K /* legacy system limit */
-      create_struct.user_chunk_malloc_max = 65536U;
-
-#     else /* modern system limit SIZE_MAX (C99) */
+#     else /* no compile-time limit, so default to the system limit */
       create_struct.user_chunk_malloc_max = PNG_SIZE_MAX;
 #     endif
 #  endif

@@ -647,7 +647,6 @@ process_data(png_struct **png_ptr, png_info **info_ptr,
 
    /* Give chunks of data as they arrive from the data stream
     * (in order, of course).
-    * On segmented machines, don't give it any more than 64K.
     * The library seems to run fine with sizes of 4K, although
     * you can give it much less if necessary. (I assume you can
     * give it chunks of 1 byte, but I haven't tried with less
