@@ -13,15 +13,11 @@
  * and license in png.h
  */
 
-#include "../pngpriv.h"
-
-#ifdef PNG_READ_SUPPORTED
-
-#if PNG_RISCV_RVV_IMPLEMENTATION == 1 /* intrinsics code from pngpriv.h */
+/* [[libpng-1.8]] this file is included by riscv/riscv_init.c */
 
 #include <riscv_vector.h>
 
-void
+static void
 png_read_filter_row_up_rvv(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
@@ -74,7 +70,7 @@ png_read_filter_row_sub_rvv(size_t len, size_t bpp, unsigned char *row)
    }
 }
 
-void
+static void
 png_read_filter_row_sub3_rvv(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
@@ -85,7 +81,7 @@ png_read_filter_row_sub3_rvv(png_row_info *row_info, png_byte *row,
    PNG_UNUSED(prev_row)
 }
 
-void
+static void
 png_read_filter_row_sub4_rvv(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
@@ -155,26 +151,22 @@ png_read_filter_row_avg_rvv(size_t len, size_t bpp, unsigned char *row,
    }
 }
 
-void
+static void
 png_read_filter_row_avg3_rvv(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    size_t len = row_info->rowbytes;
 
    png_read_filter_row_avg_rvv(len, 3, row, prev_row);
-
-   PNG_UNUSED(prev_row)
 }
 
-void
+static void
 png_read_filter_row_avg4_rvv(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
    size_t len = row_info->rowbytes;
 
    png_read_filter_row_avg_rvv(len, 4, row, prev_row);
-
-   PNG_UNUSED(prev_row)
 }
 
 static inline void
@@ -268,7 +260,8 @@ png_read_filter_row_paeth_rvv(size_t len, size_t bpp, unsigned char *row,
       c = b;
    }
 }
-void
+
+static void
 png_read_filter_row_paeth3_rvv(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
@@ -277,7 +270,7 @@ png_read_filter_row_paeth3_rvv(png_row_info *row_info, png_byte *row,
    png_read_filter_row_paeth_rvv(len, 3, row, prev_row);
 }
 
-void
+static void
 png_read_filter_row_paeth4_rvv(png_row_info *row_info, png_byte *row,
     const png_byte *prev_row)
 {
@@ -285,6 +278,3 @@ png_read_filter_row_paeth4_rvv(png_row_info *row_info, png_byte *row,
 
    png_read_filter_row_paeth_rvv(len, 4, row, prev_row);
 }
-
-#endif /* PNG_RISCV_RVV_IMPLEMENTATION == 1 */
-#endif /* PNG_READ_SUPPORTED */
