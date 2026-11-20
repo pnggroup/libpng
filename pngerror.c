@@ -785,7 +785,7 @@ png_safe_warning(png_struct *png_nonconst_ptr, const char *warning_message)
    png_image *image = png_voidcast(png_image *, png_ptr->error_ptr);
 
    /* A warning is only logged if there is no prior warning or error. */
-   if (image->warning_or_error == 0)
+   if (image != NULL && image->warning_or_error == 0)
    {
       png_safecat(image->message, (sizeof image->message), 0, warning_message);
       image->warning_or_error |= PNG_IMAGE_WARNING;
