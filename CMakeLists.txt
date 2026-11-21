@@ -630,6 +630,9 @@ set(pngstest_sources
 set(pnggetset_sources
     contrib/libtests/pnggetset.c
 )
+set(pngfilter_sources
+    contrib/libtests/pngfilter.c
+)
 set(pngreadend_sources
     contrib/libtests/pngreadend.c
 )
@@ -803,6 +806,15 @@ if(PNG_TESTS AND PNG_SHARED)
 
   png_add_test(NAME pnggetset
                COMMAND pnggetset)
+
+  # pngfilter test:
+  # Row filter selection by png_set_filter.
+  add_executable(pngfilter ${pngfilter_sources})
+  target_link_libraries(pngfilter
+                        PRIVATE png_shared)
+
+  png_add_test(NAME pngfilter
+               COMMAND pngfilter)
 
   # pngreadend test:
   # Reading the end of a PNG without reading the image.

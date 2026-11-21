@@ -1103,6 +1103,8 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
       }
 
 #ifdef PNG_WRITE_FILTER_SUPPORTED
+      filters = png_ptr->do_filter;
+
       /* If we have allocated the row_buf, this means we have already started
        * with the image and we should have allocated all of the filter buffers
        * that have been selected.  If prev_row isn't already allocated, then
