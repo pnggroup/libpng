@@ -776,6 +776,11 @@
 #  undef const
 #endif
 
+/* zlib 1.2.8 is the oldest version that libpng supports. */
+#if !defined(ZLIB_VERNUM) || ZLIB_VERNUM < 0x1280
+#  error libpng requires zlib version 1.2.8 or newer
+#endif
+
 /* The Adler-32 option relies on inflateValidate, added in zlib 1.2.9. */
 #if defined(PNG_DISABLE_ADLER32_CHECK_SUPPORTED) && ZLIB_VERNUM < 0x1290
 #  error DISABLE_ADLER32_CHECK requires zlib version 1.2.9 or newer

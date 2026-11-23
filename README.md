@@ -10,10 +10,8 @@ For usage information and restrictions (what little they are) on libpng,
 see `png.h`.  For a description on using zlib (the compression library
 used by libpng) and zlib's restrictions, see `zlib.h`.
 
-You should use zlib 1.0.4 or later to run this, but it _may_ work with
-versions as old as zlib 0.95.  Even so, there are bugs in older zlib
-versions which can cause the output of invalid compression streams for
-some images.
+libpng requires zlib 1.2.8 or later, and refuses to compile with an
+older one.
 
 You should also note that zlib is a compression library that is useful
 for more things than just PNG files.  You can use zlib as a drop-in

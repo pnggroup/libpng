@@ -761,4 +761,25 @@ MAXSEG_64K, no longer have any effect on libpng, and png_alloc_size_t is
 always size_t.  An application that needs such a limit can enforce it in
 its own memory allocator, registered with png_set_mem_fn().
 
+Libpng now requires zlib 1.2.8 or newer, and refuses to compile with an
+older zlib.h.
+
+The zlib settings have been removed from pnglibconf.h and can no longer
+be changed when libpng is built:
+
+1) The macros PNG_Z_DEFAULT_COMPRESSION, PNG_Z_DEFAULT_STRATEGY,
+PNG_Z_DEFAULT_NOFILTER_STRATEGY, PNG_TEXT_Z_DEFAULT_COMPRESSION,
+PNG_TEXT_Z_DEFAULT_STRATEGY, PNG_ZBUF_SIZE and PNG_IDAT_READ_SIZE are
+defined in png.h, and state the defaults of the library.  Applications
+can change the compression parameters at run time by calling
+png_set_compression_level() and its siblings, and the compression buffer
+sizes by calling png_set_compression_buffer_size().
+
+2) The macro PNG_INFLATE_BUF_SIZE is no longer defined in a public header.
+It is used only to size internal buffers and has no run-time counterpart.
+
+3) The macro PNG_ZLIB_VERNUM is no longer defined in any header.
+Applications that need the zlib version number can use ZLIB_VERNUM from
+zlib.h, or call zlibVersion() at run time.
+
 [TODO]

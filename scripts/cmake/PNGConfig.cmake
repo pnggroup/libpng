@@ -1,7 +1,7 @@
 # PNGConfig.cmake
 # CMake config file compatible with the FindPNG module.
 
-# Copyright (c) 2024 Cosmin Truta
+# Copyright (c) 2024-2026 Cosmin Truta
 # Written by Benjamin Buch, 2024
 #
 # Use, modification and distribution are subject to
@@ -13,7 +13,10 @@
 
 include(CMakeFindDependencyMacro)
 
-find_dependency(ZLIB REQUIRED)
+# Avoid using REQUIRED here.
+# find_dependency(ZLIB) forwards REQUIRED and QUIET from find_package(PNG),
+# which allows an optional find_package(PNG) to fail softly.
+find_dependency(ZLIB 1.2.8)
 
 include("${CMAKE_CURRENT_LIST_DIR}/PNGTargets.cmake")
 

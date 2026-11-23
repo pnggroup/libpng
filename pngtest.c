@@ -37,11 +37,7 @@
 #include <string.h>
 #define STDERR stdout
 
-#ifdef PNG_ZLIB_HEADER
-#  include PNG_ZLIB_HEADER /* defined by pnglibconf.h from 1.7 */
-#else
-#  include <zlib.h>
-#endif
+#include <zlib.h>
 
 #include "png.h"
 

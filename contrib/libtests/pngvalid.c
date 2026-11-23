@@ -53,11 +53,7 @@
 #  include "../../png.h"
 #endif
 
-#ifdef PNG_ZLIB_HEADER
-#  include PNG_ZLIB_HEADER
-#else
-#  include <zlib.h>   /* For crc32 */
-#endif
+#include <zlib.h> /* For crc32 */
 
 /* 1.6.1 added support for the configure test harness, which uses 77 to indicate
  * a skipped test, in earlier versions we need to succeed on a skipped test, so:
