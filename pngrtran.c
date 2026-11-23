@@ -514,8 +514,7 @@ png_set_quantize(png_struct *png_ptr, png_color *palette,
          int i, j;
 
          /* Initialize the local array to sort colors. */
-         quantize_sort = (png_byte *)png_malloc(png_ptr,
-             (png_alloc_size_t)num_palette);
+         quantize_sort = (png_byte *)png_malloc(png_ptr, (size_t)num_palette);
          for (i = 0; i < num_palette; i++)
             quantize_sort[i] = (png_byte)i;
 
@@ -645,9 +644,9 @@ png_set_quantize(png_struct *png_ptr, png_color *palette,
 
          /* Initialize palette index arrays */
          png_ptr->index_to_palette = (png_byte *)png_malloc(png_ptr,
-             (png_alloc_size_t)num_palette);
+             (size_t)num_palette);
          png_ptr->palette_to_index = (png_byte *)png_malloc(png_ptr,
-             (png_alloc_size_t)num_palette);
+             (size_t)num_palette);
 
          /* Initialize the sort array */
          for (i = 0; i < num_palette; i++)
@@ -656,8 +655,7 @@ png_set_quantize(png_struct *png_ptr, png_color *palette,
             png_ptr->palette_to_index[i] = (png_byte)i;
          }
 
-         hash = (png_dsort **)png_calloc(png_ptr, (png_alloc_size_t)(769 *
-             (sizeof (png_dsort *))));
+         hash = (png_dsort **)png_calloc(png_ptr, 769 * (sizeof (png_dsort *)));
 
          num_new_palette = num_palette;
 
@@ -687,7 +685,7 @@ png_set_quantize(png_struct *png_ptr, png_color *palette,
                   {
 
                      t = (png_dsort *)png_malloc_warn(png_ptr,
-                         (png_alloc_size_t)(sizeof (png_dsort)));
+                         sizeof (png_dsort));
 
                      if (t == NULL)
                          break;
@@ -817,11 +815,9 @@ png_set_quantize(png_struct *png_ptr, png_color *palette,
       int num_blue = (1 << PNG_QUANTIZE_BLUE_BITS);
       size_t num_entries = ((size_t)1 << total_bits);
 
-      png_ptr->palette_lookup = (png_byte *)png_calloc(png_ptr,
-          (png_alloc_size_t)(num_entries));
+      png_ptr->palette_lookup = (png_byte *)png_calloc(png_ptr, num_entries);
 
-      distance = (png_byte *)png_malloc(png_ptr, (png_alloc_size_t)num_entries);
-
+      distance = (png_byte *)png_malloc(png_ptr, num_entries);
       memset(distance, 0xff, num_entries);
 
       for (i = 0; i < num_palette; i++)

@@ -485,7 +485,7 @@ pngtest_error(png_struct *png_ptr, const char *message)
 
 typedef struct memory_information
 {
-   png_alloc_size_t size;
+   size_t size;
    void *pointer;
    struct memory_information *next;
 } memory_information;
@@ -497,12 +497,11 @@ static int maximum_allocation = 0;
 static int total_allocation = 0;
 static int num_allocations = 0;
 
-void *png_debug_malloc(png_struct *png_ptr,
-    png_alloc_size_t size);
+void *png_debug_malloc(png_struct *png_ptr, size_t size);
 void png_debug_free(png_struct *png_ptr, void *ptr);
 
 void *
-png_debug_malloc(png_struct *png_ptr, png_alloc_size_t size)
+png_debug_malloc(png_struct *png_ptr, size_t size)
 {
    /* png_malloc has already tested for NULL; png_create_struct calls
     * png_debug_malloc directly, with png_ptr == NULL which is OK

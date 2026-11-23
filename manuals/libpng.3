@@ -11,7 +11,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.8.0.git
 
 \fBvoid png_build_grayscale_palette (int \fP\fIbit_depth\fP\fB, png_color \fI*palette\fP\fB);\fP
 
-\fBvoid *png_calloc (png_struct \fP\fI*png_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
+\fBvoid *png_calloc (png_struct \fP\fI*png_ptr\fP\fB, size_t \fIsize\fP\fB);\fP
 
 \fBvoid png_chunk_benign_error (png_struct \fP\fI*png_ptr\fP\fB, const char \fI*error\fP\fB);\fP
 
@@ -69,7 +69,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.8.0.git
 
 \fBpng_uint_32 png_get_chunk_cache_max (const png_struct \fI*png_ptr\fP\fB);\fP
 
-\fBpng_alloc_size_t png_get_chunk_malloc_max (const png_struct \fI*png_ptr\fP\fB);\fP
+\fBsize_t png_get_chunk_malloc_max (const png_struct \fI*png_ptr\fP\fB);\fP
 
 \fBpng_byte png_get_color_type (const png_struct \fP\fI*png_ptr\fP\fB, const png_info \fI*info_ptr\fP\fB);\fP
 
@@ -229,7 +229,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.8.0.git
 
 \fBint png_image_write_to_file (png_image \fP\fI*image\fP\fB, const char \fP\fI*file\fP\fB, int \fP\fIconvert_to_8bit\fP\fB, const void \fP\fI*buffer\fP\fB, png_int_32 \fP\fIrow_stride\fP\fB, void \fI*colormap\fP\fB);\fP
 
-\fBint png_image_write_to_memory (png_image \fP\fI*image\fP\fB, void \fP\fI*memory\fP\fB, png_alloc_size_t \fP\fI*memory_bytes\fP\fB, int \fP\fIconvert_to_8_bit\fP\fB, const void \fP\fI*buffer\fP\fB, png_int_32 \fP\fIrow_stride\fP\fB, const void \fI*colormap\fP\fB);\fP
+\fBint png_image_write_to_memory (png_image \fP\fI*image\fP\fB, void \fP\fI*memory\fP\fB, size_t \fP\fI*memory_bytes\fP\fB, int \fP\fIconvert_to_8_bit\fP\fB, const void \fP\fI*buffer\fP\fB, png_int_32 \fP\fIrow_stride\fP\fB, const void \fI*colormap\fP\fB);\fP
 
 \fBint png_image_write_to_stdio (png_image \fP\fI*image\fP\fB, FILE \fP\fI*file\fP\fB, int \fP\fIconvert_to_8_bit\fP\fB, const void \fP\fI*buffer\fP\fB, png_int_32 \fP\fIrow_stride\fP\fB, void \fI*colormap\fP\fB);\fP
 
@@ -239,11 +239,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.8.0.git
 
 \fBvoid png_longjmp (png_struct \fP\fI*png_ptr\fP\fB, int \fIval\fP\fB);\fP
 
-\fBvoid *png_malloc (png_struct \fP\fI*png_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
+\fBvoid *png_malloc (png_struct \fP\fI*png_ptr\fP\fB, size_t \fIsize\fP\fB);\fP
 
-\fBvoid *png_malloc_default (png_struct \fP\fI*png_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
+\fBvoid *png_malloc_default (png_struct \fP\fI*png_ptr\fP\fB, size_t \fIsize\fP\fB);\fP
 
-\fBvoid *png_malloc_warn (png_struct \fP\fI*png_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
+\fBvoid *png_malloc_warn (png_struct \fP\fI*png_ptr\fP\fB, size_t \fIsize\fP\fB);\fP
 
 \fBpng_uint_32 png_permit_mng_features (png_struct \fP\fI*png_ptr\fP\fB, png_uint_32 \fImng_features_permitted\fP\fB);\fP
 
@@ -363,7 +363,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.8.0.git
 
 \fBjmp_buf* png_set_longjmp_fn (png_struct \fP\fI*png_ptr\fP\fB, png_longjmp_ptr \fP\fIlongjmp_fn\fP\fB, size_t \fIjmp_buf_size\fP\fB);\fP
 
-\fBvoid png_set_chunk_malloc_max (png_struct \fP\fI*png_ptr\fP\fB, png_alloc_size_t \fIuser_chunk_cache_max\fP\fB);\fP
+\fBvoid png_set_chunk_malloc_max (png_struct \fP\fI*png_ptr\fP\fB, size_t \fIuser_chunk_cache_max\fP\fB);\fP
 
 \fBvoid png_set_compression_buffer_size (png_struct \fP\fI*png_ptr\fP\fB, png_uint_32 \fIsize\fP\fB);\fP
 
@@ -4640,7 +4640,7 @@ be written:
       Write the image to the named file.
 
    int png_image_write_to_memory (png_image *image, void *memory,
-      png_alloc_size_t *memory_bytes,
+      size_t *memory_bytes,
       int convert_to_8_bit, const void *buffer, ptrdiff_t row_stride,
       const void *colormap));
 
@@ -4696,7 +4696,7 @@ provide a void pointer that can be retrieved via
 
 Your replacement memory functions must have prototypes as follows:
 
-    void *malloc_fn(png_struct *png_ptr, png_alloc_size_t size);
+    void *malloc_fn(png_struct *png_ptr, size_t size);
 
     void free_fn(png_struct *png_ptr, void *ptr);
 

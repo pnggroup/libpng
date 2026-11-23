@@ -843,7 +843,7 @@ PNG_FUNCTION(void, (*png_longjmp_ptr), (jmp_buf, int), typedef);
  * following.
  */
 typedef PNG_CALLBACK(void *, *png_malloc_ptr,
-   (png_struct *, png_alloc_size_t));
+   (png_struct *, size_t));
 typedef PNG_CALLBACK(void, *png_free_ptr,
    (png_struct *, void *));
 
@@ -1744,16 +1744,16 @@ PNG_EXPORT(void, png_progressive_combine_row,
 #endif /* PROGRESSIVE_READ */
 
 PNG_EXPORTA(void *, png_malloc,
-   (const png_struct *png_ptr, png_alloc_size_t size),
+   (const png_struct *png_ptr, size_t size),
    PNG_ALLOCATED);
 /* Added at libpng version 1.4.0 */
 PNG_EXPORTA(void *, png_calloc,
-   (const png_struct *png_ptr, png_alloc_size_t size),
+   (const png_struct *png_ptr, size_t size),
    PNG_ALLOCATED);
 
 /* Added at libpng version 1.2.4 */
 PNG_EXPORTA(void *, png_malloc_warn,
-   (const png_struct *png_ptr, png_alloc_size_t size),
+   (const png_struct *png_ptr, size_t size),
    PNG_ALLOCATED);
 
 /* Frees a pointer allocated by png_malloc() */
@@ -1797,7 +1797,7 @@ PNG_EXPORT(void, png_data_freer,
 
 #ifdef PNG_USER_MEM_SUPPORTED
 PNG_EXPORTA(void *, png_malloc_default,
-   (const png_struct *png_ptr, png_alloc_size_t size),
+   (const png_struct *png_ptr, size_t size),
    PNG_ALLOCATED PNG_DEPRECATED);
 PNG_EXPORTA(void, png_free_default,
    (const png_struct *png_ptr, void *ptr),
@@ -2547,8 +2547,8 @@ PNG_EXPORT(png_uint_32, png_get_chunk_cache_max,
    (const png_struct *png_ptr));
 /* Added in libpng-1.4.1 */
 PNG_EXPORT(void, png_set_chunk_malloc_max,
-   (png_struct *png_ptr, png_alloc_size_t user_chunk_cache_max));
-PNG_EXPORT(png_alloc_size_t, png_get_chunk_malloc_max,
+   (png_struct *png_ptr, size_t user_chunk_cache_max));
+PNG_EXPORT(size_t, png_get_chunk_malloc_max,
    (const png_struct *png_ptr));
 #endif
 
@@ -3277,7 +3277,7 @@ PNG_EXPORT(int, png_image_write_to_stdio,
 
 PNG_EXPORT(int, png_image_write_to_memory,
    (png_image *image,
-    void *memory, png_alloc_size_t *memory_bytes, int convert_to_8_bit,
+    void *memory, size_t *memory_bytes, int convert_to_8_bit,
     const void *buffer, png_int_32 row_stride, const void *colormap));
    /* Write the image to the given memory buffer.  The function both writes the
     * whole PNG data stream to *memory and updates *memory_bytes with the count
@@ -3341,7 +3341,7 @@ PNG_EXPORT(int, png_image_write_to_memory,
 #endif
 
 #define PNG_IMAGE_COMPRESSED_SIZE_MAX(image)\
-   PNG_ZLIB_MAX_SIZE((png_alloc_size_t)PNG_IMAGE_DATA_SIZE(image))
+   PNG_ZLIB_MAX_SIZE((size_t)PNG_IMAGE_DATA_SIZE(image))
    /* An upper bound on the size of the data in the PNG IDAT chunks. */
 
 #define PNG_IMAGE_PNG_SIZE_MAX_(image, image_size)\
@@ -3360,9 +3360,9 @@ PNG_EXPORT(int, png_image_write_to_memory,
 #define PNG_IMAGE_PNG_SIZE_MAX(image)\
    PNG_IMAGE_PNG_SIZE_MAX_(image, PNG_IMAGE_COMPRESSED_SIZE_MAX(image))
    /* An upper bound on the total length of the PNG data stream for 'image'.
-    * The result is of type png_alloc_size_t, on 32-bit systems this may
-    * overflow even though PNG_IMAGE_DATA_SIZE does not overflow; the write will
-    * run out of buffer space but return a corrected size which should work.
+    * The result is of type size_t.  On 32-bit systems this may overflow,
+    * even though PNG_IMAGE_DATA_SIZE does not overflow; the write will run
+    * out of buffer space but return a corrected size which should work.
     */
 #endif /* SIMPLIFIED_WRITE */
 /*******************************************************************************

@@ -897,7 +897,7 @@ PNG_INTERNAL_FUNCTION(int, png_user_version_check,
  * png_error (although that would be a bug in the application implementation.)
  */
 PNG_INTERNAL_FUNCTION(void *, png_malloc_base,
-   (const png_struct *png_ptr, png_alloc_size_t size),
+   (const png_struct *png_ptr, size_t size),
    PNG_ALLOCATED);
 
 #if defined(PNG_TEXT_SUPPORTED) || defined(PNG_sPLT_SUPPORTED) ||\
@@ -1042,7 +1042,7 @@ PNG_INTERNAL_FUNCTION(void, png_write_PLTE,
 
 PNG_INTERNAL_FUNCTION(void, png_compress_IDAT,
    (png_struct *png_ptr,
-    const png_byte *row_data, png_alloc_size_t row_data_length, int flush),
+    const png_byte *row_data, size_t row_data_length, int flush),
    PNG_EMPTY);
 
 PNG_INTERNAL_FUNCTION(void, png_write_IEND,
@@ -1324,7 +1324,7 @@ PNG_INTERNAL_FUNCTION(void, png_write_find_filter,
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 PNG_INTERNAL_FUNCTION(void, png_read_IDAT_data,
-   (png_struct *png_ptr, png_byte *output, png_alloc_size_t avail_out),
+   (png_struct *png_ptr, png_byte *output, size_t avail_out),
    PNG_EMPTY);
    /* Read 'avail_out' bytes of data from the IDAT stream.  If the output buffer
     * is NULL the function checks, instead, for the end of the stream.  In this
@@ -1552,7 +1552,7 @@ PNG_INTERNAL_FUNCTION(void, png_write_fcTL,
     png_byte dispose_op, png_byte blend_op),
    PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void, png_write_fdAT,
-   (png_struct *png_ptr, const png_byte *data, png_size_t length),
+   (png_struct *png_ptr, const png_byte *data, size_t length),
    PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void, png_write_reset,
    (png_struct *png_ptr),
@@ -1630,7 +1630,7 @@ PNG_INTERNAL_FUNCTION(size_t, png_safecat,
  * does unsigned values.
  */
 PNG_INTERNAL_FUNCTION(char *, png_format_number,
-   (const char *start, char *end, int format, png_alloc_size_t number),
+   (const char *start, char *end, int format, size_t number),
    PNG_EMPTY);
 
 /* Convenience macro that takes an array: */
@@ -1670,10 +1670,10 @@ PNG_INTERNAL_FUNCTION(void, png_warning_parameter,
     * including the trailing '\0'.
     */
 PNG_INTERNAL_FUNCTION(void, png_warning_parameter_unsigned,
-   (png_warning_parameters p, int number, int format, png_alloc_size_t value),
+   (png_warning_parameters p, int number, int format, size_t value),
    PNG_EMPTY);
-   /* Use png_alloc_size_t because it is an unsigned type as big as any we
-    * need to output.  Use the following for a signed value.
+   /* Use size_t because it is an unsigned type as big as any we need to
+    * output.  Use the following for a signed value.
     */
 PNG_INTERNAL_FUNCTION(void, png_warning_parameter_signed,
    (png_warning_parameters p, int number, int format, png_int_32 value),

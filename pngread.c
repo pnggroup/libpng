@@ -4226,10 +4226,6 @@ png_image_finish_read(png_image *image, const png_color *background,
              * And the component size is always 1 or 2, so make sure that the
              * number of *bytes* that the application is saying are available
              * does actually fit into a 32-bit number.
-             *
-             * NOTE: this will be changed in 1.7 because PNG_IMAGE_BUFFER_SIZE
-             * will be changed to use png_alloc_size_t; bigger images can be
-             * accommodated on 64-bit systems.
              */
             if (image->height <=
                 0xffffffffU/PNG_IMAGE_PIXEL_COMPONENT_SIZE(image->format)/check)

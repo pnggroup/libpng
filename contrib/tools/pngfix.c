@@ -143,7 +143,7 @@ typedef const png_uint_16 *uarbc;
     */
 
 static int
-uarb_set(uarb result, png_alloc_size_t val)
+uarb_set(uarb result, size_t val)
    /* Set (initialize) 'result' to 'val'.  The size required for 'result' must
     * be determined by the caller from a knowledge of the maximum for 'val'.
     */

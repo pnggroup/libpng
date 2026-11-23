@@ -1,6 +1,6 @@
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Copyright (c) 2021-2025 Cosmin Truta
+ * Copyright (c) 2021-2026 Cosmin Truta
  * Copyright (c) 2014-2017 John Cunningham Bowler
  *
  * This code is released under the libpng license.
@@ -665,15 +665,15 @@ typedef struct store_pool
    png_byte             mark[4]; /* Before and after data */
 
    /* Statistics for this run. */
-   png_alloc_size_t     max;     /* Maximum single allocation */
-   png_alloc_size_t     current; /* Current allocation */
-   png_alloc_size_t     limit;   /* Highest current allocation */
-   png_alloc_size_t     total;   /* Total allocation */
+   size_t               max;     /* Maximum single allocation */
+   size_t               current; /* Current allocation */
+   size_t               limit;   /* Highest current allocation */
+   size_t               total;   /* Total allocation */
 
    /* Overall statistics (retained across successive runs). */
-   png_alloc_size_t     max_max;
-   png_alloc_size_t     max_limit;
-   png_alloc_size_t     max_total;
+   size_t               max_max;
+   size_t               max_limit;
+   size_t               max_total;
 } store_pool;
 
 typedef struct png_store
@@ -1726,7 +1726,7 @@ typedef struct store_memory
 {
    store_pool          *pool;    /* Originating pool */
    struct store_memory *next;    /* Singly linked list */
-   png_alloc_size_t     size;    /* Size of memory allocated */
+   size_t               size;    /* Size of memory allocated */
    png_byte             mark[4]; /* ID marker */
 } store_memory;
 
@@ -1766,7 +1766,7 @@ store_memory_free(const png_struct *pp, store_pool *pool, store_memory *memory)
    /* It should be safe to read the size field now. */
    else
    {
-      png_alloc_size_t cb = memory->size;
+      size_t cb = memory->size;
 
       if (cb > pool->max)
          store_pool_error(pool->store, pp, "memory corrupted (size)");
@@ -1837,7 +1837,7 @@ store_pool_delete(png_store *ps, store_pool *pool)
 
 /* The memory callbacks: */
 static void *
-store_malloc(png_struct *ppIn, png_alloc_size_t cb)
+store_malloc(png_struct *ppIn, size_t cb)
 {
    const png_struct *pp = ppIn;
    store_pool *pool = voidcast(store_pool*, png_get_mem_ptr(pp));

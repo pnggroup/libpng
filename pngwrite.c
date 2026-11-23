@@ -1129,7 +1129,7 @@ png_set_filter(png_struct *png_ptr, int method, int filters)
       if (png_ptr->row_buf != NULL)
       {
          int num_filters;
-         png_alloc_size_t buf_size;
+         size_t buf_size;
 
          /* Repeat the checks in png_write_start_row; 1 pixel high or wide
           * images cannot benefit from certain filters.  If this isn't done here
@@ -1602,8 +1602,8 @@ typedef struct
 
    /* Byte count for memory writing */
    png_byte *memory;
-   png_alloc_size_t memory_bytes; /* not used for STDIO */
-   png_alloc_size_t output_bytes; /* running total */
+   size_t memory_bytes;    /* not used for STDIO */
+   size_t output_bytes;    /* running total */
 } png_image_write_control;
 
 /* Write png_uint_16 input to a 16-bit PNG; the png_ptr has already been set to
@@ -2252,10 +2252,10 @@ image_memory_write(png_struct *png_ptr, png_byte *data, size_t size)
 {
    png_image_write_control *display = png_voidcast(png_image_write_control*,
        png_ptr->io_ptr/*backdoor: png_get_io_ptr(png_ptr)*/);
-   png_alloc_size_t ob = display->output_bytes;
+   size_t ob = display->output_bytes;
 
    /* Check for overflow; this should never happen: */
-   if (size <= ((png_alloc_size_t)-1) - ob)
+   if (size <= ((size_t)-1) - ob)
    {
       /* I don't think libpng ever does this, but just in case: */
       if (size > 0)
@@ -2296,7 +2296,7 @@ png_image_write_memory(void *argument)
 
 int
 png_image_write_to_memory(png_image *image, void *memory,
-    png_alloc_size_t *memory_bytes, int convert_to_8bit, const void *buffer,
+    size_t *memory_bytes, int convert_to_8bit, const void *buffer,
     png_int_32 row_stride, const void *colormap)
 {
    /* Write the image to the given buffer, or count the bytes if it is NULL */

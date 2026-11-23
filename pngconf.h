@@ -405,21 +405,15 @@
 #  error libpng requires an unsigned 32-bit (or longer) integer type
 #endif
 
-/* Prior to 1.6.0, it was possible to disable the use of size_t and ptrdiff_t.
- * From 1.6.0 onwards, an ISO C90 compiler, as well as a standard-compliant
- * behavior of sizeof and ptrdiff_t are required.
- * The legacy typedefs are provided here for backwards compatibility.
- */
-typedef size_t png_size_t;
-typedef ptrdiff_t png_ptrdiff_t;
-
-/* TODO: Deprecate this. */
-typedef size_t png_alloc_size_t;
-
 /* Typedef for floating-point numbers that are converted to fixed-point with a
  * multiple of 100,000, e.g., gamma
  */
 typedef png_int_32 png_fixed_point;
+
+/* [Deprecated] */
+typedef size_t    png_alloc_size_t;
+typedef size_t    png_size_t;
+typedef ptrdiff_t png_ptrdiff_t;
 
 /* [Deprecated] */
 typedef void                  *png_voidp;

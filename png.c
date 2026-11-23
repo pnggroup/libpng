@@ -101,7 +101,7 @@ PNG_FUNCTION(voidpf /* PRIVATE */,
 png_zalloc,(voidpf png_ptr, uInt items, uInt size),
     PNG_ALLOCATED)
 {
-   png_alloc_size_t num_bytes = size;
+   size_t num_bytes = size;
 
    if (png_ptr == NULL)
       return NULL;
@@ -112,7 +112,7 @@ png_zalloc,(voidpf png_ptr, uInt items, uInt size),
     * prevention against programming errors inside zlib, although it
     * should rather be a debug-time assertion instead.
     */
-   if (size != 0 && items >= (~(png_alloc_size_t)0) / size)
+   if (size != 0 && items >= (~(size_t)0) / size)
    {
       png_warning(png_voidcast(png_struct *, png_ptr),
                   "Potential overflow in png_zalloc()");
@@ -1487,14 +1487,14 @@ png_icc_tag_name(char *name, png_uint_32 tag)
 }
 
 static int
-is_ICC_signature_char(png_alloc_size_t it)
+is_ICC_signature_char(size_t it)
 {
    return it == 32 || (it >= 48 && it <= 57) || (it >= 65 && it <= 90) ||
       (it >= 97 && it <= 122);
 }
 
 static int
-is_ICC_signature(png_alloc_size_t it)
+is_ICC_signature(size_t it)
 {
    return is_ICC_signature_char(it >> 24) /* checks all the top bits */ &&
       is_ICC_signature_char((it >> 16) & 0xff) &&
@@ -1504,7 +1504,7 @@ is_ICC_signature(png_alloc_size_t it)
 
 static int
 png_icc_profile_error(const png_struct *png_ptr, const char *name,
-   png_alloc_size_t value, const char *reason)
+   size_t value, const char *reason)
 {
    size_t pos;
    char message[196]; /* see below for calculation */
@@ -1947,13 +1947,12 @@ png_check_IHDR(const png_struct *png_ptr,
 
    /* The bit mask on the first line below must be at least as big as a
     * png_uint_32.  "~7U" is not adequate on 16-bit systems because it will
-    * be an unsigned 16-bit value.  Casting to (png_alloc_size_t) makes the
-    * type of the result at least as bit (in bits) as the RHS of the > operator
-    * which also avoids a common warning on 64-bit systems that the comparison
-    * of (png_uint_32) against the constant value on the RHS will always be
-    * false.
+    * be an unsigned 16-bit value.  Casting to (size_t) makes the type of the
+    * result at least as big (in bits) as the RHS of the > operator, which
+    * also avoids a common warning on 64-bit systems that the comparison of
+    * (png_uint_32) against the constant value on the RHS will always be false.
     */
-   if (((width + 7) & ~(png_alloc_size_t)7) >
+   if (((width + 7) & ~(size_t)7) >
        (((PNG_SIZE_MAX
            - 48        /* big_row_buf hack */
            - 1)        /* filter byte */

@@ -395,7 +395,7 @@ struct display
    /* Used on a read, both the original read and when validating a written
     * image.
     */
-   png_alloc_size_t read_size;
+   size_t           read_size;
    png_struct      *read_pp;
    png_info        *ip;
 #  if defined PNG_TEXT_SUPPORTED
@@ -412,13 +412,13 @@ struct display
 #  endif /* PNGCP_TIMING */
 
    /* Used to write a new image (the original info_ptr is used) */
-#  define MAX_SIZE ((png_alloc_size_t)(-1))
-   png_alloc_size_t write_size;
-   png_alloc_size_t best_size;
+#  define MAX_SIZE ((size_t)(-1))
+   size_t           write_size;
+   size_t           best_size;
    png_struct      *write_pp;
 
    /* Base file information */
-   png_alloc_size_t size;
+   size_t           size;
    png_uint_32      w;
    png_uint_32      h;
    int              bpp;
@@ -454,9 +454,9 @@ struct display
                                         */
    struct stack
    {
-      png_alloc_size_t best_size;      /* Best so far for this option */
-      png_alloc_size_t lo_size;
-      png_alloc_size_t hi_size;
+      size_t           best_size;      /* Best so far for this option */
+      size_t           lo_size;
+      size_t           hi_size;
       int              lo, hi;         /* For binary chop of a range */
       int              best_val;       /* Best value found so far */
       int              opt_string_end; /* End of the option string in 'curr' */
@@ -931,7 +931,7 @@ next_opt(struct display *dp, unsigned int sp)
       else
       {
          /* This is the best size found for this option value: */
-         png_alloc_size_t best_size = dp->stack[sp].best_size;
+         size_t best_size = dp->stack[sp].best_size;
          int lo = dp->stack[sp].lo;
          int hi = dp->stack[sp].hi;
          int val = dp->value[opt];
@@ -964,8 +964,8 @@ next_opt(struct display *dp, unsigned int sp)
 
          else
          {
-            png_alloc_size_t lo_size = dp->stack[sp].lo_size;
-            png_alloc_size_t hi_size = dp->stack[sp].hi_size;
+            size_t lo_size = dp->stack[sp].lo_size;
+            size_t hi_size = dp->stack[sp].hi_size;
 
             /* lo and hi should have been tested. */
             assert(lo_size < MAX_SIZE && hi_size < MAX_SIZE);
@@ -1886,7 +1886,7 @@ read_png(struct display *dp, const char *filename)
        * first call to png_set_IHDR, which should have happened by now, but just
        * in case:
        */
-      png_alloc_size_t rb = png_get_rowbytes(dp->read_pp, dp->ip);
+      size_t rb = png_get_rowbytes(dp->read_pp, dp->ip);
 
       if (rb == 0)
          png_error(dp->read_pp, "invalid row byte count from libpng");

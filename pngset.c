@@ -2033,8 +2033,7 @@ png_set_chunk_cache_max(png_struct *png_ptr, png_uint_32 user_chunk_cache_max)
 
 /* This function was added to libpng 1.4.1 */
 void
-png_set_chunk_malloc_max(png_struct *png_ptr,
-    png_alloc_size_t user_chunk_malloc_max)
+png_set_chunk_malloc_max(png_struct *png_ptr, size_t user_chunk_malloc_max)
 {
    png_debug(1, "in png_set_chunk_malloc_max");
 

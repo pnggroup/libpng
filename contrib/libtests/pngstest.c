@@ -3274,7 +3274,7 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
 
    else /* use memory */
    {
-      png_alloc_size_t size;
+      size_t size;
 
       if (png_image_write_get_memory_size(image->image, size, convert_to_8bit,
                image->buffer+16, (png_int_32)image->stride, image->colormap))

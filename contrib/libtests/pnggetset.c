@@ -575,7 +575,7 @@ typedef struct
 } mem_buf;
 
 static void PNGCBAPI
-mem_write(png_structp png_ptr, png_bytep buf, png_size_t length)
+mem_write(png_structp png_ptr, png_bytep buf, size_t length)
 {
    mem_buf *mb = (mem_buf *)png_get_io_ptr(png_ptr);
 
@@ -593,7 +593,7 @@ mem_flush(png_structp png_ptr)
 }
 
 static void PNGCBAPI
-mem_read(png_structp png_ptr, png_bytep buf, png_size_t length)
+mem_read(png_structp png_ptr, png_bytep buf, size_t length)
 {
    mem_buf *mb = (mem_buf *)png_get_io_ptr(png_ptr);
 

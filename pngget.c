@@ -1,6 +1,6 @@
 /* pngget.c - retrieval of values from info struct
  *
- * Copyright (c) 2018-2025 Cosmin Truta
+ * Copyright (c) 2018-2026 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -1321,7 +1321,7 @@ png_get_chunk_cache_max(const png_struct *png_ptr)
 }
 
 /* This function was added to libpng 1.4.1 */
-png_alloc_size_t
+size_t
 png_get_chunk_malloc_max(const png_struct *png_ptr)
 {
    return (png_ptr ? png_ptr->user_chunk_malloc_max : 0);

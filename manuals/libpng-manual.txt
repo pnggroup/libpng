@@ -4133,7 +4133,7 @@ be written:
       Write the image to the named file.
 
    int png_image_write_to_memory (png_image *image, void *memory,
-      png_alloc_size_t *memory_bytes,
+      size_t *memory_bytes,
       int convert_to_8_bit, const void *buffer, ptrdiff_t row_stride,
       const void *colormap));
 
@@ -4189,7 +4189,7 @@ provide a void pointer that can be retrieved via
 
 Your replacement memory functions must have prototypes as follows:
 
-    void *malloc_fn(png_struct *png_ptr, png_alloc_size_t size);
+    void *malloc_fn(png_struct *png_ptr, size_t size);
 
     void free_fn(png_struct *png_ptr, void *ptr);
 

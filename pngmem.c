@@ -41,7 +41,7 @@ png_destroy_png_struct(png_struct *png_ptr)
 
 /* Allocate memory and set it to zero. */
 PNG_FUNCTION(void *,
-png_calloc,(const png_struct *png_ptr, png_alloc_size_t size),
+png_calloc,(const png_struct *png_ptr, size_t size),
     PNG_ALLOCATED)
 {
    void *ret;
@@ -60,7 +60,7 @@ png_calloc,(const png_struct *png_ptr, png_alloc_size_t size),
  * if the allocation cannot be done (for any reason.)
  */
 PNG_FUNCTION(void * /* PRIVATE */,
-png_malloc_base,(const png_struct *png_ptr, png_alloc_size_t size),
+png_malloc_base,(const png_struct *png_ptr, size_t size),
     PNG_ALLOCATED)
 {
 #  ifdef PNG_USER_MEM_SUPPORTED
@@ -84,7 +84,7 @@ static void *
 png_malloc_array_checked(const png_struct *png_ptr, int nelements,
     size_t element_size)
 {
-   png_alloc_size_t req = (png_alloc_size_t)nelements; /* known to be > 0 */
+   size_t req = (size_t)nelements; /* known to be > 0 */
 
    if (req <= PNG_SIZE_MAX/element_size)
       return png_malloc_base(png_ptr, req * element_size);
@@ -146,7 +146,7 @@ png_realloc_array,(const png_struct *png_ptr, const void *old_array,
  * function png_malloc_default is also provided.
  */
 PNG_FUNCTION(void *,
-png_malloc,(const png_struct *png_ptr, png_alloc_size_t size),
+png_malloc,(const png_struct *png_ptr, size_t size),
     PNG_ALLOCATED)
 {
    void *ret;
@@ -164,7 +164,7 @@ png_malloc,(const png_struct *png_ptr, png_alloc_size_t size),
 
 #ifdef PNG_USER_MEM_SUPPORTED
 PNG_FUNCTION(void *,
-png_malloc_default,(const png_struct *png_ptr, png_alloc_size_t size),
+png_malloc_default,(const png_struct *png_ptr, size_t size),
     PNG_ALLOCATED PNG_DEPRECATED)
 {
    void *ret;
@@ -187,7 +187,7 @@ png_malloc_default,(const png_struct *png_ptr, png_alloc_size_t size),
  * png_error, if it fails to allocate the requested memory.
  */
 PNG_FUNCTION(void *,
-png_malloc_warn,(const png_struct *png_ptr, png_alloc_size_t size),
+png_malloc_warn,(const png_struct *png_ptr, size_t size),
     PNG_ALLOCATED)
 {
    if (png_ptr != NULL)

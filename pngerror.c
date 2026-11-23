@@ -1,6 +1,6 @@
 /* pngerror.c - functions for warnings and error handling
  *
- * Copyright (c) 2018-2025 Cosmin Truta
+ * Copyright (c) 2018-2026 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -103,8 +103,7 @@ png_safecat(char *buffer, size_t bufsize, size_t pos,
  * Returns the pointer to the start of the formatted string.
  */
 char *
-png_format_number(const char *start, char *end, int format,
-    png_alloc_size_t number)
+png_format_number(const char *start, char *end, int format, size_t number)
 {
    int count = 0;    /* number of digits output */
    int mincount = 1; /* minimum number required */
@@ -207,7 +206,7 @@ png_warning_parameter(png_warning_parameters p, int number,
 
 void
 png_warning_parameter_unsigned(png_warning_parameters p, int number, int format,
-    png_alloc_size_t value)
+    size_t value)
 {
    char buffer[PNG_NUMBER_BUFFER_SIZE] = {0};
    png_warning_parameter(p, number, PNG_FORMAT_NUMBER(buffer, format, value));
@@ -217,12 +216,12 @@ void
 png_warning_parameter_signed(png_warning_parameters p, int number, int format,
     png_int_32 value)
 {
-   png_alloc_size_t u;
+   size_t u;
    char *str;
    char buffer[PNG_NUMBER_BUFFER_SIZE] = {0};
 
-   /* Avoid overflow by doing the negate in a png_alloc_size_t: */
-   u = (png_alloc_size_t)value;
+   /* Avoid overflow by doing the negate in a size_t. */
+   u = (size_t)value;
    if (value < 0)
       u = ~u + 1;
 
