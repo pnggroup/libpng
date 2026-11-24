@@ -34,3 +34,4 @@ jobs:
         env:
           CI_MAKE_FLAGS: -j2
           CI_SANITIZERS: address,undefined
+          UBSAN_OPTIONS: halt_on_error=1
