@@ -492,8 +492,11 @@ png_set_pCAL(const png_struct *png_ptr, png_info *info_ptr,
     const char *purpose, png_int_32 X0, png_int_32 X1, int type,
     int nparams, const char *units, char **params)
 {
+   char *new_purpose;
+   char *new_units;
+   char **new_params;
    size_t length;
-   int i;
+   int i, j;
 
    png_debug1(1, "in %s storage function", "pCAL");
 
@@ -534,17 +537,87 @@ png_set_pCAL(const png_struct *png_ptr, png_info *info_ptr,
       }
    }
 
-   info_ptr->pcal_purpose = png_voidcast(char *,
+   /* Allocate and fill the replacement values before releasing the
+    * values currently stored in info_ptr, in the same order as
+    * png_set_iCCP and png_set_eXIf_1.  Repeated calls therefore replace
+    * the previous pCAL data instead of leaking it, an allocation failure
+    * leaves the previous data intact, and the arguments stay readable
+    * throughout in case they point into the stored data (getter-to-setter
+    * aliasing).
+    */
+   new_purpose = png_voidcast(char *,
        png_malloc_warn(png_ptr, length));
 
-   if (info_ptr->pcal_purpose == NULL)
+   if (new_purpose == NULL)
    {
       png_chunk_report(png_ptr, "Insufficient memory for pCAL purpose",
             PNG_CHUNK_WRITE_ERROR);
       return;
    }
 
-   memcpy(info_ptr->pcal_purpose, purpose, length);
+   memcpy(new_purpose, purpose, length);
+
+   length = strlen(units) + 1;
+   png_debug1(3, "allocating units for info (%lu bytes)",
+       (unsigned long)length);
+
+   new_units = png_voidcast(char *,
+       png_malloc_warn(png_ptr, length));
+
+   if (new_units == NULL)
+   {
+      png_free(png_ptr, new_purpose);
+      png_warning(png_ptr, "Insufficient memory for pCAL units");
+      return;
+   }
+
+   memcpy(new_units, units, length);
+
+   new_params = png_voidcast(char **, png_malloc_warn(png_ptr,
+       (size_t)(((unsigned int)nparams + 1) * (sizeof (char *)))));
+
+   if (new_params == NULL)
+   {
+      png_free(png_ptr, new_units);
+      png_free(png_ptr, new_purpose);
+      png_warning(png_ptr, "Insufficient memory for pCAL params");
+      return;
+   }
+
+   memset(new_params, 0, ((unsigned int)nparams + 1) *
+       (sizeof (char *)));
+
+   for (i = 0; i < nparams; i++)
+   {
+      length = strlen(params[i]) + 1;
+      png_debug2(3, "allocating parameter %d for info (%lu bytes)", i,
+          (unsigned long)length);
+
+      new_params[i] = (char *)png_malloc_warn(png_ptr, length);
+
+      if (new_params[i] == NULL)
+      {
+         for (j = 0; j < i; j++)
+            png_free(png_ptr, new_params[j]);
+
+         png_free(png_ptr, new_params);
+         png_free(png_ptr, new_units);
+         png_free(png_ptr, new_purpose);
+         png_warning(png_ptr, "Insufficient memory for pCAL parameter");
+         return;
+      }
+
+      memcpy(new_params[i], params[i], length);
+   }
+
+   /* The replacement values are complete; release the previous pCAL
+    * data.  This must precede the assignment of pcal_nparams below,
+    * because png_free_data releases the stored parameter strings
+    * according to the count of the data being replaced.
+    */
+   png_free_data(png_ptr, info_ptr, PNG_FREE_PCAL, 0);
+
+   info_ptr->pcal_purpose = new_purpose;
 
    info_ptr->free_me |= PNG_FREE_PCAL;
 
@@ -554,49 +627,8 @@ png_set_pCAL(const png_struct *png_ptr, png_info *info_ptr,
    info_ptr->pcal_type = (png_byte)type;
    info_ptr->pcal_nparams = (png_byte)nparams;
 
-   length = strlen(units) + 1;
-   png_debug1(3, "allocating units for info (%lu bytes)",
-       (unsigned long)length);
-
-   info_ptr->pcal_units = png_voidcast(char *,
-       png_malloc_warn(png_ptr, length));
-
-   if (info_ptr->pcal_units == NULL)
-   {
-      png_warning(png_ptr, "Insufficient memory for pCAL units");
-      return;
-   }
-
-   memcpy(info_ptr->pcal_units, units, length);
-
-   info_ptr->pcal_params = png_voidcast(char **, png_malloc_warn(png_ptr,
-       (size_t)(((unsigned int)nparams + 1) * (sizeof (char *)))));
-
-   if (info_ptr->pcal_params == NULL)
-   {
-      png_warning(png_ptr, "Insufficient memory for pCAL params");
-      return;
-   }
-
-   memset(info_ptr->pcal_params, 0, ((unsigned int)nparams + 1) *
-       (sizeof (char *)));
-
-   for (i = 0; i < nparams; i++)
-   {
-      length = strlen(params[i]) + 1;
-      png_debug2(3, "allocating parameter %d for info (%lu bytes)", i,
-          (unsigned long)length);
-
-      info_ptr->pcal_params[i] = (char *)png_malloc_warn(png_ptr, length);
-
-      if (info_ptr->pcal_params[i] == NULL)
-      {
-         png_warning(png_ptr, "Insufficient memory for pCAL parameter");
-         return;
-      }
-
-      memcpy(info_ptr->pcal_params[i], params[i], length);
-   }
+   info_ptr->pcal_units = new_units;
+   info_ptr->pcal_params = new_params;
 
    info_ptr->valid |= PNG_INFO_pCAL;
 }
@@ -607,6 +639,8 @@ void
 png_set_sCAL_s(const png_struct *png_ptr, png_info *info_ptr,
     int unit, const char *swidth, const char *sheight)
 {
+   char *new_s_width;
+   char *new_s_height;
    size_t lengthw = 0, lengthh = 0;
 
    png_debug1(1, "in %s storage function", "sCAL");
@@ -628,41 +662,55 @@ png_set_sCAL_s(const png_struct *png_ptr, png_info *info_ptr,
        sheight[0] == 45 /* '-' */ || !png_check_fp_string(sheight, lengthh))
       png_error(png_ptr, "Invalid sCAL height");
 
-   info_ptr->scal_unit = (png_byte)unit;
-
    ++lengthw;
 
    png_debug1(3, "allocating unit for info (%u bytes)", (unsigned int)lengthw);
 
-   info_ptr->scal_s_width = png_voidcast(char *,
+   /* Allocate and fill the replacement strings before releasing the
+    * ones currently stored in info_ptr, in the same order as
+    * png_set_iCCP and png_set_eXIf_1.  Repeated calls therefore replace
+    * the previous sCAL data instead of leaking it, an allocation failure
+    * leaves the previous data intact, and the arguments stay readable
+    * throughout in case they point into the stored data (getter-to-setter
+    * aliasing).
+    */
+   new_s_width = png_voidcast(char *,
        png_malloc_warn(png_ptr, lengthw));
 
-   if (info_ptr->scal_s_width == NULL)
+   if (new_s_width == NULL)
    {
       png_warning(png_ptr, "Memory allocation failed while processing sCAL");
 
       return;
    }
 
-   memcpy(info_ptr->scal_s_width, swidth, lengthw);
+   memcpy(new_s_width, swidth, lengthw);
 
    ++lengthh;
 
    png_debug1(3, "allocating unit for info (%u bytes)", (unsigned int)lengthh);
 
-   info_ptr->scal_s_height = png_voidcast(char *,
+   new_s_height = png_voidcast(char *,
        png_malloc_warn(png_ptr, lengthh));
 
-   if (info_ptr->scal_s_height == NULL)
+   if (new_s_height == NULL)
    {
-      png_free(png_ptr, info_ptr->scal_s_width);
-      info_ptr->scal_s_width = NULL;
+      png_free(png_ptr, new_s_width);
 
       png_warning(png_ptr, "Memory allocation failed while processing sCAL");
       return;
    }
 
-   memcpy(info_ptr->scal_s_height, sheight, lengthh);
+   memcpy(new_s_height, sheight, lengthh);
+
+   /* The replacement strings are complete; release the previous sCAL
+    * data before installing them.
+    */
+   png_free_data(png_ptr, info_ptr, PNG_FREE_SCAL, 0);
+
+   info_ptr->scal_unit = (png_byte)unit;
+   info_ptr->scal_s_width = new_s_width;
+   info_ptr->scal_s_height = new_s_height;
 
    info_ptr->free_me |= PNG_FREE_SCAL;
    info_ptr->valid |= PNG_INFO_sCAL;
