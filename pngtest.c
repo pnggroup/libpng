@@ -17,7 +17,7 @@
  *
  * The program will report "FAIL" in certain legitimate cases:
  * 1) when the compression level or filter selection method is changed.
- * 2) when the maximum IDAT size (PNG_ZBUF_SIZE in png.h) is not 8192.
+ * 2) when the input file was written with a different maximum IDAT size.
  * 3) unknown unsafe-to-copy ancillary chunks or unknown critical chunks
  *    exist in the input file.
  * 4) others not listed here...
@@ -107,6 +107,9 @@
 #else /* PNG_DEBUG < 0 */
 #  error Bad PNG_DEBUG value
 #endif
+
+/* The maximum size of the IDAT chunks written by pngtest. */
+#define PNGTEST_ZBUF_SIZE 8192
 
 /* Turn on CPU timing
 #define PNGTEST_TIMING
@@ -1013,6 +1016,10 @@ test_one_file(const char *inname, const char *outname)
 #  endif
 #endif
 
+#ifdef PNG_WRITE_SUPPORTED
+   png_set_compression_buffer_size(write_ptr, PNGTEST_ZBUF_SIZE);
+#endif
+
    if (status_dots_requested == 1)
    {
 #ifdef PNG_WRITE_SUPPORTED
@@ -1865,7 +1872,7 @@ test_one_file(const char *inname, const char *outname)
                fprintf(STDERR,
                    "   Was %s written with the same maximum IDAT"
                    " chunk size (%d bytes),\n",
-                   inname, PNG_ZBUF_SIZE);
+                   inname, PNGTEST_ZBUF_SIZE);
                fprintf(STDERR,
                    "   compression level (zlib default),\n");
                fprintf(STDERR,
@@ -1897,7 +1904,7 @@ test_one_file(const char *inname, const char *outname)
                fprintf(STDERR,
                    "   Was %s written with the same maximum"
                    " IDAT chunk size (%d bytes),\n",
-                    inname, PNG_ZBUF_SIZE);
+                    inname, PNGTEST_ZBUF_SIZE);
                fprintf(STDERR,
                    "   compression level (zlib default),\n");
                fprintf(STDERR,
