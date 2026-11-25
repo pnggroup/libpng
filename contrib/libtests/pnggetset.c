@@ -773,6 +773,82 @@ test_plte_palette_sync(void)
    return 0;
 }
 
+#ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
+/* Test: png_set_user_transform_info() rejects a user_transform_depth that is
+ * not 0 and not a PNG sample depth (issue #867).  The value replaces
+ * row_info->bit_depth and drives png_combine_row() iteration and row buffer
+ * sizing, so a nonstandard depth (3) or a value that silently truncates in
+ * the png_byte store (256 -> 0) must not be accepted.  Each call runs under
+ * its own setjmp because rejection is reported as a libpng error. */
+static void PNGCBAPI
+quiet_error(png_structp png_ptr, png_const_charp error_message)
+{
+   (void)error_message;
+   png_longjmp(png_ptr, 1);
+}
+
+static int
+try_user_transform_depth(int depth)
+{
+   png_structp png_ptr;
+   int errored;
+
+   png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+       NULL, quiet_error, NULL);
+   if (png_ptr == NULL)
+   {
+      fprintf(stderr, "pnggetset: png_create_write_struct failed\n");
+      return -1;
+   }
+
+   if (setjmp(png_jmpbuf(png_ptr)))
+      errored = 1;
+   else
+   {
+      png_set_user_transform_info(png_ptr, NULL, depth, 1);
+      errored = 0;
+   }
+
+   png_destroy_write_struct(&png_ptr, NULL);
+   return errored;
+}
+
+static int
+test_user_transform_depth_validation(void)
+{
+   static const int good_depths[] = { 0, 1, 2, 4, 8, 16 };
+   static const int bad_depths[] = { 3, 5, 7, 32, 255, 256, 257, -1 };
+   size_t i;
+   int r;
+
+   for (i = 0; i < sizeof good_depths / sizeof good_depths[0]; ++i)
+   {
+      r = try_user_transform_depth(good_depths[i]);
+      if (r != 0)
+      {
+         fprintf(stderr,
+             "pnggetset: depth %d was rejected%s\n", good_depths[i],
+             r < 0 ? " (struct creation failed)" : "");
+         return 1;
+      }
+   }
+
+   for (i = 0; i < sizeof bad_depths / sizeof bad_depths[0]; ++i)
+   {
+      r = try_user_transform_depth(bad_depths[i]);
+      if (r != 1)
+      {
+         fprintf(stderr,
+             "pnggetset: depth %d was accepted (error %d)\n",
+             bad_depths[i], r);
+         return 1;
+      }
+   }
+
+   return 0;
+}
+#endif
+
 int
 main(void)
 {
@@ -857,6 +933,18 @@ main(void)
    }
    else
       printf("PASS\n");
+
+#ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
+   printf("Testing user transform depth validation... ");
+   fflush(stdout);
+   if (test_user_transform_depth_validation() != 0)
+   {
+      printf("FAIL\n");
+      result = 1;
+   }
+   else
+      printf("PASS\n");
+#endif
 
    return result;
 }
