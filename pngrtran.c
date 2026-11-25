@@ -479,6 +479,18 @@ png_set_quantize(png_struct *png_ptr, png_color *palette,
    if (palette == NULL)
       return;
 
+   if (num_palette < 0 || num_palette > PNG_MAX_PALETTE_LENGTH)
+   {
+      png_warning(png_ptr, "Invalid palette length");
+      return;
+   }
+
+   if (maximum_colors <= 0 || maximum_colors > PNG_MAX_PALETTE_LENGTH)
+   {
+      png_warning(png_ptr, "Invalid maximum colors");
+      return;
+   }
+
    png_ptr->transformations |= PNG_QUANTIZE;
 
    if (full_quantize == 0)
