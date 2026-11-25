@@ -651,7 +651,7 @@ static void rpng2_win_init()
 
     /* Guard against integer overflow */
     if (rpng2_info.height > ((size_t)(-1))/rowbytes) {
-        fprintf(stderr, PROGNAME ":  image_data buffer would be too large\n",
+        fprintf(stderr, PROGNAME ":  image_data buffer would be too large\n");
         readpng2_cleanup(&rpng2_info);
         return;
     }
