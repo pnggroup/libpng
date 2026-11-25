@@ -83,6 +83,7 @@
 #     include "intel/check.h"
 #     include "mips/check.h"
 #     include "powerpc/check.h"
+#     include "riscv/check.h"
 #endif
 #endif /* PNG_TARGET_SPECIFIC_CODE_SUPPORTED */
 

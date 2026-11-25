@@ -7,24 +7,22 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  */
-
-#include "../pngpriv.h"
-
-#ifdef PNG_READ_SUPPORTED
-
-#if PNG_RISCV_RVV_IMPLEMENTATION == 1
+#define png_target_impl "riscv-rvv"
 
 #include <riscv_vector.h>
+#include "filter_rvv_intrinsics.c"
 
-#ifndef PNG_ALIGNED_MEMORY_SUPPORTED
-#  error "ALIGNED_MEMORY is required; set: -DPNG_ALIGNED_MEMORY_SUPPORTED"
-#endif
-
-void
+static void
 png_init_filter_functions_rvv(png_struct *pp, unsigned int bpp)
 {
    png_debug(1, "in png_init_filter_functions_rvv");
 
+   /* IMPORTANT: DO NOT DEFINE EXTERNAL FUNCTIONS HERE
+    *
+    * This is because external functions must be declared with
+    * PNG_INTERNAL_FUNCTION in pngpriv.h; without this the PNG_PREFIX option to
+    * the build will not work (it will not know about these symbols).
+    */
    pp->read_filter[PNG_FILTER_VALUE_UP-1] = png_read_filter_row_up_rvv;
 
    if (bpp == 3)
@@ -41,5 +39,4 @@ png_init_filter_functions_rvv(png_struct *pp, unsigned int bpp)
    }
 }
 
-#endif /* PNG_RISCV_RVV_IMPLEMENTATION == 1 */
-#endif /* PNG_READ_SUPPORTED */
+#define png_target_init_filter_functions_impl png_init_filter_functions_rvv
