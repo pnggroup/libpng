@@ -494,6 +494,9 @@ png_set_pCAL(const png_struct *png_ptr, png_info *info_ptr,
 {
    size_t length;
    int i;
+   char *new_purpose;
+   char *new_units;
+   char **new_params;
 
    png_debug1(1, "in %s storage function", "pCAL");
 
@@ -534,51 +537,46 @@ png_set_pCAL(const png_struct *png_ptr, png_info *info_ptr,
       }
    }
 
-   info_ptr->pcal_purpose = png_voidcast(char *,
+   new_purpose = png_voidcast(char *,
        png_malloc_warn(png_ptr, length));
 
-   if (info_ptr->pcal_purpose == NULL)
+   if (new_purpose == NULL)
    {
       png_chunk_report(png_ptr, "Insufficient memory for pCAL purpose",
             PNG_CHUNK_WRITE_ERROR);
       return;
    }
 
-   memcpy(info_ptr->pcal_purpose, purpose, length);
-
-   info_ptr->free_me |= PNG_FREE_PCAL;
-
-   png_debug(3, "storing X0, X1, type, and nparams in info");
-   info_ptr->pcal_X0 = X0;
-   info_ptr->pcal_X1 = X1;
-   info_ptr->pcal_type = (png_byte)type;
-   info_ptr->pcal_nparams = (png_byte)nparams;
+   memcpy(new_purpose, purpose, length);
 
    length = strlen(units) + 1;
    png_debug1(3, "allocating units for info (%lu bytes)",
        (unsigned long)length);
 
-   info_ptr->pcal_units = png_voidcast(char *,
+   new_units = png_voidcast(char *,
        png_malloc_warn(png_ptr, length));
 
-   if (info_ptr->pcal_units == NULL)
+   if (new_units == NULL)
    {
+      png_free(png_ptr, new_purpose);
       png_warning(png_ptr, "Insufficient memory for pCAL units");
       return;
    }
 
-   memcpy(info_ptr->pcal_units, units, length);
+   memcpy(new_units, units, length);
 
-   info_ptr->pcal_params = png_voidcast(char **, png_malloc_warn(png_ptr,
+   new_params = png_voidcast(char **, png_malloc_warn(png_ptr,
        (size_t)(((unsigned int)nparams + 1) * (sizeof (char *)))));
 
-   if (info_ptr->pcal_params == NULL)
+   if (new_params == NULL)
    {
+      png_free(png_ptr, new_units);
+      png_free(png_ptr, new_purpose);
       png_warning(png_ptr, "Insufficient memory for pCAL params");
       return;
    }
 
-   memset(info_ptr->pcal_params, 0, ((unsigned int)nparams + 1) *
+   memset(new_params, 0, ((unsigned int)nparams + 1) *
        (sizeof (char *)));
 
    for (i = 0; i < nparams; i++)
@@ -587,17 +585,34 @@ png_set_pCAL(const png_struct *png_ptr, png_info *info_ptr,
       png_debug2(3, "allocating parameter %d for info (%lu bytes)", i,
           (unsigned long)length);
 
-      info_ptr->pcal_params[i] = (char *)png_malloc_warn(png_ptr, length);
+      new_params[i] = (char *)png_malloc_warn(png_ptr, length);
 
-      if (info_ptr->pcal_params[i] == NULL)
+      if (new_params[i] == NULL)
       {
+         while (i > 0)
+            png_free(png_ptr, new_params[--i]);
+
+         png_free(png_ptr, new_params);
+         png_free(png_ptr, new_units);
+         png_free(png_ptr, new_purpose);
          png_warning(png_ptr, "Insufficient memory for pCAL parameter");
          return;
       }
 
-      memcpy(info_ptr->pcal_params[i], params[i], length);
+      memcpy(new_params[i], params[i], length);
    }
 
+   /* Commit the replacement only after every allocation succeeds. */
+   png_free_data(png_ptr, info_ptr, PNG_FREE_PCAL, 0);
+
+   info_ptr->pcal_purpose = new_purpose;
+   info_ptr->pcal_units = new_units;
+   info_ptr->pcal_params = new_params;
+   info_ptr->pcal_X0 = X0;
+   info_ptr->pcal_X1 = X1;
+   info_ptr->pcal_type = (png_byte)type;
+   info_ptr->pcal_nparams = (png_byte)nparams;
+   info_ptr->free_me |= PNG_FREE_PCAL;
    info_ptr->valid |= PNG_INFO_pCAL;
 }
 #endif
