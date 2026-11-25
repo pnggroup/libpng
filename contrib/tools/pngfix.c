@@ -2922,11 +2922,8 @@ get32(png_byte *buffer, int offset)
    /* Read a 32-bit value from an 8-byte circular buffer (used only below).
     */
 {
-   return
-      (buffer[ offset    & 7] << 24) +
-      (buffer[(offset+1) & 7] << 16) +
-      (buffer[(offset+2) & 7] <<  8) +
-      (buffer[(offset+3) & 7]      );
+   return PNG_U32(buffer[ offset    & 7], buffer[(offset+1) & 7],
+                  buffer[(offset+2) & 7], buffer[(offset+3) & 7]);
 }
 
 static void
