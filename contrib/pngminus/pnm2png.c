@@ -375,6 +375,9 @@ BOOL do_pnm2png (png_struct *png_ptr, png_info *info_ptr,
   /* allocate the rows using the same memory layout as libpng, and transfer
    * their ownership to libpng, with the responsibility to clean everything up;
    * please note the use of png_calloc instead of png_malloc */
+  if ((size_t) height > PNG_SIZE_MAX / sizeof (png_byte *))
+    return FALSE; /* row pointer array is too large */
+
   row_pointers = (png_byte **)
                  png_calloc (png_ptr, height * sizeof (png_byte *));
   png_set_rows (png_ptr, info_ptr, row_pointers);
