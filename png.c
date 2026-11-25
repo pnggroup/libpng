@@ -2693,7 +2693,7 @@ png_fixed(const png_struct *png_ptr, double fp, const char *text)
 {
    double r = floor(100000 * fp + .5);
 
-   if (r > 2147483647. || r < -2147483648.)
+   if (!(r >= -2147483648. && r <= 2147483647.))
       png_fixed_error(png_ptr, text);
 
 #  ifndef PNG_ERROR_TEXT_SUPPORTED
@@ -2712,7 +2712,7 @@ png_fixed_ITU(const png_struct *png_ptr, double fp, const char *text)
 {
    double r = floor(10000 * fp + .5);
 
-   if (r > 2147483647. || r < 0)
+   if (!(r >= 0. && r <= 2147483647.))
       png_fixed_error(png_ptr, text);
 
 #  ifndef PNG_ERROR_TEXT_SUPPORTED
