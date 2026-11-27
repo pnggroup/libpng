@@ -745,7 +745,7 @@ png_convert_to_rfc1123_buffer(char out[29], png_const_timep ptime)
         {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
-   if (out == NULL)
+   if (out == NULL || ptime == NULL)
       return 0;
 
    if (ptime->year > 9999 /* RFC1123 limitation */ ||
@@ -2653,7 +2653,7 @@ png_ascii_from_fixed(png_const_structrp png_ptr, png_charp ascii,
       /* Avoid overflow here on the minimum integer. */
       if (fp < 0)
       {
-         *ascii++ = 45; num = (png_uint_32)(-fp);
+         *ascii++ = 45; num = 0U - (png_uint_32)fp;
       }
       else
          num = (png_uint_32)fp;
@@ -2798,19 +2798,19 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
          png_uint_32 s16, s32, s00;
 
          if (a < 0)
-            negative = 1, A = -a;
+            negative = 1, A = 0U - (png_uint_32)a;
          else
-            A = a;
+            A = (png_uint_32)a;
 
          if (times < 0)
-            negative = !negative, T = -times;
+            negative = !negative, T = 0U - (png_uint_32)times;
          else
-            T = times;
+            T = (png_uint_32)times;
 
          if (divisor < 0)
-            negative = !negative, D = -divisor;
+            negative = !negative, D = 0U - (png_uint_32)divisor;
          else
-            D = divisor;
+            D = (png_uint_32)divisor;
 
          /* Following can't overflow because the arguments only
           * have 31 bits each, however the result may be 32 bits.
