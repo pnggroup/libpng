@@ -2831,8 +2831,12 @@ png_muldiv(png_fixed_point *res, png_fixed_point a, png_int_32 times,
                }
             }
 
-            /* Handle the rounding, without wrapping the result to 0. */
-            if (s00 >= (D >> 1) && result < 0xffffffffU)
+            /* Round to nearest, with ties away from zero, without wrapping
+             * the result to zero.
+             * The remainder s00 is less than D, so (D - s00) cannot wrap.
+             * The test (s00 >= D - s00) is equivalent to (2 * s00 >= D).
+             */
+            if (s00 >= D - s00 && result < 0xffffffffU)
                ++result;
 
             /* Check for overflow. */
