@@ -65,8 +65,8 @@ png_target_do_expand_palette_rgba8_neon(const png_uint_32 *riffled_palette,
    for (i = 0; i + pixels_per_chunk <= row_width; i += pixels_per_chunk)
    {
       uint32x4_t cur;
-      const png_byte *sp = *ssp - i;
-      png_byte *dp = *ddp - i * 4;
+      const png_byte *sp = *ssp - (size_t)i;
+      png_byte *dp = *ddp - (size_t)i * 4;
       cur = vld1q_dup_u32 (riffled_palette + *(sp - 3));
       cur = vld1q_lane_u32(riffled_palette + *(sp - 2), cur, 1);
       cur = vld1q_lane_u32(riffled_palette + *(sp - 1), cur, 2);
@@ -79,8 +79,8 @@ png_target_do_expand_palette_rgba8_neon(const png_uint_32 *riffled_palette,
     * to the correct position.
     */
    *ddp = *ddp + (pixels_per_chunk * 4 - 1);
-   *ssp = *ssp - i;
-   *ddp = *ddp - i * 4;
+   *ssp = *ssp - (size_t)i;
+   *ddp = *ddp - (size_t)i * 4;
    return i;
 }
 
@@ -106,8 +106,8 @@ png_target_do_expand_palette_rgb8_neon(const png_color *paletteIn,
    for (i = 0; i + pixels_per_chunk <= row_width; i += pixels_per_chunk)
    {
       uint8x8x3_t cur;
-      const png_byte *sp = *ssp - i;
-      const png_byte *dp = *ddp - i * 3;
+      const png_byte *sp = *ssp - (size_t)i;
+      const png_byte *dp = *ddp - (size_t)i * 3;
       cur = vld3_dup_u8(palette + *(sp - 7) * 3);
       cur = vld3_lane_u8(palette + *(sp - 6) * 3, cur, 1);
       cur = vld3_lane_u8(palette + *(sp - 5) * 3, cur, 2);
@@ -124,7 +124,7 @@ png_target_do_expand_palette_rgb8_neon(const png_color *paletteIn,
     * to the correct position.
     */
    *ddp = *ddp + (pixels_per_chunk * 3 - 1);
-   *ssp = *ssp - i;
-   *ddp = *ddp - i * 3;
+   *ssp = *ssp - (size_t)i;
+   *ddp = *ddp - (size_t)i * 3;
    return i;
 }

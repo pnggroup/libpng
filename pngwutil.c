@@ -2483,7 +2483,7 @@ png_setup_avg_row(png_struct *png_ptr, png_uint_32 bpp,
     size_t row_bytes, size_t lmins)
 {
    png_byte *rp, *dp, *pp, *lp;
-   png_uint_32 i;
+   size_t i;
    size_t sum = 0;
    unsigned int v;
 
@@ -2523,7 +2523,7 @@ png_setup_avg_row_only(png_struct *png_ptr, png_uint_32 bpp,
     size_t row_bytes)
 {
    png_byte *rp, *dp, *pp, *lp;
-   png_uint_32 i;
+   size_t i;
 
    png_ptr->try_row[0] = PNG_FILTER_VALUE_AVG;
 
