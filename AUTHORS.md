@@ -4,6 +4,7 @@ PNG REFERENCE LIBRARY AUTHORS
 This is the list of PNG Reference Library ("libpng") Contributing
 Authors, for copyright and licensing purposes.
 
+ * Aaron Elijah Mars
  * Adam Richter
  * Alexander Smorkalov
  * Andreas Dilger
