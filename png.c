@@ -2836,7 +2836,7 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
              * required shift is 31.
              */
             int bitshift = 32;
-            png_fixed_point result = 0; /* NOTE: signed */
+            png_uint_32 result = 0; /* NOTE: unsigned, may need 32 bits */
 
             while (--bitshift >= 0)
             {
@@ -2851,26 +2851,38 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
                if (s32 > d32)
                {
                   if (s00 < d00) --s32; /* carry */
-                  s32 -= d32, s00 -= d00, result += 1<<bitshift;
+                  s32 -= d32, s00 -= d00;
+                  result += (png_uint_32)1 << bitshift;
                }
 
                else
+               {
                   if (s32 == d32 && s00 >= d00)
-                     s32 = 0, s00 -= d00, result += 1<<bitshift;
+                  {
+                     s32 = 0, s00 -= d00;
+                     result += (png_uint_32)1 << bitshift;
+                  }
+               }
             }
 
-            /* Handle the rounding. */
-            if (s00 >= (D >> 1))
+            /* Handle the rounding, without wrapping the result to 0. */
+            if (s00 >= (D >> 1) && result < 0xffffffffU)
                ++result;
 
-            if (negative != 0)
-               result = -result;
-
             /* Check for overflow. */
-            if ((negative != 0 && result <= 0) ||
-                (negative == 0 && result >= 0))
+            if (result <= 0x7fffffffU)
             {
-               *res = result;
+               *res = (png_fixed_point)result;
+
+               if (negative != 0)
+                  *res = -*res;
+
+               return 1;
+            }
+
+            else if (negative != 0 && result == 0x80000000U)
+            {
+               *res = -0x7fffffff - 1;
                return 1;
             }
          }
