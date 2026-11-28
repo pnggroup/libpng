@@ -84,7 +84,7 @@ static void read_by_row(png_struct *png_ptr, png_info *info_ptr,
    /* These don't get freed on error, this is fine; the program immediately
     * exits.
     */
-   png_byte *row = NULL, display = NULL;
+   png_byte *row = NULL, *display = NULL;
    io_data io_copy;
 
    if (write_ptr != NULL)
